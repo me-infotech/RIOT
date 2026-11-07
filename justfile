@@ -5,7 +5,7 @@ info-boards:
     #!/usr/bin/env bash
     set -e
     if [ "${BOARDS+x}" = x ]; then
-        echo $BOARDS
+        printf '%s\n' "$BOARDS"
         exit 0
     fi
     riotbase="${RIOTBASE:-$PWD}"
@@ -25,7 +25,7 @@ info-emulated-boards:
     #!/usr/bin/env bash
     set -e
     if [ "${EMULATED_BOARDS+x}" = x ]; then
-        echo $EMULATED_BOARDS
+        printf '%s\n' "$EMULATED_BOARDS"
         exit 0
     fi
     riotbase="${RIOTBASE:-$PWD}"
