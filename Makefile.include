@@ -169,6 +169,10 @@ GLOBAL_GOALS += info-boards-features-blacklisted \
                 #
 
 PRIVATE_GLOBAL_GOALS := info-boards-collect \
+                        _info-boards-supported \
+                        _info-boards-features-missing \
+                        _info-boards-features-blacklisted \
+                        _info-boards-features-conflicting \
                         #
 
 ifneq (,$(filter $(GLOBAL_GOALS) $(PRIVATE_GLOBAL_GOALS),$(MAKECMDGOALS)))
@@ -1061,6 +1065,40 @@ ifneq ($(_BASELIBS_VALUE_BEFORE_USAGE),$(BASELIBS))
   $(error BASELIBS value changed)
 endif
 
+endif
+
+# The contextual information targets are forwarded through Just and then back
+# to a private Make target.  Export only the resolved state consumed by those
+# targets so the private Make process sees application-local values too.
+# Keep Make's command-line overrides as command-line overrides in the child.
+JUST_CONTEXT_GOALS := info-build info-build-json info-files info-modules \
+                      info-packages info-cpu info-features-provided \
+                      info-features-required info-features-missing \
+                      info-features-used info-kconfig-variables \
+                      info-debug-variable-% \
+                      info-toolchains-supported check-toolchain-supported \
+                      info-programmers-supported info-rust \
+                      info-boards-supported info-boards-features-missing \
+                      info-boards-features-blacklisted \
+                      info-boards-features-conflicting \
+                      info-applications-supported-boards \
+                      #
+JUST_CONTEXT_VARIABLES := \
+  BOARDS BOARDS_SUPPORTED BOARDS_UNSUPPORTED BOARD_WHITELIST BOARD_BLACKLIST \
+  BOARDSDIRS FEATURES_REQUIRED_ANY FEATURES_OPTIONAL_ONLY \
+  FEATURES_OPTIONAL_MISSING FEATURES_BLACKLIST FEATURES_USED_BLACKLISTED \
+  FEATURES_CONFLICT FEATURES_CONFLICT_MSG FEATURES_CONFLICTING \
+  ELFFILE HEXFILE BINFILE FLASHFILE FLASHER FFLAGS \
+  TERMPROG TERMFLAGS TERMENV PORT PROG_DEV \
+  DEBUGGER DEBUGGER_FLAGS DEBUGSERVER DEBUGSERVER_FLAGS \
+  DEBUGCLIENT DEBUGCLIENT_FLAGS RESET RESET_FLAGS \
+  SRCXX CXXFLAGS LINKFLAGS RUST_TARGET CARGO_PROFILE CARGO_OPTIONS \
+  TOOLCHAINS_SUPPORTED TOOLCHAINS_BLACKLIST PROGRAMMERS_SUPPORTED \
+  APPLICATION_DIRS \
+  #
+ifneq (,$(filter $(JUST_CONTEXT_GOALS),$(MAKECMDGOALS)))
+  export $(JUST_CONTEXT_VARIABLES)
+  export MAKEFLAGS MAKEOVERRIDES
 endif
 
 include $(RIOTMAKE)/cargo-targets.inc.mk

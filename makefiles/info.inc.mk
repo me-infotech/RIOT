@@ -295,11 +295,17 @@ info-kconfig-variables:
 _info-kconfig-variables:
 	@for i in $(sort $(filter CONFIG_%,$(.VARIABLES))); do echo $$i; done
 
+info-debug-variable-%: export RIOT_JUST_DEBUG_VARIABLE = $*
+info-debug-variable-%: export RIOT_JUST_DEBUG_VALUE = $($*)
 info-debug-variable-%:
 	@just --working-directory "$(CURDIR)" info-debug-variable "$*"
 
 _info-debug-variable-%:
-	@echo $($*)
+	@if [ "$${RIOT_JUST_DEBUG_VARIABLE+x}" = x ]; then \
+	  printf '%s\n' "$${RIOT_JUST_DEBUG_VALUE}"; \
+	else \
+	  echo $($*); \
+	fi
 
 info-toolchains-supported:
 	@just --working-directory "$(CURDIR)" info-toolchains-supported
