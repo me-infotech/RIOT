@@ -31,4 +31,6 @@ EMULATED_BOARDS := \
   #
 
 info-emulated-boards:
-	@EMULATED_BOARDS="$(sort $(EMULATED_BOARDS))" just info-emulated-boards
+	@BOARDSDIRS="$(BOARDSDIRS)" RIOTBOARD="$(RIOTBOARD)" \
+		RIOTBASE="$(RIOTBASE)" EXTERNAL_BOARD_DIRS="$(EXTERNAL_BOARD_DIRS)" \
+		just info-emulated-boards

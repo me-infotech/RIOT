@@ -37,7 +37,7 @@ info-buildsize:
 	@$(SIZE) -d -B $(ELFFILE) || echo ''
 
 info-build:
-	@just --working-directory "$(CURDIR)" info-build
+	@env $(JUST_CONTEXT_UNEXPORT) just --working-directory "$(CURDIR)" info-build
 
 _info-build:
 	@echo 'APPLICATION: $(APPLICATION)'
@@ -173,7 +173,7 @@ endef
 # cflags such as:  -DNIMBLE_HOST_PRIO="(NIMBLE_CONTROLLER_PRIO + 1)", this is
 # splitted into 3 array elements.
 info-build-json:
-	@just --working-directory "$(CURDIR)" info-build-json
+	@env $(JUST_CONTEXT_UNEXPORT) just --working-directory "$(CURDIR)" info-build-json
 
 _info-build-json:
 	@echo '{ '

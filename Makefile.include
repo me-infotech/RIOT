@@ -1069,8 +1069,28 @@ endif
 
 # Contextual Just recipes invoke their private Make target in the same
 # application directory, so Make recomputes the application state there.
-# Do not export the resolved state globally: exporting computed list variables
-# makes the child parse them again and can duplicate values in its output.
+# Do not export the resolved state into that fresh Make process: exporting
+# computed list variables makes the child parse them again and can duplicate
+# values in its output.  Keep values supplied by the environment or command
+# line; Makefile-local values are intentionally recomputed by the child.  The
+# resulting options are applied only to the two Just forwarding recipes.
+JUST_CONTEXT_COMPUTED_VARIABLES := \
+  Q QQ QUIET QUIETER OS OS_ARCH APPLICATION APPLICATION_MODULE BOARD CPU \
+  CPU_MODEL CPU_CORE CPU_ARCH CPU_FAM INCLUDES CXXINCLUDES NATIVEINCLUDES \
+  GCC_C_INCLUDES GCC_CXX_INCLUDES GCC_VERSION USEMODULE BIN_USEMODULE \
+  USEPKG DISABLE_MODULE BOARDDIR BINDIRBASE BINDIR PKG_PATHS PKGDIRBASE \
+  PYTHONPATH FEATURES_REQUIRED FEATURES_PROVIDED FEATURES_OPTIONAL \
+  FEATURES_USED TOOLCHAIN TARGET_ARCH TARGET_ARCH_LLVM PREFIX CC CXX CCAS \
+  CFLAGS CFLAGS_CPU CFLAGS_STATIC_ANALYSIS RCFLAGS_WRITE_SARIF CXXUWFLAGS \
+  CXXEXFLAGS CCASUWFLAGS CCASEXFLAGS AS ASFLAGS LINK ARCHIVES LTOFLAGS \
+  OBJCOPY OFLAGS OBJDUMP OBJDUMPFLAGS SIZE SIZEFLAGS UNDEF WERROR WPEDANTIC \
+  FLASH_ADDR ELFFILE HEXFILE DEVELHELP RUST_TARGET RUSTFLAGS \
+  RIOTBASE RIOTCPU RIOTBOARD RIOTPKG RIOTTOOLS RIOTPROJECT RIOTMAKE \
+  RIOTKCONFIG RIOT_TEST_HASH_DIR CARGO_TARGET_DIR BUILD_DIR APPDIR \
+  CARGO_PROFILE CARGO_OPTIONS \
+  #
+JUST_CONTEXT_UNEXPORT := $(foreach var,$(JUST_CONTEXT_COMPUTED_VARIABLES),\
+  $(if $(filter environment command line,$(origin $(var))),,-u $(var)))
 
 include $(RIOTMAKE)/cargo-targets.inc.mk
 
