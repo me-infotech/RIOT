@@ -6,6 +6,12 @@
         check-toolchain-supported \
         info-programmers-supported \
         info-rust \
+        _info-build _info-build-json _info-files _info-modules \
+        _info-packages _info-cpu _info-features-provided \
+        _info-features-required _info-features-missing \
+        _info-features-used _info-kconfig-variables \
+        _info-toolchains-supported _check-toolchain-supported \
+        _info-programmers-supported _info-rust \
         generate-Makefile.ci \
         #
 
@@ -31,11 +37,15 @@ info-buildsize:
 	@$(SIZE) -d -B $(ELFFILE) || echo ''
 
 info-build:
+	@just --working-directory "$(CURDIR)" info-build
+
+_info-build:
 	@echo 'APPLICATION: $(APPLICATION)'
 	@echo 'APPDIR:      $(APPDIR)'
 	@echo ''
 	@echo 'supported boards:'
-	@echo $$(env -i PATH='$(PATH)' LANG='$(LANG)' HOME='$(HOME)' SHELL='$(SHELL)' $(MAKE) info-boards-supported -j)
+	@echo $$(env -i PATH='$(PATH)' LANG='$(LANG)' HOME='$(HOME)' SHELL='$(SHELL)' \
+	  $(MAKE) _info-boards-supported -j)
 	@echo ''
 	@echo 'BOARD:   $(BOARD)'
 	@echo 'CPU:     $(CPU)'
@@ -163,6 +173,9 @@ endef
 # cflags such as:  -DNIMBLE_HOST_PRIO="(NIMBLE_CONTROLLER_PRIO + 1)", this is
 # splitted into 3 array elements.
 info-build-json:
+	@just --working-directory "$(CURDIR)" info-build-json
+
+_info-build-json:
 	@echo '{ '
 	@echo '"APPLICATION": "$(APPLICATION)",'
 	@echo '"APPDIR": "$(APPDIR)",'
@@ -212,6 +225,10 @@ info-build-json:
 
 info-files: QUIET := 0
 info-files:
+	@just --working-directory "$(CURDIR)" info-files
+
+_info-files: QUIET := 0
+_info-files:
 	@( \
 	  echo "$(abspath $(MAKEFILE_LIST))" | tr ' ' '\n'; \
 	  CSRC="$$($(MAKE) USEPKG="" -Bn | grep -o -e "[^ ]\+\.[csS]$$" -e "[^ ]\+\.[csS][ \']" | grep -v -e "^\s*-D")"; \
@@ -229,44 +246,83 @@ info-files:
 	) | sort | uniq | sed 's#$(RIOTBASE)/##'
 
 info-modules:
+	@just --working-directory "$(CURDIR)" info-modules
+
+_info-modules:
 	@for i in $(sort $(USEMODULE)); do echo $$i; done
 
 info-packages:
+	@just --working-directory "$(CURDIR)" info-packages
+
+_info-packages:
 	@for i in $(sort $(USEPKG)); do echo $$i; done
 
 info-cpu:
+	@just --working-directory "$(CURDIR)" info-cpu
+
+_info-cpu:
 	@echo $(CPU)
 
 info-features-provided:
+	@just --working-directory "$(CURDIR)" info-features-provided
+
+_info-features-provided:
 	@for i in $(sort $(FEATURES_PROVIDED)); do echo $$i; done
 
 info-features-required:
+	@just --working-directory "$(CURDIR)" info-features-required
+
+_info-features-required:
 	@for i in $(sort $(FEATURES_REQUIRED)); do echo $$i; done
 
 info-features-missing:
+	@just --working-directory "$(CURDIR)" info-features-missing
+
+_info-features-missing:
 	@for i in $(FEATURES_MISSING); do echo $$i; done
 
 info-features-used:
+	@just --working-directory "$(CURDIR)" info-features-used
+
+_info-features-used:
 	@for i in $(FEATURES_USED); do echo $$i; done
 
 # This target prints all variables set via KConfig sorted alphabetically for
 # debugging.
 info-kconfig-variables:
+	@just --working-directory "$(CURDIR)" info-kconfig-variables
+
+_info-kconfig-variables:
 	@for i in $(sort $(filter CONFIG_%,$(.VARIABLES))); do echo $$i; done
 
 info-debug-variable-%:
+	@just --working-directory "$(CURDIR)" info-debug-variable "$*"
+
+_info-debug-variable-%:
 	@echo $($*)
 
 info-toolchains-supported:
+	@just --working-directory "$(CURDIR)" info-toolchains-supported
+
+_info-toolchains-supported:
 	@echo $(filter-out $(TOOLCHAINS_BLACKLIST),$(TOOLCHAINS_SUPPORTED))
 
 check-toolchain-supported:
+	@just --working-directory "$(CURDIR)" check-toolchain-supported
+
+_check-toolchain-supported:
 	@exit $(if $(filter $(TOOLCHAIN),$(filter-out $(TOOLCHAINS_BLACKLIST),$(TOOLCHAINS_SUPPORTED))),0,1)
 
 info-programmers-supported:
+	@just --working-directory "$(CURDIR)" info-programmers-supported
+
+_info-programmers-supported:
 	@echo $(sort $(PROGRAMMERS_SUPPORTED))
 
 info-rust:
+	@just --working-directory "$(CURDIR)" info-rust
+
+_info-rust:
 	cargo version
 	c2rust --version
 	@echo "To use this setup of Rust in an IDE, add these command line arguments to the \`cargo check\` or \`rust-analyzer\`:"

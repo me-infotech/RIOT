@@ -48,6 +48,90 @@ info-applications:
         | grep -vFf "$riotbase/makefiles/app_dirs.blacklist" \
         | sort -u
 
+# Print Make's resolved build information.
+info-build:
+    make --no-print-directory _info-build
+
+# Print Make's resolved build information as JSON.
+info-build-json:
+    make --no-print-directory _info-build-json
+
+# List files participating in the application.
+info-files:
+    make --no-print-directory _info-files
+
+# List resolved modules.
+info-modules:
+    make --no-print-directory _info-modules
+
+# List resolved packages.
+info-packages:
+    make --no-print-directory _info-packages
+
+# Print the resolved CPU.
+info-cpu:
+    make --no-print-directory _info-cpu
+
+# List provided features.
+info-features-provided:
+    make --no-print-directory _info-features-provided
+
+# List required features.
+info-features-required:
+    make --no-print-directory _info-features-required
+
+# List missing features.
+info-features-missing:
+    make --no-print-directory _info-features-missing
+
+# List used features.
+info-features-used:
+    make --no-print-directory _info-features-used
+
+# List KConfig variables.
+info-kconfig-variables:
+    make --no-print-directory _info-kconfig-variables
+
+# Print a resolved Make variable.
+info-debug-variable variable:
+    make --no-print-directory "_info-debug-variable-{{variable}}"
+
+# List supported toolchains.
+info-toolchains-supported:
+    make --no-print-directory _info-toolchains-supported
+
+# Check whether the selected toolchain is supported.
+check-toolchain-supported:
+    make --no-print-directory _check-toolchain-supported
+
+# List supported programmers.
+info-programmers-supported:
+    make --no-print-directory _info-programmers-supported
+
+# Print the Rust toolchain integration details.
+info-rust:
+    make --no-print-directory _info-rust
+
+# List boards supported by the resolved application configuration.
+info-boards-supported:
+    make --no-print-directory _info-boards-supported
+
+# List boards missing required features.
+info-boards-features-missing:
+    make --no-print-directory _info-boards-features-missing
+
+# List boards using blacklisted features.
+info-boards-features-blacklisted:
+    make --no-print-directory _info-boards-features-blacklisted
+
+# List boards with conflicting features.
+info-boards-features-conflicting:
+    make --no-print-directory _info-boards-features-conflicting
+
+# List applications together with their supported boards.
+info-applications-supported-boards:
+    make --no-print-directory _info-applications-supported-boards
+
 # Remove all build products through Make, retaining Make's computed directory state.
 clean:
     make --no-print-directory _clean
