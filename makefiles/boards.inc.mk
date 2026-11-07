@@ -19,7 +19,8 @@ BOARDS ?= $(ALLBOARDS)
 .PHONY: info-boards info-emulated-boards
 info-boards:
 	@BOARDS="$(BOARDS)" BOARDSDIRS="$(BOARDSDIRS)" RIOTBOARD="$(RIOTBOARD)" \
-		RIOTBASE="$(RIOTBASE)" EXTERNAL_BOARD_DIRS="$(EXTERNAL_BOARD_DIRS)" just info-boards
+		RIOTBASE="$(RIOTBASE)" EXTERNAL_BOARD_DIRS="$(EXTERNAL_BOARD_DIRS)" \
+		just --working-directory "$(CURDIR)" info-boards
 
 EMULATED_BOARDS_RENODE := $(wildcard $(BOARDSDIRS)/*/dist/board.resc)
 EMULATED_BOARDS_QEMU := microbit
@@ -31,4 +32,6 @@ EMULATED_BOARDS := \
   #
 
 info-emulated-boards:
-	@EMULATED_BOARDS="$(sort $(EMULATED_BOARDS))" just info-emulated-boards
+	@BOARDSDIRS="$(BOARDSDIRS)" RIOTBOARD="$(RIOTBOARD)" \
+		RIOTBASE="$(RIOTBASE)" EXTERNAL_BOARD_DIRS="$(EXTERNAL_BOARD_DIRS)" \
+		just --working-directory "$(CURDIR)" info-emulated-boards

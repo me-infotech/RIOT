@@ -1,4 +1,5 @@
-.PHONY: info-applications info-applications-supported-boards
+.PHONY: info-applications info-applications-supported-boards \
+        _info-applications-supported-boards
 
 # fallback so empty RIOTBASE won't lead to "/examples/"
 RIOTBASE ?= .
@@ -24,12 +25,18 @@ TOOLS_DIRS := $(shell find $(TOOLS_BASE_DIRS) -mindepth 2 -maxdepth 2 -name Make
     sort | uniq)
 
 info-applications:
-	@APPLICATION_DIRS="$(APPLICATION_DIRS)" just info-applications
+	@APPLICATION_DIRS="$(APPLICATION_DIRS)" \
+		just --working-directory "$(CURDIR)" info-applications
 
 # All applications / board output of `info-boards-supported`.
 info-applications-supported-boards:
+	@APPLICATION_DIRS="$(APPLICATION_DIRS)" \
+		just --working-directory "$(CURDIR)" info-applications-supported-boards
+
+_info-applications-supported-boards:
 	@for dir in $(APPLICATION_DIRS); do \
-	  $(MAKE) --no-print-directory -C $${dir} info-boards-supported -j 2>/dev/null | xargs -n 1 echo $${dir}; \
+	  $(MAKE) --no-print-directory -C $${dir} _info-boards-supported -j \
+	    2>/dev/null | xargs -n 1 echo $${dir}; \
 	done
 # BOARDS values from 'boards.inc.mk' to only evaluate it once
-info-applications-supported-boards: export BOARDS ?=
+info-applications-supported-boards _info-applications-supported-boards: export BOARDS ?=

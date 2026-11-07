@@ -169,6 +169,10 @@ GLOBAL_GOALS += info-boards-features-blacklisted \
                 #
 
 PRIVATE_GLOBAL_GOALS := info-boards-collect \
+                        _info-boards-supported \
+                        _info-boards-features-missing \
+                        _info-boards-features-blacklisted \
+                        _info-boards-features-conflicting \
                         #
 
 ifneq (,$(filter $(GLOBAL_GOALS) $(PRIVATE_GLOBAL_GOALS),$(MAKECMDGOALS)))
@@ -733,7 +737,7 @@ pkg-build: $(BUILDDEPS) | $(GENSRC)
 
 clean:
 ifndef MAKE_RESTARTS
-	@just clean
+	@just --working-directory "$(CURDIR)" clean
 endif
 
 _clean:
@@ -809,7 +813,7 @@ cleanterm: $(TERMDEPS)
 	$(TERMPROG) $(TERMFLAGS) $(TERMTEE)
 
 list-ttys:
-	@just list-ttys
+	@just --working-directory "$(CURDIR)" list-ttys
 
 _list-ttys:
 	$(Q)$(RIOTTOOLS)/usb-serial/ttys.py
@@ -863,7 +867,7 @@ emulate:
 endif
 
 reset:
-	@just reset
+	@just --working-directory "$(CURDIR)" reset
 
 _reset:
 	$(call check_cmd,$(RESET),Reset program)
@@ -992,7 +996,7 @@ endif
 # hyphens, or underscores; explicitly include generate-Makefile.ci
 # inspired by: https://stackoverflow.com/a/26339924
 help:
-	@just help
+	@just --working-directory "$(CURDIR)" help
 
 _help:
 	@LC_ALL=C $(MAKE) -pRrq -f $(firstword $(MAKEFILE_LIST)) : 2>/dev/null | sed -ne 's/\(^[a-z][a-z_-]*\|generate-Makefile.ci\):.*/\1/p' | sort -u
@@ -1062,6 +1066,31 @@ ifneq ($(_BASELIBS_VALUE_BEFORE_USAGE),$(BASELIBS))
 endif
 
 endif
+
+# Contextual Just recipes invoke their private Make target in the same
+# application directory, so Make recomputes the application state there.
+# Do not export the resolved state into that fresh Make process: exporting
+# computed list variables makes the child parse them again and can duplicate
+# values in its output.  Keep values supplied by the environment or command
+# line; Makefile-local values are intentionally recomputed by the child.  The
+# resulting options are applied only to the two Just forwarding recipes.
+JUST_CONTEXT_COMPUTED_VARIABLES := \
+  Q QQ QUIET QUIETER OS OS_ARCH APPLICATION APPLICATION_MODULE BOARD CPU \
+  CPU_MODEL CPU_CORE CPU_ARCH CPU_FAM INCLUDES CXXINCLUDES NATIVEINCLUDES \
+  GCC_C_INCLUDES GCC_CXX_INCLUDES GCC_VERSION USEMODULE BIN_USEMODULE \
+  USEPKG DISABLE_MODULE BOARDDIR BINDIRBASE BINDIR PKG_PATHS PKGDIRBASE \
+  PYTHONPATH FEATURES_REQUIRED FEATURES_PROVIDED FEATURES_OPTIONAL \
+  FEATURES_USED TOOLCHAIN TARGET_ARCH TARGET_ARCH_LLVM PREFIX CC CXX CCAS \
+  CFLAGS CFLAGS_CPU CFLAGS_STATIC_ANALYSIS RCFLAGS_WRITE_SARIF CXXUWFLAGS \
+  CXXEXFLAGS CCASUWFLAGS CCASEXFLAGS AS ASFLAGS LINK ARCHIVES LTOFLAGS \
+  OBJCOPY OFLAGS OBJDUMP OBJDUMPFLAGS SIZE SIZEFLAGS UNDEF WERROR WPEDANTIC \
+  FLASH_ADDR ELFFILE HEXFILE DEVELHELP RUST_TARGET RUSTFLAGS \
+  RIOTBASE RIOTCPU RIOTBOARD RIOTPKG RIOTTOOLS RIOTPROJECT RIOTMAKE \
+  RIOTKCONFIG RIOT_TEST_HASH_DIR CARGO_TARGET_DIR BUILD_DIR APPDIR \
+  CARGO_PROFILE CARGO_OPTIONS \
+  #
+JUST_CONTEXT_UNEXPORT := $(foreach var,$(JUST_CONTEXT_COMPUTED_VARIABLES),\
+  $(if $(filter environment command line,$(origin $(var))),,-u $(var)))
 
 include $(RIOTMAKE)/cargo-targets.inc.mk
 
