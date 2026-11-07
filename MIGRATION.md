@@ -5,62 +5,130 @@ SPDX-License-Identifier: LGPL-2.1-only
 
 # RIOT Build-System Migration
 
-**Status:** Category 1 (Static Introspection) in progress  
-**Baseline:** `a4863f6422` — `buildsystem: migrate static targets to just`
+**Status:** Category 1 (Static Introspection) completed
+**Coordination branch:** `master` at merge `c9bc274f40`
+**Initial baseline:** `a4863f6422` — `buildsystem: migrate static targets to just`
 
 ## Operating model
 
 - **Tier 1 — Stateless:** direct `just` recipes over repository files or
   explicit environment values.
 - **Tier 2A — Context-dependent:** retains RIOT Make context through private
-  helpers until a real RIOT CMake configuration exists.
+  `_info-*` helpers until a real RIOT CMake configuration exists.
 - **Tier 2B — Artifact-dependent:** remains Make-native until RIOT defines a
   CMake/Ninja artifact contract.
 
-RIOT has no root `CMakeLists.txt` or `build.ninja`; Phase 1 does not invent
-either system or add unrelated `cmake`/`ninja` gates.
+RIOT has no root `CMakeLists.txt` or `build.ninja`. Category 1 therefore does
+not invent either system or add unrelated `cmake`/`ninja` gates. Tier labels
+describe coupling; they do not imply a build-system replacement.
 
-## Package status
+## Category 1 package results
 
-| Package | Worktree | Scope | Status |
+| Package | Branch commit | Scope | Result |
 |---|---|---|---|
-| 1A | `migration-cat1-static` | `info-boards`, `info-emulated-boards`, `info-applications` | Fix committed as `e55d22617c`; validation rerun pending |
-| 1B | `migration-cat1-context` | Make-contextual `info-*` targets and board-support introspection | Developer fixes pending; auditor/reviewer found blockers |
-| 1C | `migration-cat1-artifacts` | `info-objsize`, `info-buildsize`, `info-buildsizes-diff` | Intentionally unchanged; auditor/reviewer/tester passed |
+| 1A static | `e55d22617c` | `info-boards`, `info-emulated-boards`, `info-applications` | Merged (`4c3b687adb`) |
+| 1B contextual | `eb98e8ca9b` | Contextual `info-*` and board-support targets | Merged (`c9bc274f40`) |
+| 1C artifacts | `a4863f6422` (unchanged) | `info-objsize`, `info-buildsize`, `info-buildsizes-diff` | Validated as intentionally Make-native |
 
-No package may merge without independent auditor, reviewer, and tester
-approval. The `just` executable is unavailable in the current environment;
-native Just parser/runtime checks are therefore pending.
+Every merged package received independent auditor, reviewer, and tester
+reports before merge. Package 1C was routed through the same gates and
+confirmed to require no changes.
 
 ## Target mapping
 
-| Legacy Make target | Just/bridge | Tier | Preconditions |
-|---|---|---:|---|
-| `info-boards` | `just info-boards` | 1 | Board directories and board variables |
-| `info-emulated-boards` | `just info-emulated-boards` | 1 | Board directories and board variables |
-| `info-applications` | `just info-applications` | 1 | Repository application directories |
-| `info-build`, `info-build-json` | `just` → private Make helper | 2A | Evaluated application/board context |
-| `info-modules`, `info-packages`, `info-cpu` | `just` → private Make helper | 2A | Evaluated Make variables |
-| `info-features-*`, `info-kconfig-variables` | `just` → private Make helper | 2A | Evaluated feature/Kconfig context |
-| `info-boards-supported`, `info-boards-features-*` | `just` → private Make helper | 2A | Board-candidate support evaluation |
-| `info-objsize`, `info-buildsize`, `info-buildsizes-diff` | Make-native | 2B | Existing object/ELF artifact contract |
+| Legacy Make target | Implementation | Tier |
+|---|---|---:|
+| `info-boards` | Direct Just recipe; Make bridge forwards board state | 1 |
+| `info-emulated-boards` | Direct Just recipe; Make bridge forwards board dirs | 1 |
+| `info-applications` | Direct Just recipe; Make bridge forwards directory state | 1 |
+| `info-build` | Just → `_info-build` private helper | 2A |
+| `info-build-json` | Just → `_info-build-json` private helper | 2A |
+| `info-modules`, `info-packages`, `info-cpu` | Just → private helper | 2A |
+| `info-features-provided/required/missing/used` | Just → private helper | 2A |
+| `info-kconfig-variables` | Just → private helper | 2A |
+| `info-toolchains-supported` | Just → private helper | 2A |
+| `check-toolchain-supported` | Just → private helper | 2A |
+| `info-programmers-supported` | Just → private helper | 2A |
+| `info-rust` | Just → private helper | 2A |
+| `info-boards-supported` | Just → `_info-boards-supported` | 2A |
+| `info-boards-features-missing` | Just → private helper | 2A |
+| `info-boards-features-blacklisted` | Just → private helper | 2A |
+| `info-boards-features-conflicting` | Just → private helper | 2A |
+| `info-applications-supported-boards` | Just → `_info-applications-supported-boards` | 2A |
+| `info-files` | Make-native (recursive `make -Bn` plus compiler probes) | 2A |
+| `info-debug-variable-%` | Make-native (dynamic variable-name pattern) | 2A |
+| `info-objsize` | Make-native | 2B |
+| `info-buildsize` | Make-native | 2B |
+| `info-buildsizes-diff` | Make-native | 2B |
 
-## Verification gates
+Previously migrated utility targets remain bridged: `clean`, `pkg-clean`,
+`print-versions`, `generate-features`, `list-ttys`, `reset`, `help`.
 
-Each branch must provide:
+### Bridge contract
 
-1. Target-scope and non-compilation inventory.
-2. `git diff --check` and static/recursion scans.
-3. `make -n` bridge verification.
-4. Make/Just output parity where `just` is available.
-5. Independent auditor, reviewer, and tester reports.
+```text
+make <public-target>
+    └── just --working-directory "$(CURDIR)" <recipe>
+            └── make --no-print-directory _<private-helper>   (Tier 2A only)
+```
 
-Current successful evidence:
+- Make bridges pass `--working-directory "$(CURDIR)"` so Just runs recipes in
+  the invoking application directory, not the justfile directory.
+- Just recipes call only private `_...` Make helpers or the original
+  implementation; no public Make ↔ Just recursion exists.
+- `info-build` and `info-build-json` unset Makefile-computed variables before
+  entering Just so the child Make re-evaluates them exactly once instead of
+  duplicating flags and include paths.
+- `info-boards`, `info-emulated-boards`, and `info-applications` use
+  definedness checks (`${VAR+x}`) to preserve explicitly empty and custom
+  values.
 
-- Artifact package: read-only Make checks passed; worktree clean; no changes
-  required because artifact paths and semantics are Make-computed.
-- Static package: Make bridge and variable-propagation checks passed; quoting
-  fix committed after review finding; final gate rerun is pending.
+## Verification evidence
+
+Validated with `just 1.59.0` (static musl binary), GNU Make 4.3, and Bash
+5.2.21:
+
+```sh
+just --list
+just --dry-run <each recipe>
+git diff --check
+```
+
+Byte-identical Make/Just parity in `examples/basic/hello-world` for:
+
+- `info-build`, `info-build-json`
+- `info-cpu`, `info-modules`, `info-packages`
+- `info-features-provided/required/missing/used`
+- `info-kconfig-variables`
+- `info-toolchains-supported`, `info-programmers-supported`
+- `info-boards-supported`
+- `help`, `list-ttys`
+
+Root-level checks passed:
+
+- `make BOARDS= info-boards` preserves the empty value.
+- `make BOARDS='a b' info-boards` preserves a custom value.
+- `make EXTERNAL_BOARD_DIRS=... info-emulated-boards` discovers external
+  boards by name.
+- `make APPLICATION_DIRS=... info-applications` preserves overrides.
+- `make APPLICATION_DIRS=... info-applications-supported-boards` matches its
+  private helper.
+- `make -n clean` emits only recursive clean operations, no compiler or linker
+  invocations.
+- Recursion scan: `justfile` contains no call to a public `make info-*` target.
+
+## Known deviations
+
+- Failure paths add bridge frames. For example, `make reset` without hardware
+  exits with the same status as before but prints the child Make error plus the
+  Just/parent-Make frame. Successful-output parity is exact.
+- `info-files` remains Make-native because its recursive `make -Bn` and
+  compiler `-MM` probes add a Make recursion level when bridged.
+- `info-debug-variable-%` remains Make-native because forwarding arbitrary
+  values through the environment changes shell backslash/quote handling.
+- Artifact targets intentionally remain Make-native; migration requires a
+  defined artifact contract covering board identity, `BINDIR` layout, ELF
+  paths, per-module object directories, and missing-artifact behavior.
 
 ## Onboarding
 
@@ -73,15 +141,19 @@ just info-applications
 make info-boards
 ```
 
-Use `make -n <target>` to inspect a legacy bridge. Never make a public Just
-recipe call a public Make target that forwards back to the same recipe; use a
-private `_...` helper when Make-computed state is required.
+From an application directory:
 
-## Open items
+```sh
+make BOARD=native64 info-build
+just --working-directory "$PWD" info-build
+```
 
-- Revalidate the static branch after the quoting fix.
-- Fix and revalidate contextual private-helper inclusion and Make-state
-  propagation.
-- Merge only branches with all three approval reports.
-- Install `just` or provide an equivalent CI environment for native Just
-  syntax, dry-run, and runtime parity checks.
+`just` locates the root justfile by searching upward; always pass
+`--working-directory "$(CURDIR)"` from Make bridges so application context is
+preserved. Use `make -n <target>` to inspect a bridge without executing it.
+
+## Next categories
+
+Category 1 established the bridge and validation pattern. Later categories
+(Auditing, HIL-Interaction, Synthesis, Reduction) should reuse it and must not
+merge without auditor, reviewer, and tester evidence.
