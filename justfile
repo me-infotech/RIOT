@@ -4,8 +4,8 @@ set shell := ["bash", "-ec"]
 info-boards:
     #!/usr/bin/env bash
     set -e
-    if [ -n "${BOARDS:-}" ]; then
-        echo "$BOARDS"
+    if [ "${BOARDS+x}" = x ]; then
+        printf '%s\n' "$BOARDS"
         exit 0
     fi
     riotbase="${RIOTBASE:-$PWD}"
@@ -24,6 +24,10 @@ info-boards:
 info-emulated-boards:
     #!/usr/bin/env bash
     set -e
+    if [ "${EMULATED_BOARDS+x}" = x ]; then
+        printf '%s\n' "$EMULATED_BOARDS"
+        exit 0
+    fi
     riotbase="${RIOTBASE:-$PWD}"
     boarddirs="${BOARDSDIRS:-${EXTERNAL_BOARD_DIRS:-} ${RIOTBOARD:-$riotbase/boards}}"
     boards="microbit gba_cartridge"
@@ -41,6 +45,12 @@ info-emulated-boards:
 info-applications:
     #!/usr/bin/env bash
     set -e
+    if [ "${APPLICATION_DIRS+x}" = x ]; then
+        for dir in $APPLICATION_DIRS; do
+            echo "$dir"
+        done
+        exit 0
+    fi
     riotbase="${RIOTBASE:-$PWD}"
     find bootloaders examples fuzzing tests -name Makefile -type f \
         | xargs dirname \
@@ -130,7 +140,12 @@ info-boards-features-conflicting:
 
 # List applications together with their supported boards.
 info-applications-supported-boards:
-    make --no-print-directory _info-applications-supported-boards
+    if [ "${APPLICATION_DIRS+x}" = x ]; then
+        make --no-print-directory "APPLICATION_DIRS=$APPLICATION_DIRS" \
+            _info-applications-supported-boards
+    else
+        make --no-print-directory _info-applications-supported-boards
+    fi
 
 # Remove all build products through Make, retaining Make's computed directory state.
 clean:
