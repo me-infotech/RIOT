@@ -720,6 +720,8 @@ endif
 # The `clean` needs to be serialized before everything else.
 all $(BASELIBS) $(ARCHIVES) $(BUILDDEPS) $(GENSRC) ..in-docker-container: | $(CLEAN)
 
+.PHONY: _clean _list-ttys _reset _help
+
 .PHONY: pkg-prepare pkg-build
 pkg-prepare:
 	-@$(foreach dir,$(PKG_PATHS),"$(MAKE)" -C $(dir) prepare $(NEWLINE))
@@ -731,10 +733,13 @@ pkg-build: $(BUILDDEPS) | $(GENSRC)
 
 clean:
 ifndef MAKE_RESTARTS
+	@just clean
+endif
+
+_clean:
 	-@$(foreach dir,$(PKG_PATHS),"$(MAKE)" -C $(dir) clean $(NEWLINE))
 	-@rm -rf $(BINDIR)
 	-@rm -rf $(SCANBUILD_OUTPUTDIR)
-endif
 
 # Remove intermediates, but keep the .elf, .hex and .map etc.
 # Special care has to be taken for ESP32 targets, the bootloader directory has
@@ -804,6 +809,9 @@ cleanterm: $(TERMDEPS)
 	$(TERMPROG) $(TERMFLAGS) $(TERMTEE)
 
 list-ttys:
+	@just list-ttys
+
+_list-ttys:
 	$(Q)$(RIOTTOOLS)/usb-serial/ttys.py
 
 doc doc-man doc-latex:
@@ -855,6 +863,9 @@ emulate:
 endif
 
 reset:
+	@just reset
+
+_reset:
 	$(call check_cmd,$(RESET),Reset program)
 	$(PROGRAMMER_RESET)
 
@@ -981,6 +992,9 @@ endif
 # hyphens, or underscores; explicitly include generate-Makefile.ci
 # inspired by: https://stackoverflow.com/a/26339924
 help:
+	@just help
+
+_help:
 	@LC_ALL=C $(MAKE) -pRrq -f $(firstword $(MAKEFILE_LIST)) : 2>/dev/null | sed -ne 's/\(^[a-z][a-z_-]*\|generate-Makefile.ci\):.*/\1/p' | sort -u
 
 ifeq (iotlab-m3,$(BOARD))

@@ -24,7 +24,7 @@ TOOLS_DIRS := $(shell find $(TOOLS_BASE_DIRS) -mindepth 2 -maxdepth 2 -name Make
     sort | uniq)
 
 info-applications:
-	@for dir in $(APPLICATION_DIRS); do echo $$dir; done
+	@just info-applications
 
 # All applications / board output of `info-boards-supported`.
 info-applications-supported-boards:
