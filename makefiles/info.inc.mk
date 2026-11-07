@@ -6,7 +6,7 @@
         check-toolchain-supported \
         info-programmers-supported \
         info-rust \
-        _info-build _info-build-json _info-files _info-modules \
+        _info-build _info-build-json _info-modules \
         _info-packages _info-cpu _info-features-provided \
         _info-features-required _info-features-missing \
         _info-features-used _info-kconfig-variables \
@@ -225,10 +225,6 @@ _info-build-json:
 
 info-files: QUIET := 0
 info-files:
-	@just --working-directory "$(CURDIR)" info-files
-
-_info-files: QUIET := 0
-_info-files:
 	@( \
 	  echo "$(abspath $(MAKEFILE_LIST))" | tr ' ' '\n'; \
 	  CSRC="$$($(MAKE) USEPKG="" -Bn | grep -o -e "[^ ]\+\.[csS]$$" -e "[^ ]\+\.[csS][ \']" | grep -v -e "^\s*-D")"; \
@@ -295,17 +291,8 @@ info-kconfig-variables:
 _info-kconfig-variables:
 	@for i in $(sort $(filter CONFIG_%,$(.VARIABLES))); do echo $$i; done
 
-info-debug-variable-%: export RIOT_JUST_DEBUG_VARIABLE = $*
-info-debug-variable-%: export RIOT_JUST_DEBUG_VALUE = $($*)
 info-debug-variable-%:
-	@just --working-directory "$(CURDIR)" info-debug-variable "$*"
-
-_info-debug-variable-%:
-	@if [ "$${RIOT_JUST_DEBUG_VARIABLE+x}" = x ]; then \
-	  printf '%s\n' "$${RIOT_JUST_DEBUG_VALUE}"; \
-	else \
-	  echo $($*); \
-	fi
+	@echo $($*)
 
 info-toolchains-supported:
 	@just --working-directory "$(CURDIR)" info-toolchains-supported

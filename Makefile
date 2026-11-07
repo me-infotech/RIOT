@@ -21,13 +21,13 @@ docclean:
 	"$(MAKE)" -C doc/starlight clean
 
 pkg-clean:
-	@just pkg-clean
+	@just --working-directory "$(CURDIR)" pkg-clean
 
 print-versions:
-	@just print-versions
+	@just --working-directory "$(CURDIR)" print-versions
 
 generate-features:
-	@just generate-features
+	@just --working-directory "$(CURDIR)" generate-features
 
 include makefiles/boards.inc.mk
 include makefiles/app_dirs.inc.mk
@@ -41,7 +41,7 @@ CLEAN_DIRS := $(APPLICATION_DIRS) $(TOOLS_DIRS)
 
 .PHONY: clean _clean distclean $(CLEAN_DIRS:%=CLEAN--%) $(CLEAN_DIRS:%=DISTCLEAN--%)
 clean: $(CLEAN_DIRS:%=CLEAN--%)
-	@just clean
+	@just --working-directory "$(CURDIR)" clean
 
 _clean:
 	@echo "Cleaned all build products."

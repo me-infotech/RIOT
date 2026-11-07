@@ -737,7 +737,7 @@ pkg-build: $(BUILDDEPS) | $(GENSRC)
 
 clean:
 ifndef MAKE_RESTARTS
-	@just clean
+	@just --working-directory "$(CURDIR)" clean
 endif
 
 _clean:
@@ -813,7 +813,7 @@ cleanterm: $(TERMDEPS)
 	$(TERMPROG) $(TERMFLAGS) $(TERMTEE)
 
 list-ttys:
-	@just list-ttys
+	@just --working-directory "$(CURDIR)" list-ttys
 
 _list-ttys:
 	$(Q)$(RIOTTOOLS)/usb-serial/ttys.py
@@ -867,7 +867,7 @@ emulate:
 endif
 
 reset:
-	@just reset
+	@just --working-directory "$(CURDIR)" reset
 
 _reset:
 	$(call check_cmd,$(RESET),Reset program)
@@ -996,7 +996,7 @@ endif
 # hyphens, or underscores; explicitly include generate-Makefile.ci
 # inspired by: https://stackoverflow.com/a/26339924
 help:
-	@just help
+	@just --working-directory "$(CURDIR)" help
 
 _help:
 	@LC_ALL=C $(MAKE) -pRrq -f $(firstword $(MAKEFILE_LIST)) : 2>/dev/null | sed -ne 's/\(^[a-z][a-z_-]*\|generate-Makefile.ci\):.*/\1/p' | sort -u
