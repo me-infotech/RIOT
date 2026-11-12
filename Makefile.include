@@ -535,7 +535,7 @@ include $(RIOTMAKE)/bindist.inc.mk
 include $(RIOTMAKE)/modules.inc.mk
 
 
-.PHONY: all link clean flash flash-only preflash termdeps term doc doc-man doc-latex debug debug-server reset objdump help info-modules
+.PHONY: all link clean flash flash-only preflash termdeps term debug debug-server reset objdump help info-modules
 .PHONY: print-size elffile lstfile binfile hexfile flashfile cosy
 .PHONY: ..in-docker-container
 
@@ -819,12 +819,6 @@ cleanterm: export PYTERMFLAGS += --no-reconnect --noprefix --no-repeat-command-o
 cleanterm: $(TERMDEPS)
 	$(call check_cmd,$(TERMPROG),Terminal program)
 	$(TERMPROG) $(TERMFLAGS) $(TERMTEE)
-
-list-ttys:
-	$(Q)$(RIOTTOOLS)/usb-serial/ttys.py
-
-doc doc-man doc-latex:
-	$(MAKE) -C $(RIOTBASE) $@
 
 ifeq (, $(DEBUGGER))
 debug:

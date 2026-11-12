@@ -1,11 +1,20 @@
-.PHONY: info-applications info-applications-supported-boards
+# Root justfile, located relative to this file.
+_RIOT_JUSTFILE := $(abspath $(dir $(lastword $(MAKEFILE_LIST)))../justfile)
+
+.PHONY: info-applications-supported-boards
 
 # fallback so empty RIOTBASE won't lead to "/examples/"
 RIOTBASE ?= .
 
-APPS_BASE_DIRS = bootloaders examples fuzzing tests
+# Single source: just/settings.just (`info-applications` is a just recipe).
+APPS_BASE_DIRS := $(shell just --justfile "$(_RIOT_JUSTFILE)" --evaluate APPS_BASE_DIRS)
+ifeq (,$(APPS_BASE_DIRS))
+  $(error APPS_BASE_DIRS could not be read from just/settings.just (is just installed))
+endif
 TOOLS_BASE_DIRS = dist/tools
 
+# The same derivation is the just recipe `info-applications`
+# (just/repository.just); keep both alike.
 # 1. recursively find Makefiles
 # 2. take parent folders
 # 3. exclude build artifacts (below bin/)
@@ -22,9 +31,6 @@ TOOLS_DIRS := $(shell find $(TOOLS_BASE_DIRS) -mindepth 2 -maxdepth 2 -name Make
     xargs dirname | \
     grep -vFf $(RIOTBASE)/makefiles/app_dirs.blacklist | \
     sort | uniq)
-
-info-applications:
-	@for dir in $(APPLICATION_DIRS); do echo $$dir; done
 
 # All applications / board output of `info-boards-supported`.
 info-applications-supported-boards:

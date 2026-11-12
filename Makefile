@@ -1,19 +1,16 @@
 .all:
 
-.PHONY: all doc doc-man doc-latex docclean doc-starlight print-versions welcome
+.PHONY: all docclean
 
-all: welcome
-	@echo ""
+all:
+	$(call just_hint)
 	@exit 1
 
-doc doc-man doc-latex doc-ci:
+doc-ci:
 	@./dist/tools/features_yaml2mx/features_yaml2mx.py \
 		features.yaml \
 		--output-md doc/doxygen/src/feature_list.md
 	"$(MAKE)" -C doc/doxygen $@
-
-doc-starlight:
-	"$(MAKE)" -C doc/starlight dev
 
 docclean:
 	"$(MAKE)" -BC doc/doxygen clean
@@ -23,21 +20,10 @@ pkg-clean:
 	@echo "Cleaning all package sources"
 	rm -rf build/pkg
 
-print-versions:
-	@./dist/tools/ci/print_toolchain_versions.sh
-
-generate-features:
-	@./dist/tools/features_yaml2mx/features_yaml2mx.py \
-		features.yaml \
-		--output-makefile makefiles/features_existing.inc.mk
-
 include makefiles/boards.inc.mk
 include makefiles/app_dirs.inc.mk
 
-include makefiles/tools/riotgen.inc.mk
 -include makefiles/tests.inc.mk
-
-include makefiles/color.inc.mk
 
 CLEAN_DIRS := $(APPLICATION_DIRS) $(TOOLS_DIRS)
 
@@ -54,35 +40,19 @@ $(CLEAN_DIRS:%=CLEAN--%):
 $(CLEAN_DIRS:%=DISTCLEAN--%):
 	-"$(MAKE)" -C $(@:DISTCLEAN--%=%) distclean
 
-# Prints a welcome message
-define welcome_message
-	@echo "Welcome to RIOT - The friendly OS for IoT!"
-	@echo ""
-	@echo "You executed 'make' from the base directory."
-	@echo "Usually, you should run 'make' in your application's directory instead."
-	@echo ""
-	@echo "Please see our Quick Start Guide at:"
-	@echo "    https://guide.riot-os.org/getting-started/installing/"
-	@echo "You can ask questions or discuss with other users on our forum:"
-	@echo "    https://forum.riot-os.org"
-	@echo ""
-	@echo "Available targets for the RIOT base directory include:"
-	@echo " generate-{board,driver,example,module,pkg,test,features}"
-	@echo " info-{applications,boards,emulated-boards} info-applications-supported-boards"
-	@echo " print-versions"
-	@echo " clean distclean docclean pkg-clean"
-	@echo " doc doc-{starlight,man,latex}"
-	@echo ""
-	@echo "==> tl;dr Try running:"
+# The repository commands of the base directory (welcome, doc, info-boards,
+# generate-*, print-versions, ...) are no longer Make targets; they run with
+# just (root justfile). Make points there.
+define just_hint
+	@echo "The repository commands of the RIOT base directory run with just:"
+	@echo "    just --list"
+	@echo "Applications are still built with make in their directory, e.g.:"
 	@echo "    cd examples/basic/default"
 	@echo "    make BOARD=<INSERT_BOARD_NAME>"
 endef
 
-welcome:
-	$(call welcome_message)
-
 .DEFAULT:
 	@echo '*** ERROR: unrecognized target "$@"'
 	@echo ""
-	$(call welcome_message)
+	$(call just_hint)
 	@exit 1

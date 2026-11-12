@@ -362,7 +362,7 @@ implementation.
 
 From the RIOT base directory, run:
 ```
-make generate-driver
+just generate-driver
 ```
 Then answer a few questions about the driver:
 - Driver name: enter a name for your driver. It will be used as both the name

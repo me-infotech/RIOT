@@ -16,18 +16,6 @@ ALLBOARDS := $(sort \
 # Set the default value from `BOARDS`
 BOARDS ?= $(ALLBOARDS)
 
-.PHONY: info-boards info-emulated-boards
-info-boards:
-	@echo $(BOARDS)
-
-EMULATED_BOARDS_RENODE := $(wildcard $(BOARDSDIRS)/*/dist/board.resc)
-EMULATED_BOARDS_QEMU := microbit
-EMULATED_BOARDS_MGBA := gba_cartridge
-EMULATED_BOARDS := \
-  $(EMULATED_BOARDS_QEMU) \
-  $(EMULATED_BOARDS_MGBA) \
-  $(foreach board_path,$(EMULATED_BOARDS_RENODE),$(subst $(strip $(BOARDSDIRS)/),,$(subst /dist/board.resc,,$(board_path))))
-  #
-
-info-emulated-boards:
-	@echo $(sort $(EMULATED_BOARDS))
+# `info-boards` and `info-emulated-boards` are just recipes
+# (just/repository.just); the variables above stay for the Make targets of
+# groups 2A/2B/2C/3.

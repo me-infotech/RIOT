@@ -141,7 +141,7 @@ def __exec_cmd(cmd, shell=False, env=None, cwd=None,
 
 
 def _all_apps(cwd):
-    cmd = ('make', 'info-applications', '--no-print-directory')
+    cmd = ('just', 'info-applications')
     return __exec_cmd(cmd, cwd=cwd).split()
 
 

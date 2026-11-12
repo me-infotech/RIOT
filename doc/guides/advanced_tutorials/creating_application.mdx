@@ -239,13 +239,13 @@ packages, required features) included.
 To generate an example application, e.g in the `examples` directory, from the
 RIOT base directory, run:
 ```sh
-make generate-example
+just generate-example
 ```
 
 To generate a test application, e.g in the `tests` directory, from the
 RIOT base directory, run:
 ```sh
-make generate-test
+just generate-test
 ```
 
 Then answer a few questions about the application:
@@ -269,7 +269,7 @@ Once completed, the application files are either located in
 `examples/<application name>` or `tests/<application name>` depending on the
 target used.
 
-**Testrunner:** when using the `make generate-test`, you can also automatically
+**Testrunner:** when using the `just generate-test`, you can also automatically
 add a testrunner Python script. Just answer 'y' when prompted.
 
 ## Creating an Out of Tree Application Structure

@@ -18,12 +18,12 @@ usage() {
 
 
 applications() {
-    make --no-print-directory -C "${RIOTBASE}" info-applications
+    just --justfile "${RIOTBASE}/justfile" info-applications
 }
 
 
 boards() {
-    make --no-print-directory -C "${RIOTBASE}" info-boards
+    just --justfile "${RIOTBASE}/justfile" info-boards
 }
 
 

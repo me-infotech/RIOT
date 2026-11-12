@@ -42,7 +42,7 @@ fi
 if [[ "$(uname -s -m)" == "Linux x86_64" ]]; then
     DOXY_OUTPUT=$(make -C "${RIOTBASE}" doc-ci 2>&1)
 else
-    DOXY_OUTPUT=$(make -C "${RIOTBASE}" doc 2>&1)
+    DOXY_OUTPUT=$(just --justfile "${RIOTBASE}/justfile" doc 2>&1)
 fi
 
 DOXY_OUTPUT=$(echo "${DOXY_OUTPUT}" | grep -Fvf "${EXCLUDE_SIMPLE_FILE}" | \
@@ -52,7 +52,7 @@ DOXY_ERRCODE=$?
 RESULT=0
 
 if [ "${DOXY_ERRCODE}" -ne 0 ] ; then
-    echo "'make doc' exited with non-zero code (${DOXY_ERRCODE})"
+    echo "'just doc' exited with non-zero code (${DOXY_ERRCODE})"
     echo "${DOXY_OUTPUT}"
     RESULT=2
 else

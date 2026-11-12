@@ -214,7 +214,7 @@ _greplist() {
 
 # get list of all app directories
 get_apps() {
-    make -f makefiles/app_dirs.inc.mk info-applications \
+    just info-applications \
         | $(_greplist $APPS) | sort
 }
 

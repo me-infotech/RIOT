@@ -49,7 +49,7 @@ BOARD=$1
 RIOTBASE="$(dirname "$0")/../../.."
 TMPFILE="$(mktemp)"
 
-APPLICATIONS="${APPLICATIONS} $(make -sC "${RIOTBASE}" info-applications)"
+APPLICATIONS="${APPLICATIONS} $(just --justfile "${RIOTBASE}/justfile" info-applications)"
 
 for application in ${APPLICATIONS}; do
     printf "${CNORMAL}%-40s${CRESET}" "${application}"

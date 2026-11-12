@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "deny": [
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git merge:*)",
+      "Bash(git rebase:*)",
+      "Bash(git cherry-pick:*)",
+      "Bash(git tag:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(git clean:*)",
+      "Bash(git stash drop:*)",
+      "Bash(git branch -D:*)",
+      "Bash(git branch -d:*)",
+      "Edit(/home/mohammadjavad/Documents/RIOT/**)",
+      "Write(/home/mohammadjavad/Documents/RIOT/**)",
+      "Edit(/home/mohammadjavad/Documents/riot-build-config-thesis/docs/04-make-targets/**)",
+      "Write(/home/mohammadjavad/Documents/riot-build-config-thesis/docs/04-make-targets/**)",
+      "Edit(.opencode/**)",
+      "Write(.opencode/**)"
+    ],
+    "allow": [
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git branch --list:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(just --list:*)",
+      "Bash(just --dry-run:*)",
+      "Bash(make -n:*)"
+    ],
+    "additionalDirectories": [
+      "/home/mohammadjavad/Documents/RIOT",
+      "/home/mohammadjavad/Documents/riot-build-config-thesis"
+    ]
+  }
+}

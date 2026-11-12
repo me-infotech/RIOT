@@ -5,6 +5,8 @@ on:
     paths:
       - 'doc/guides/**'
       - 'doc/starlight/**'
+      - 'justfile'
+      - 'just/**'
       - 'CODE_OF_CONDUCT.md'
       - 'GOVERNANCE.md'
       - 'CONTRIBUTING.md'
@@ -24,5 +26,9 @@ jobs:
         uses: actions/setup-node@v6
         with:
             node-version: '25.x'
+      - name: Install just
+        uses: taiki-e/install-action@v2
+        with:
+          tool: just@1.59.0
       - name: Build documentation
-        run: make build
+        run: just starlight-build

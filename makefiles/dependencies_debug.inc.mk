@@ -17,7 +17,7 @@
 #
 # To compare in an aggregated file, you can run in an application directory:
 #
-#    for board in $(make info-boards); do DEPENDENCY_DEBUG_OUTPUT_DIR=bin/info BOARD=${board} make dependency-debug; done; cat bin/info/* > bin/deps_info
+#    for board in $(just info-boards); do DEPENDENCY_DEBUG_OUTPUT_DIR=bin/info BOARD=${board} make dependency-debug; done; cat bin/info/* > bin/deps_info
 #    DEPENDENCY_DEBUG=1 DEPENDENCY_DEBUG_OUTPUT_DIR=bin/info-global make info-boards-supported; cat bin/info-global/* > bin/deps_info-boards-supported
 #    # And compare both files
 #    diff -u bin/deps_info bin/deps_info-boards-supported

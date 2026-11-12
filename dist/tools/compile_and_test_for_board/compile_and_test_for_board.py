@@ -163,7 +163,7 @@ def apps_directories(riotdir, apps_dirs=None, apps_dirs_skip=None):
     """
     Return sorted list of test directories relative to `riotdir`.
 
-    By default it uses RIOT 'info-applications' command to list them.
+    By default it uses RIOT's 'just info-applications' command to list them.
 
     :param riotdir: base riot directory
     :param apps_dirs: use this applications list instead of the RIOT list
@@ -181,7 +181,7 @@ def apps_directories(riotdir, apps_dirs=None, apps_dirs_skip=None):
 
 def _riot_applications_dirs(riotdir):
     """Applications directories in the RIOT repository with relative path."""
-    cmd = [MAKE, "info-applications"]
+    cmd = ["just", "info-applications"]
 
     out = subprocess.check_output(cmd, cwd=riotdir)
     out = out.decode("utf-8", errors="replace")

@@ -139,7 +139,7 @@ See <http://watr.li/samr21-dev-setup-ubuntu.html>
 If you have multiple boards connected to the same computer and want to flash,
 this is what you can do:
 
-First, run `make list-ttys`. This will show you a list of currently connected
+First, run `just list-ttys`. This will show you a list of currently connected
 boards, their serial numbers and the names of their TTYs:
 
 ```text

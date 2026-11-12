@@ -24,13 +24,13 @@ Generally, the latest LTS version should work fine (As of writing v22), as speci
 Once installed you should be able to install the dependencies and run the site locally with the following command, making sure to be within the root of the repository:
 
 ```bash title="Running the site locally (within the root of the repository)"
-make doc-starlight
+just doc-starlight
 ```
 
 This will start a local development server and open the site in your default web browser. The resulting output should look like this:
 
 ```bash title="Output of running the site locally"
-(3.12.8) [user@computer RIOT]$ make doc-starlight
+(3.12.8) [user@computer RIOT]$ just doc-starlight
 Installing starlight...
 
 Starlight installed successfully.
@@ -55,10 +55,10 @@ You can then browse the site at the URL shown in the output, which is usually `h
 
 One big advantage of Starlight is that it supports hot reloading, which means that any changes you make to the content will be reflected in the browser immediately without needing to refresh the page. This makes it easy to see how your changes affect the site in real-time.
 
-You can also use the `make build` command within the `doc/starlight` folder to build the site for production. This will create a static version of the site in the `dist` directory, which can be deployed to any static file hosting service.
+You can also use the `just starlight-build` command to build the site for production. This will create a static version of the site in the `dist` directory, which can be deployed to any static file hosting service.
 
 ```bash title="Building the site for production"
-cd doc/starlight && make build
+just starlight-build
 ```
 
 ### Folder Structure

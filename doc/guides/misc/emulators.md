@@ -20,10 +20,10 @@ If no emulator is specified by the board configuration (e.g. in its
 `Makefile.include`), the default emulator is `renode`.
 
 The boards with emulator supported can be listed using the
-`info-emulated-boards` target:
+`info-emulated-boards` command:
 
 ```shell
-make info-emulated-boards
+just info-emulated-boards
 ```
 
 ## Features
