@@ -41,9 +41,12 @@ EMULATED_BOARDS_MGBA := "gba_cartridge"
 # EMULATED_BOARDS       board list for info-emulated-boards
 # DOCUMENTATION_FORMAT  Doxygen outputs of doc, doc-man, doc-latex
 #                       (html, man, latex, check; empty: none)
+# Q                     command echo prefix for list-ttys; empty: print
+#                       the command (Make's command-line `Q=`)
 APPLICATION_DIRS := "(derived)"
 EMULATED_BOARDS := "(derived)"
 DOCUMENTATION_FORMAT := "(derived)"
+Q := "(derived)"
 
 # Inputs taken from the environment (Make: `?=`; a set but empty value counts
 # as set, as in Make). Their defaults are derived here, once:
@@ -58,7 +61,10 @@ DOCUMENTATION_FORMAT := "(derived)"
 #                       did in the Makefiles that defined these commands:
 #                       boards: this directory (also when empty),
 #                       info-applications: ".", documentation: git top level
-# Q                     empty (QUIET=0): list-ttys prints its command
+#                       (resolved by the doc recipes only: a backtick here
+#                       would run git, and print its errors, for every recipe)
+# QUIET                 not 1: list-ttys prints its command (default: 1;
+#                       also `just QUIET=0`, as on the Make command line)
 # CC_NOCOLOR            1: no coloured messages
 RIOTBOARD := env("RIOTBOARD", (if env("RIOTBASE", "") == "" { justfile_directory() } else { env("RIOTBASE") }) + "/boards")
 BOARDSDIRS := env("BOARDSDIRS", env("EXTERNAL_BOARD_DIRS", "") + " " + RIOTBOARD)
@@ -66,6 +72,7 @@ RIOTTOOLS := env("RIOTTOOLS", justfile_directory() + "/dist/tools")
 DOXYGEN := env("DOXYGEN", "doxygen")
 APPS_BLACKLIST := env("RIOTBASE", ".") + "/makefiles/app_dirs.blacklist"
 DOC_RIOTBASE := env("RIOTBASE", "(git top level)")
+QUIET := env("QUIET", "1")
 
 # Settings passed to the recipe scripts through the environment, never pasted
 # into script text, so that unusual characters cannot change a script.
@@ -82,6 +89,8 @@ export _RIOT_EMULATED_BOARDS_FIXED := EMULATED_BOARDS_QEMU + " " + EMULATED_BOAR
 export _RIOT_APPLICATION_DIRS := APPLICATION_DIRS
 export _RIOT_EMULATED_BOARDS := EMULATED_BOARDS
 export _RIOT_DOCUMENTATION_FORMAT := DOCUMENTATION_FORMAT
+export _RIOT_QUIET := QUIET
+export _RIOT_Q := Q
 
 # ---------------------------------------------------------------- output
 

@@ -127,11 +127,16 @@ info-applications:
     fi
     exec /bin/sh -c 'for dir in $1; do echo $dir; done' sh "$dirs"
 
-# Like Make's `$(Q)`, the command is printed when Q is set and empty.
+# Like Make's `$(Q)` (Makefile.include): the command is printed when QUIET is
+# not 1, or when Q is given empty on the command line.
 [doc('List the serial devices of the host.')]
 [group('repository')]
 list-ttys:
     #!/usr/bin/env bash
     cmd="$_RIOT_RIOTTOOLS/usb-serial/ttys.py"
-    if [ "${Q+x}" = x ] && [ -z "$Q" ]; then echo "$cmd"; fi
+    if [ "$_RIOT_Q" = "(derived)" ]; then
+        [ "$_RIOT_QUIET" = 1 ] || echo "$cmd"
+    elif [ -z "$_RIOT_Q" ]; then
+        echo "$cmd"
+    fi
     exec $cmd

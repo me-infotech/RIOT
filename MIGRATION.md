@@ -63,8 +63,9 @@ directory (no goal or an unknown goal) prints a short pointer to
 
 | Input | How to give it | As in Make |
 |---|---|---|
-| `APPLICATION_DIRS`, `EMULATED_BOARDS`, `DOCUMENTATION_FORMAT` | `just NAME=value <recipe>` (environment ignored) | command line only (`:=`) |
-| `BOARDS`, `BOARDSDIRS`, `EXTERNAL_BOARD_DIRS`, `RIOTBOARD`, `RIOTBASE`, `RIOTTOOLS`, `DOXYGEN`, `Q`, `CC_NOCOLOR` | environment | environment or command line (`?=`) |
+| `APPLICATION_DIRS`, `EMULATED_BOARDS`, `DOCUMENTATION_FORMAT`, `Q` | `just NAME=value <recipe>` (environment ignored) | command line only (`:=`; `Q` is set from `QUIET`) |
+| `QUIET` | environment or `just QUIET=0 <recipe>` | environment or command line (`?=`) |
+| `BOARDS`, `BOARDSDIRS`, `EXTERNAL_BOARD_DIRS`, `RIOTBOARD`, `RIOTBASE`, `RIOTTOOLS`, `DOXYGEN`, `CC_NOCOLOR` | environment | environment or command line (`?=`) |
 
 Without an application context, `info-boards` and `info-emulated-boards`
 use only the inputs given; an `EXTERNAL_BOARD_DIRS` set in an application's
@@ -77,12 +78,14 @@ Makefile must be passed explicitly (`EXTERNAL_BOARD_DIRS=… just info-boards`).
 `dist/tools/doccheck/check.sh`, `dist/tools/compile_test/compile_like_murdock.py`,
 `dist/tools/insufficient_memory/update_insufficient_memory_board.sh`,
 `dist/tools/buildsystem_sanity_check/save_all_dependencies_resolution_variables.sh`,
-`.github/workflows/{test,deploy}-guides.yml` (new step installs just 1.59.0
+`.github/workflows/test-on-iotlab.yml` (installs just for
+`compile_and_test_for_board.py`), `.github/workflows/{test,deploy}-guides.yml` (new step installs just 1.59.0
 with `taiki-e/install-action@v2`; `justfile` and `just/**` added to the path
 filters), `.github/workflows/static-test.yml` (just installed on the runner and
 mounted into the `riot/static-test-tools` container, which has no just yet),
 `features.yaml` (comment), `features_yaml2mx.py` (generated hint text;
-`makefiles/features_existing.inc.mk` regenerated), and 14 documentation files.
+`makefiles/features_existing.inc.mk` regenerated), the zsh completion
+(`list-ttys` removed from the make targets), and 14 documentation files.
 Release notes and the generated changelog are historical and unchanged.
 
 ### Prerequisite
@@ -90,7 +93,11 @@ Release notes and the generated changelog are historical and unchanged.
 `just` must be installed (tested with 1.59.0; the justfiles use `import`,
 `[group]`, `[doc]`, `[working-directory]`, `[no-exit-message]`,
 `[positional-arguments]`). Make also needs it for `doc-ci` and for the base
-directory Makefile, which reads `APPS_BASE_DIRS` with `just --evaluate`. The
+directory goals `clean`, `distclean` and `info-applications-supported-boards`,
+which read `APPS_BASE_DIRS` with `just --evaluate`; without just these stop
+with an explicit error, the other base-directory goals (`docclean`,
+`pkg-clean`, `static-test`, the pointer to just) and all application builds
+work as before. The
 CI images (riotbuild, static-test tools, Murdock workers) must provide just
 before this can go upstream; the static-test workflow mounts it meanwhile.
 `doc-ci` passes a command-line `DOCUMENTATION_FORMAT` on to just.

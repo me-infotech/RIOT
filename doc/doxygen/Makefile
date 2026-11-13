@@ -17,7 +17,7 @@ LESSC ?= lessc
 # When updating the version, make sure to update the SHA512 checksum
 # of the doxygen-x.xx.x.linux.bin.tar.gz archive accordingly to avoid cache
 # misses. Single source: just/settings.just.
-DOXYGEN_MIN_VERSION := $(shell just --justfile "$(_RIOT_JUSTFILE)" --evaluate DOXYGEN_MIN_VERSION)
+DOXYGEN_MIN_VERSION := $(shell just --justfile "$(_RIOT_JUSTFILE)" --evaluate DOXYGEN_MIN_VERSION 2>/dev/null)
 ifneq (,$(filter doc-ci,$(MAKECMDGOALS)))
   ifeq (,$(DOXYGEN_MIN_VERSION))
     $(error DOXYGEN_MIN_VERSION could not be read from just/settings.just (is just installed))

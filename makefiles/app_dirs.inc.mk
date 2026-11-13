@@ -7,9 +7,12 @@ _RIOT_JUSTFILE := $(abspath $(dir $(lastword $(MAKEFILE_LIST)))../justfile)
 RIOTBASE ?= .
 
 # Single source: just/settings.just (`info-applications` is a just recipe).
-APPS_BASE_DIRS := $(shell just --justfile "$(_RIOT_JUSTFILE)" --evaluate APPS_BASE_DIRS)
+# Only the goals below need it; without just the other root goals still work.
+APPS_BASE_DIRS := $(shell just --justfile "$(_RIOT_JUSTFILE)" --evaluate APPS_BASE_DIRS 2>/dev/null)
 ifeq (,$(APPS_BASE_DIRS))
-  $(error APPS_BASE_DIRS could not be read from just/settings.just (is just installed))
+  ifneq (,$(filter clean distclean info-applications-supported-boards CLEAN--% DISTCLEAN--%,$(MAKECMDGOALS)))
+    $(error APPS_BASE_DIRS could not be read from just/settings.just (is just installed))
+  endif
 endif
 TOOLS_BASE_DIRS = dist/tools
 
@@ -20,11 +23,11 @@ TOOLS_BASE_DIRS = dist/tools
 # 3. exclude build artifacts (below bin/)
 # 4. exclude false positives from app_dirs.blacklist
 # 5. sort
-APPLICATION_DIRS := $(shell find $(APPS_BASE_DIRS) -name Makefile -type f | \
+APPLICATION_DIRS := $(if $(APPS_BASE_DIRS),$(shell find $(APPS_BASE_DIRS) -name Makefile -type f | \
     xargs dirname | \
     grep -vF "/bin/" | \
     grep -vFf $(RIOTBASE)/makefiles/app_dirs.blacklist | \
-    sort | uniq)
+    sort | uniq))
 
 # used for `make claen` and `make distclean`
 TOOLS_DIRS := $(shell find $(TOOLS_BASE_DIRS) -mindepth 2 -maxdepth 2 -name Makefile -type f | \

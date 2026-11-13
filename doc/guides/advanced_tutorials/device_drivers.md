@@ -353,8 +353,8 @@ endif
 
 ### Helper Tools
 
-To help you start writing a device driver, the RIOT build system provides the
-`generate-driver` make target. It is a wrapper around the
+To help you start writing a device driver, RIOT's root justfile provides the
+`generate-driver` just recipe. It is a wrapper around the
 [riotgen](https://pypi.org/project/riotgen/) command line tool that is helpful
 when starting to implement a driver: all minimum files are generated with
 copyright headers, doxygen groups, etc, so you can concentrate on the driver

@@ -7,7 +7,7 @@ boards; `native`/`native32`/`native64` run on the host.
 ## Build
 
 - Always build inside an app or test directory. Root `make` only prints a
-  welcome (`Makefile:5`).
+  hint to `just --list` (repository commands run with just).
 - `make -C examples/basic/hello-world BOARD=native64 all`
 - `BOARD` defaults to `native` in every example and in
   `tests/Makefile.tests_common`; hardware builds need `BOARD=<board>`.
