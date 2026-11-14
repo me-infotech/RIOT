@@ -1,0 +1,18 @@
+# P4-Baseline (Roadmap P4 Schritt 1) -- erzeugt 2026-11-13 vom config-analyst
+# Checkout: /home/mohammadjavad/Documents/RIOT, Commit 0be9299ca97e5db753861f326106619ca7c72c4a
+# Werkzeuge: GNU Make 4.3; just 1.59.0; GNU bash, version 5.2.21(1)-release (x86_64-pc-linux-gnu); getconf LONG_BIT=64; gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0; Linux 7.0.0-43-generic x86_64
+# Vorher geprueft: info-build-json/info-debug-variable-* schreiben keine Dateien
+#   (git status --short --ignored vor/nach identisch, im Klon und im Referenz-Checkout).
+# Arbeitsverzeichnis: /home/mohammadjavad/Documents/RIOT ; Umgebung ohne BOARD/CFLAGS/DEVELHELP/QUIET/WERROR gesetzt.
+make --no-print-directory -C examples/basic/hello-world BOARD=native64 info-build-json > hello-world.native64.info-build-json.json 2> hello-world.native64.stderr.txt
+make --no-print-directory -C examples/basic/hello-world BOARD=native info-build-json > hello-world.native.info-build-json.json 2> hello-world.native.stderr.txt
+make --no-print-directory -C examples/networking/gnrc/networking BOARD=native64 info-build-json > gnrc_networking.native64.info-build-json.json 2> gnrc_networking.native64.stderr.txt
+# info-debug-variables.txt: je Kombination und Variable
+#   make --no-print-directory -C <app> BOARD=<board> info-debug-variable-<VAR> 2>/dev/null
+#   VAR in: BOARD BOARD_ALIAS RIOTBASE APPLICATION APPDIR DEVELHELP QUIET WERROR CPU CPU_MODEL CPU_FAM CPU_ARCH BINDIRBASE BINDIR
+#           USEMODULE USEPKG DEFAULT_MODULE DISABLE_MODULE FEATURES_REQUIRED FEATURES_REQUIRED_ANY FEATURES_OPTIONAL FEATURES_BLACKLIST
+#           FEATURES_USED FEATURES_PROVIDED PKG_PATHS EXTERNAL_BOARD_DIRS EXTERNAL_MODULE_DIRS EXTERNAL_PKG_DIRS TOOLCHAIN OPTIMIZATION LTO
+#           NATIVE_ARCH_BIT RIOT_EMULATOR PROGRAMMER TERMPROG FLASHER DEBUGGER KCONFIG_ADD_CONFIG TEST_KCONFIG USE_ZEP ZEP_PORT_BASE RIOT_CI_BUILD CFLAGS
+#   (Format: <kombination>\t<VAR>\t<wert>; Werte sind Roh-Make-Werte, nicht sortiert/dedupliziert)
+# Gegenprobe RIOT_Test (HEAD 8a39e8ebb9): gleiche 3 Befehle, Pfad RIOT_Test->RIOT ersetzt, cmp gegen die Dateien hier: alle 3 identisch.
+# Pruefen: cd p4-baseline && sha256sum -c SHA256SUMS

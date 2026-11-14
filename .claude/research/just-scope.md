@@ -71,7 +71,7 @@ user inputs / repository locations, not resolved state; just reads them from
 the environment. Make-*derived* values (`BOARDSDIRS` from a Makefile,
 `APPLICATION_DIRS`, filtered `BOARDS`) are never passed on.
 
-**Status 2026-11-12:** A+B implemented (roadmap P3, uncommitted) — see
+**Status 2026-11-12:** A+B implemented (roadmap P3, committed on branch `migration/just-group1-extraction`) — see
 `test-logs/2026-11-12-p3-group1-just.md`.
 
 Note (historical, forwards removed by D20): `export BOARDS ?=` (target-specific, `makefiles/app_dirs.inc.mk`)
@@ -86,6 +86,14 @@ the other forwarded recipes do not read `BOARDS`.
 | `generate-board`, `generate-driver`, `generate-example`, `generate-module`, `generate-pkg`, `generate-test` | `makefiles/tools/riotgen.inc.mk:17-21` | `RIOTBASE=<root> riotgen <kind> -i`; external host tool, only input is the repo root |
 | `riotgen-installed` | `riotgen.inc.mk:8` | `command -v riotgen` |
 | `generate-features` | `Makefile:29` | `features_yaml2mx.py features.yaml --output-makefile …`; recipe is Make-free. Its *output* is a Make include (consumer = config layer); `check_features_existing_inc_mk_is_up_to_date.sh` calls `make generate-features` and must switch to `just` when migrated |
+
+### F — new just recipes that never were Make targets (1; roadmap P4, D21)
+
+| Recipe | Source | Why just is fine |
+|---|---|---|
+| `generate-app-config` | `just/generate.just` (working tree 2026-11-13) | `riot_app_config.py --all`: regenerates every `riot-app.inc.mk` from its `riot-app.yaml`, repository-wide, like `generate-features`; no application context, no make, reads no resolved state. just itself never reads the application configuration; the recipe runs a Python tool that does (same exception as `generate-features`, which reads `features.yaml`). Its output is the transitional Make adapter of the configuration layer |
+
+Not counted in the 36 migrated targets (no Make predecessor).
 
 ### C — stay in Make for now (2; user decision 2026-11-12, D18)
 

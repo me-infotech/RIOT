@@ -228,6 +228,7 @@ check_not_setting_board_equal() {
     patterns+=(-e '^[[:space:]]*BOARD[[:space:]]*=')
 
     pathspec+=('**/Makefile')
+    pathspec+=('**/riot-app.inc.mk')
 
     git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
         | error_with_message 'Applications Makefile should use "BOARD ?="'
@@ -242,6 +243,7 @@ check_board_insufficient_memory_not_in_makefile() {
     patterns+=(-e '^[[:space:]]*BOARD_INSUFFICIENT_MEMORY[[:space:]:+]*=')
 
     pathspec+=('**/Makefile')
+    pathspec+=('**/riot-app.inc.mk')
 
     git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
         | error_with_message 'Move BOARD_INSUFFICIENT_MEMORY to Makefile.ci'
@@ -255,6 +257,7 @@ checks_tests_application_not_defined_in_makefile() {
     patterns+=(-e '^[[:space:]]*APPLICATION[[:space:]:+]=')
 
     pathspec+=('tests/**/Makefile')
+    pathspec+=('tests/**/riot-app.inc.mk')
     pathspec+=(':!tests/build_system/external_board_native/Makefile')
 
     git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
@@ -269,6 +272,7 @@ checks_develhelp_not_defined_via_cflags() {
     patterns+=(-e '^[[:space:]]*CFLAGS[[:space:]:+]+=[[:space:]:+]-DDEVELHELP')
 
     pathspec+=('**/Makefile')
+    pathspec+=('**/riot-app.inc.mk')
 
     git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
         | error_with_message "Use DEVELHELP ?= 1 instead of using CFLAGS directly"

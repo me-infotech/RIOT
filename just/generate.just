@@ -9,6 +9,11 @@
 generate-features:
     @./dist/tools/features_yaml2mx/features_yaml2mx.py features.yaml --output-makefile makefiles/features_existing.inc.mk
 
+# Regenerate riot-app.inc.mk from riot-app.yaml in every application directory.
+[group('generate')]
+generate-app-config:
+    @./dist/tools/riot_app_config/riot_app_config.py --all
+
 # Check that `riotgen` is installed.
 [group('generate')]
 [no-exit-message]

@@ -5,8 +5,10 @@ SPDX-License-Identifier: LGPL-2.1-only
 
 # RIOT Build-System Migration
 
-**Status (2026-11-12):** task layer (roadmap P3) implemented in the working
-tree of `master` (`0be9299ca9`), **uncommitted**. The 36 group-1 targets are
+**Status (2026-11-13):** task layer (roadmap P3) implemented on top of
+`master` (`0be9299ca9`) and committed on branch
+`migration/just-group1-extraction` (`f6e2445482`, fixes `8a39e8ebb9`).
+The 36 group-1 targets are
 extracted from Make completely and run with `just`. Groups 2A/2B/2C/3 are
 unchanged and stay in Make until the build layer (CMake + Ninja, compared
 with Meson + Ninja) takes them over.
@@ -33,7 +35,7 @@ Scope: `.claude/research/just-scope.md`; comparison with the inventory:
 | `justfile` | shell setting and `import` of the files below (35 lines) |
 | `just/settings.just` | all constants, defaults and inputs (single source) |
 | `just/repository.just` | `[repository]` welcome, print-versions, info-boards, info-emulated-boards, info-applications, list-ttys |
-| `just/generate.just` | `[generate]` generate-features, riotgen-installed, generate-{board,driver,example,module,pkg,test} |
+| `just/generate.just` | `[generate]` generate-features, generate-app-config (P4), riotgen-installed, generate-{board,driver,example,module,pkg,test} |
 | `just/doc.just` | `[doc]` doc, doc-man, doc-latex, doc-starlight, doxygen-*, graphviz-check, starlight-* |
 
 `import` keeps the recipe names unprefixed (`just info-boards`, `just doc`).
@@ -102,6 +104,15 @@ CI images (riotbuild, static-test tools, Murdock workers) must provide just
 before this can go upstream; the static-test workflow mounts it meanwhile.
 `doc-ci` passes a command-line `DOCUMENTATION_FORMAT` on to just.
 
+The configuration layer (section below) additionally needs Python 3 with
+PyYAML and **jsonschema** (Debian/Ubuntu: `python3-yaml`,
+`python3-jsonschema`; tested with jsonschema 4.10.3) for
+`just generate-app-config` and for the static test
+`check_riot_app_config_up_to_date.sh`. The `riot/static-test-tools` image
+must provide jsonschema before this can go upstream; without it the check
+fails with an explicit error. Plain `make` builds do not need it (they read
+the checked-in `riot-app.inc.mk`).
+
 ## Verification
 
 Evidence: `.claude/research/test-logs/2026-11-12-p3-group1-just.md`.
@@ -128,6 +139,98 @@ text; the welcome text points to just; generated hint texts say
 `just generate-features`; no application-context checks and warnings;
 values are data and are not re-parsed by the shell.
 
+## Configuration layer (roadmap P4)
+
+**Status (2026-11-13):** proof of concept in the working tree of
+`migration/just-group1-extraction` on top of `8a39e8ebb9`, **uncommitted**
+(decision log D21 and its "Nachtrag").
+
+### Rule
+
+`riot-app.yaml` is the authoritative, tool-independent source of an
+application's inputs. It holds no Make syntax. Make reads it only through a
+generated, checked-in adapter `riot-app.inc.mk` until the build tools of P6
+(CMake or Meson) read the YAML directly. `just` itself never reads the
+application configuration; the repository-wide recipe
+`just generate-app-config` runs a Python tool that does (the same exception
+as `generate-features`, which reads `features.yaml`).
+
+### Files
+
+| File | Role |
+|---|---|
+| `dist/tools/riot_app_config/riot-app.schema.json` | JSON Schema (draft 2020-12) of `riot-app.yaml` |
+| `dist/tools/riot_app_config/riot_app_config.py` | validator and generator (`--all`, `--check`) |
+| `dist/tools/riot_app_config/README.md` | keys, value rules, usage |
+| `dist/tools/ci/check_riot_app_config_up_to_date.sh` | static test, called from `static_tests.sh` (test `riot_app_config`) |
+| `dist/tools/ci/{static_tests.sh,test_selection.sh}` | hook; `*riot-app.yaml` and `*riot-app.inc.mk` also count as build files (feature resolution, boards-supported checks) |
+| `dist/tools/buildsystem_sanity_check/check.sh` | the rules on `BOARD =`, `BOARD_INSUFFICIENT_MEMORY`, `APPLICATION` in tests and `-DDEVELHELP` also scan `riot-app.inc.mk` |
+| `just/generate.just` | recipe `generate-app-config` |
+| `examples/basic/hello-world/{Makefile,riot-app.yaml,riot-app.inc.mk}` | migrated application |
+| `examples/networking/gnrc/networking/{Makefile,riot-app.yaml,riot-app.inc.mk}` | migrated application (the `USE_ZEP` condition and the include after `Makefile.include` stay in the Makefile) |
+
+### Inputs and precedence
+
+Keys (full table: `dist/tools/riot_app_config/README.md`):
+`schema_version` (required, `1`), `application`, `board`, `riotbase`,
+`usemodule`, `usepkg`, `disable_module`, `features_required`,
+`features_required_any`, `features_optional`, `features_blacklist`,
+`cflags`, `develhelp`, `quiet`, `werror`, `app_defaults`,
+`external_{board,module,pkg}_dirs`. Each key maps to one Make variable with
+the operator of the former Makefile (`APPLICATION =`, `?=` for defaults,
+`+=` for lists). Precedence is therefore unchanged: command line and
+environment override the YAML values exactly as they overrode the Makefile
+values. Values are checked strictly: only plain decimal integers are
+numbers; YAML 1.1 forms such as `017754`, `0x10`, `1:30`, `1_000`, `1.0`
+and `yes`/`no`/`on`/`off` are errors. `app_defaults` must not set RIOT build
+variables (`CPU`, `CFLAGS`, `FEATURES_PROVIDED`, ...); `cflags` must not
+contain `-DDEVELHELP`.
+
+### Adding an application
+
+1. Write `riot-app.yaml` next to the `Makefile` (start from the one of
+   `hello-world`; `schema_version: 1`; leave out `application` in tests).
+2. Move the unconditional settings from the `Makefile` into it; keep
+   conditions (`ifeq`, …) and everything after `Makefile.include` in the
+   `Makefile`.
+3. Replace the settings in the `Makefile` by the include block with the
+   missing-fragment error (README, section "What stays in the Makefile").
+4. Run `just generate-app-config` in the RIOT root and check the result in
+   both files.
+
+### Verification
+
+Evidence: `.claude/research/test-logs/2026-11-13-p4-config-layer.md`.
+`info-build-json`, its stderr and 43 `info-debug-variable-*` values for
+hello-world/`native64`, hello-world/`native` and gnrc_networking/`native64`
+are byte-identical to the baseline `.claude/research/p4-baseline/` (after
+normalising the tree path); 25 precedence cases (environment, command line)
+are identical to the clean tree; `make -C`, `make` in the application
+directory and `make -f <abs>/Makefile` from another directory (with
+`RIOTBASE`) find the fragment; negative tests (schema, YAML 1.1 values,
+`schema_version`, missing fragment, unreadable files, `--all` reporting
+every file) fail with clear messages; sanity check, features check, CI
+check and `just --fmt --check --unstable` pass.
+
+### Known limits
+
+- Conditional settings (`ifeq (1,$(USE_ZEP))`, …) and includes after
+  `Makefile.include` stay in the application `Makefile`.
+- Module dependencies are still resolved by Make (`Makefile.dep`); a
+  tool-independent resolver comes with the build layer (P6).
+- Only two applications are migrated (`hello-world`, `gnrc_networking`);
+  only `native64` and `native` were checked.
+- Make does not read `riot-app.yaml`: after editing it, run
+  `just generate-app-config`, otherwise `make` uses the old
+  `riot-app.inc.mk` (the static test catches this in CI).
+- `riotbase` stays relative to `$(CURDIR)` as before; `make -f` from another
+  directory needs `RIOTBASE` (unchanged behaviour).
+- Tutorials that tell users to add modules to the application `Makefile`
+  (for example `doc/guides/networking/rpl.mdx`, lines 28-31, which links to
+  the `Makefile` of `gnrc_networking`) are left unchanged: they remain valid
+  for every application that is not migrated; in `gnrc_networking` the
+  `USEMODULE` list is now in `riot-app.yaml`.
+
 ## Onboarding
 
 ```sh
@@ -136,6 +239,9 @@ just info-boards
 just doc                    # Doxygen HTML
 just DOCUMENTATION_FORMAT="html man" doc
 cd examples/basic/default && make BOARD=native64   # applications: make
+# migrated applications (hello-world, gnrc_networking): edit riot-app.yaml,
+# then regenerate riot-app.inc.mk; make does not read the YAML
+just generate-app-config
 ```
 
 ---

@@ -1,0 +1,24 @@
+# Configuration of the hello-world application. riot-app.inc.mk is generated
+# from this file: after changing it, run `just generate-app-config` in the root
+# of the RIOT repository. Keys and their meaning:
+# dist/tools/riot_app_config/README.md
+
+# Version of the format of this file (required):
+schema_version: 1
+
+# name of your application
+application: hello-world
+
+# If no BOARD is found in the environment, use this default:
+board: native
+
+# Path to the RIOT base directory, relative to this directory:
+riotbase: ../../..
+
+# Comment this out to disable code in RIOT that does safety checking
+# which is not needed in a production environment but helps in the
+# development process:
+develhelp: 1
+
+# Change this to 0 show compiler invocation lines by default:
+quiet: 1
