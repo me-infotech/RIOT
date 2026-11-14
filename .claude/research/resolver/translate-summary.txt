@@ -1,0 +1,6 @@
+statements: 9847; structured: 9667; expression fallback: 168; unsupported: 12
+helper files reached through includes: 97
+files: 1196; fully translated: 1191; unsupported constructs: 12 in 5 files
+      8  unknown statement
+      3  function call at top level
+      1  STM32_INFO := with functions (function shell)

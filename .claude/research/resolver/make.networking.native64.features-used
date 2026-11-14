@@ -1,0 +1,10 @@
+arch_64bit
+arch_native
+cpu_native
+periph_cpuid
+periph_gpio
+periph_hwrng
+periph_pm
+periph_timer
+periph_timer_query_freqs
+periph_uart

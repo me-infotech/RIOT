@@ -1,0 +1,8 @@
+statements: 18829; structured: 17828; expression fallback: 994; unsupported: 7
+helper files reached through includes: 226
+files: 2126; fully translated: 2122; unsupported constructs: 7 in 4 files
+      2  condition
+      2  endif without if
+      1  else if (esp32,$(CPU))
+      1  unknown statement
+      1  function call at top level (unbalanced: $(warning  * 'auto' to try auto-detecting the node from your experiment)

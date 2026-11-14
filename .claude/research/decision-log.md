@@ -417,3 +417,47 @@ Grundlage: `riot-build-config-thesis/docs/05-migration-concept/examples-and-tool
 - Tools hands-on: Task-Schicht Make, just, Task (go-task); Konfiguration
   Make-Variablen vs. `riot-app.yaml` (Kconfig nur aus der AHP-Bewertung);
   Build Make, CMake + Ninja, Meson + Ninja (im riotbuild-Image).
+
+## D25 — Nutzerentscheidungen 2026-11-14: Forschungsfragen, Board-Gründe, Resolver
+
+- **Forschungsfragen:** Vorschlag vom 2026-11-14 (`thesis/Masterthesis-copy/notes/rq-proposal-2026-11-14.md`)
+  bestätigt; kann später erneut angepasst werden.
+- **Gründe für `nrf52840dk`** (alle belegt in RIOT `0be9299ca9`): auf `native`
+  haben viele Targets keine Bedeutung (Termin); Zeitaufwand; Übertragbarkeit
+  (16 der 298 Boards mit `CPU_MODEL = nrf52840`); Funktionsumfang (91 Features,
+  u. a. BLE, IEEE 802.15.4, USB-Device, ADC/I2C/SPI/PWM/UART/Timer); mehrere
+  Programmer (bmp, jlink, openocd); ARM-Toolchain im gepinnten riotbuild-Image.
+- **P6-Abweichung** (ganze Apps statt erst ein Modul, Make ruft das Build-Tool
+  nicht auf) akzeptiert. **Regel:** vor Abweichungen vom Plan und vor
+  Designentscheidungen den Nutzer fragen.
+- **Resolver (P6, S2-Ende):** Abhängigkeiten als Daten + Python-Resolver
+  (Fixpunkt), halbautomatisch aus `Makefile.dep`/`Makefile.features`
+  übersetzt; Umfang hello-world **und** gnrc_networking auf `nrf52840dk`;
+  Parität mit `info-modules`/`info-features-used`/`info-packages`.
+- Nachtrag D25 (Rückfrage Resolver-Design, 2026-11-14): Auswertung in
+  **Make-Reihenfolge** (Include-Reihenfolge, Durchläufe bis stabil;
+  Reihenfolge-Abhängigkeit wird als Befund dokumentiert); **Übersetzer für
+  alle 720 `Makefile.dep`** mit Zählung der nicht übersetzbaren Konstrukte;
+  Ort **`build-poc/resolver`**, Ausgabe ersetzt Makes Export in `run_poc.sh`.
+
+## D26 — Build ohne Make: Flags, Quellen, Vorstufen (Teil A) — **entschieden und umgesetzt 2026-11-14 (uncommittet)**
+
+- **Flags** (CFLAGS, INCLUDES, LINKFLAGS, Linker-Skript): die eingebundenen
+  `Makefile.include` werden wie beim Resolver in Datenregeln übersetzt und
+  nach der Auflösung ausgewertet; `$(shell …)`-Aufrufe als benannte
+  Python-Bausteine.
+- **Quellen je Modul:** Modul-`Makefile` (MODULE, SRC, NO_AUTO_SRC,
+  SUBMODULES, DIRS) mit demselben Übersetzer; `*.c`-Suche wie `Makefile.base`
+  in Python.
+- **Vorstufen** (Paket-Downloads nach `build/pkg`, `riotbuild.h`,
+  `preprocessor_successor.h`): **vorhandene RIOT-Skripte direkt aufrufen**
+  (`genconfigheader.sh`, `generate_pp_successor_header.sh`, Git-Fetch/Patch
+  wie `pkg/pkg.mk`), gesteuert vom Resolver-Ergebnis; nur der Ablauf ist neu.
+- **Umfang:** zuerst hello-world auf `nrf52840dk`; danach Entscheidung über
+  gnrc_networking.
+- Ergebnis D26 (Testlog `2026-11-14-build-without-make.md`): hello-world auf
+  `nrf52840dk` baut in einem frischen Klon ohne Make; Firmware-Image von
+  CMake + Ninja und Meson + Ninja byte-identisch zum Make-Build. Für die
+  Vorstufen gibt es in RIOT keine eigenständigen Skripte, nur Rezepte:
+  `prestep.py` führt sie als minimaler Rezept-Ausführer aus (Befehle
+  unverändert, rekursives `$(MAKE)` aus den übersetzten Regeln).

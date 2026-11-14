@@ -1,0 +1,6 @@
+arch_64bit
+arch_native
+cpu_native
+periph_gpio
+periph_pm
+periph_uart

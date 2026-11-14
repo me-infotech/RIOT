@@ -1,0 +1,74 @@
+[
+ {
+  "file": "boards/common/makefiles/stdio_cdc_acm.dep.mk",
+  "line": 15,
+  "reason": "function call at top level",
+  "text": "$(call target-export-variables,test,TESTRUNNER_CONNECT_DELAY)"
+ },
+ {
+  "file": "boards/common/makefiles/stdio_tinyusb_cdc_acm.dep.mk",
+  "line": 15,
+  "reason": "function call at top level",
+  "text": "$(call target-export-variables,test,TESTRUNNER_CONNECT_DELAY)"
+ },
+ {
+  "file": "cpu/stm32/stm32_info.mk",
+  "line": 11,
+  "reason": "STM32_INFO := with functions (function shell)",
+  "text": "STM32_INFO     := $(shell echo $(CPU_MODEL_UPPERCASE) | sed -E -e  's/^STM32(F|H|L|W|G|MP|U|C)([0-7]|B|L)([A-Z0-9])([0-9])(.)(.)?(_A)?/\\1 \\2 \\2\\3\\4 \\3 \\4 \\5 \\6 "
+ },
+ {
+  "file": "makefiles/tools/usb_board_reset.mk",
+  "line": 29,
+  "reason": "function call at top level",
+  "text": "$(call target-export-variables,test,TESTRUNNER_CONNECT_DELAY)"
+ },
+ {
+  "file": "makefiles/tools/usb_board_reset.mk",
+  "line": 32,
+  "reason": "unknown statement",
+  "text": ".PHONY: preflash-delay"
+ },
+ {
+  "file": "makefiles/tools/usb_board_reset.mk",
+  "line": 33,
+  "reason": "unknown statement",
+  "text": "preflash-delay: preflash"
+ },
+ {
+  "file": "makefiles/tools/usb_board_reset.mk",
+  "line": 34,
+  "reason": "unknown statement",
+  "text": "sleep $(PREFLASH_DELAY)"
+ },
+ {
+  "file": "makefiles/tools/usb_board_reset.mk",
+  "line": 38,
+  "reason": "unknown statement",
+  "text": ".PHONY: term-delay"
+ },
+ {
+  "file": "makefiles/tools/usb_board_reset.mk",
+  "line": 39,
+  "reason": "unknown statement",
+  "text": "term-delay: $(TERMDELAYDEPS)"
+ },
+ {
+  "file": "makefiles/tools/usb_board_reset.mk",
+  "line": 40,
+  "reason": "unknown statement",
+  "text": "sleep $(TERM_DELAY)"
+ },
+ {
+  "file": "makefiles/utils/ansi_special.mk",
+  "line": 13,
+  "reason": "unknown statement",
+  "text": "define NEWLINE"
+ },
+ {
+  "file": "makefiles/utils/ansi_special.mk",
+  "line": 16,
+  "reason": "unknown statement",
+  "text": "endef"
+ }
+]
