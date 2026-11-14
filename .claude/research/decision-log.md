@@ -404,3 +404,16 @@ Nutzer (Rückfrage 2026-11-14): Methode **Regeln + Make-Datenbank**, Ort
 - `check-new` + `dist/tools/ci/check_new_make_targets.sh` (in
   `static_tests.sh`): neue Targets seit `CI_BASE_BRANCH` werden automatisch
   klassifiziert; CI schlägt fehl, bis sie in `inventory.csv` stehen.
+
+## D24 — Beispiel-Targets und Tool-Vergleich je Kategorie — **entschieden 2026-11-14 (Nutzer)**
+
+Grundlage: `riot-build-config-thesis/docs/05-migration-concept/examples-and-tools.md`
+(Kriterien E1–E6, Verfügbarkeit Ubuntu 24.04 und riotbuild-Image).
+- Beispiele: 1 = `doc`, `generate-features`, `list-ttys`;
+  2A = `info-modules`, `info-features-used`, `info-cpu`;
+  2B = `info-buildsize`, `flash-only`, `term`; 2C = `clean`, `distclean`;
+  3 = `all`, `flash`, `test`. Hardware-Targets ohne Board: gebaut/Dry-Run,
+  Board-Lauf "nicht ausgeführt".
+- Tools hands-on: Task-Schicht Make, just, Task (go-task); Konfiguration
+  Make-Variablen vs. `riot-app.yaml` (Kconfig nur aus der AHP-Bewertung);
+  Build Make, CMake + Ninja, Meson + Ninja (im riotbuild-Image).
