@@ -1,0 +1,12 @@
+MAKE | typo in name (DEVELHLEP)     | exit 0 | DEVELHELP=0
+YAML | typo in name (develhlep)     | exit 1 | error: examples/basic/hello-world/riot-app.yaml: (top): Additional properties are not allowed ('develhlep' was unexpected) error: 1 file(s) failed; no
+MAKE | wrong type (DEVELHELP=yes)   | exit 0 | DEVELHELP=yes
+YAML | wrong type (develhelp: yes)  | exit 1 | error: examples/basic/hello-world/riot-app.yaml: 'yes' (line 21): YAML 1.1 reads yes/no/on/off/true/false as a boolean, which riot-app.yaml does not u
+MAKE | octal-like (QUIET=01)        | exit 0 | QUIET=01
+YAML | octal-like (quiet: 01)       | exit 1 | error: examples/basic/hello-world/riot-app.yaml: '01' (line 24): YAML 1.1 reads this as a number in another notation (octal, hexadecimal, binary, sexa
+MAKE | missing RIOTBASE             | exit 2 | RIOTBASE=make: *** No rule to make target '/Makefile.include'.  Stop.
+YAML | missing riotbase             | exit 1 | error: examples/basic/hello-world/riot-app.yaml: (top): 'riotbase' is a required property error: 1 file(s) failed; nothing written 
+MAKE | unknown board (nrf52840dkx)  | exit 0 | BOARD=nrf52840dk
+YAML | unknown board (nrf52840dkx)  | exit 0 |  
+MAKE | duplicate setting            | exit 0 | QUIET=1
+YAML | duplicate key                | exit 1 | error: examples/basic/hello-world/riot-app.yaml: duplicate key 'quiet' (line 25) error: 1 file(s) failed; nothing written 

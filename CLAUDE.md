@@ -112,6 +112,8 @@ Drei Schichten des Konzepts — nie vermischen:
    sofort erledigen.
 4. **Nach jedem abgeschlossenen Task eine Push-Benachrichtigung** an den
    Nutzer senden (kurz: was fertig ist, was er entscheiden/delegieren kann).
+5. **Usage-Limit:** Ist das Usage-Limit wieder erreicht, anhalten und den
+   Nutzer fragen, ob weitergemacht werden soll (Nutzerregel 2026-11-14).
 
 ## Vorgaben aus dem Termin 2026-11-13 (D22)
 
