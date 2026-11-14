@@ -11,7 +11,6 @@
 # Usage: run_poc.sh <workdir> [app] [board]
 set -u
 W=$(realpath -m "$1"); APP_DIR=${2:-examples/basic/hello-world}; BOARD=${3:-nrf52840dk}
-APP=$(basename "$APP_DIR")
 HERE=$(cd "$(dirname "$0")" && pwd)
 IMG=docker.io/riot/riotbuild@sha256:64b8e341a0ad96309c46169f6425e84e00bfc21291044db1c88c723e523a0a90
 mkdir -p "$W/out"
@@ -23,6 +22,9 @@ run() { # run a command in the container, /riot = clone
     -v "$R:/riot" -w /riot "$IMG" "$@"
 }
 echo "== clone $(git -C "$R" log --oneline -1)"
+# application name (may differ from the directory name, e.g. gnrc_networking)
+APP=$(run make --no-print-directory -C "/riot/$APP_DIR" BOARD="$BOARD" info-debug-variable-APPLICATION 2>/dev/null | tail -1)
+echo "== application $APP, board $BOARD"
 echo "== 2. Make baseline"
 run make -C "/riot/$APP_DIR" BOARD="$BOARD" clean >/dev/null 2>&1
 run make -C "/riot/$APP_DIR" BOARD="$BOARD" QUIET=0 -j1 all > "$O/make.log" 2>&1 || { echo "make failed"; exit 1; }

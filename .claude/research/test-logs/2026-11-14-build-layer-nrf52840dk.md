@@ -91,6 +91,38 @@ than CMake's configure** for the same description; the stress-test
 assumption of `meson-vs-cmake.md` 3.5 ("Meson configures faster") is not
 confirmed for this case.
 
+## 6. Second application: gnrc_networking
+
+Same pipeline (`run_poc.sh <work> examples/networking/gnrc/networking
+nrf52840dk`; `run_poc.sh` now takes the application name from Make's
+`APPLICATION`, which differs from the directory name here). Evidence:
+`.claude/research/build-nrf52840dk/gnrc_networking/`.
+
+| Check | CMake + Ninja | Meson + Ninja |
+|---|---|---|
+| objects | 153 (all C) | 153 |
+| `size` text/data/bss | 95864 / 220 / 19956 = Make | = Make |
+| `nm -n` with addresses (1074 symbols) | **identical** | **identical** |
+| per-file flags | exact, same order (153/153) | all present; same additions as for hello-world |
+| `info-modules` (208), `info-cpu` | identical | identical |
+| `flash-only`, `term` commands | same as `make -n` | same |
+| generated description (lines) | 327 | 331 |
+
+`module_defines_consistent: true` (MODULE_* defines = modules + packages).
+
+Timing (10 rounds, ms, median and IQR):
+
+| Measure | Make | CMake + Ninja | Meson + Ninja |
+|---|---:|---:|---:|
+| resolve / configure | 177 (171–184) | **204** (190–230) | 650 (603–784) |
+| full build | 14955 (14109–16012) | **14685** (14048–16149) | 15609 (14042–16941) |
+| no-op rebuild | 1488 (1455–1574) | **12** (11–13) | **11** (9–12) |
+| incremental (`main.c`) | 1585 (1517–1691) | 1241 (1191–1433) | **1207** (1178–1262) |
+
+The full build is dominated by the compiler (IQRs overlap for all three);
+the build tool matters for configure, no-op and incremental builds. Meson
+again configures about 3× slower than CMake.
+
 ## Reading [inference]
 
 - With the resolution kept outside the build tool (S2), both CMake and

@@ -1,0 +1,21 @@
+== clone f5f5c537f4 build-poc: CMake + Ninja and Meson + Ninja from Make's resolved state (P6)
+== application gnrc_networking, board nrf52840dk
+== 2. Make baseline
+== 3. export + generate
+== 4. build
+== 5. parity
+cmake: size + nm identical to make (1075 lines)
+meson: size + nm identical to make (1075 lines)
+cmake: 153/153 sources; flags missing: none; extra flags: none; resolved flags in the same order: 153/153
+meson: 153/153 sources; flags missing: none; extra flags: {'-I.': 153, '-Ilibobjs0.a.p': 152, '-D_FILE_OFFSET_BITS=64': 153, '-fdiagnostics-color=always': 153, '-I../meson-src': 153, '-Ilibobjs1.a.p': 1}; resolved flags in the same order: 0/153
+== example targets
+cmake info-modules: identical to make
+cmake info-cpu: identical to make
+meson info-modules: identical to make
+meson info-cpu: identical to make
+== done
+== group 2B/3 targets: commands (no hardware: compared, not run)
+-- see <WORK>/out/c.*: make -n vs. ninja -t commands
+cmake clean: ELF removed
+meson clean: ELF removed
+== done 2

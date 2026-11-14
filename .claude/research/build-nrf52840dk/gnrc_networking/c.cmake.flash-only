@@ -1,0 +1,1 @@
+cd /riot/poc/cmake-build && /riot/dist/tools/openocd/openocd.sh flash <ELF>

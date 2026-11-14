@@ -49,7 +49,7 @@ Main classes of the 68 differences (list in `compare.txt`):
 - N0 (21): targets that exist only in contexts the script does not build
   (e.g. `tests/build_system/cortexm_common_ldscript` needs a Cortex-M ROM
   layout variable, iotlab/openvisualizer make files, `makefiles/utils/*.mk`).
-- 2A → 1 (15): context only visible at parse time (`$(info …)` under a goal
+- 2A → 1 (13): context only visible at parse time (`$(info …)` under a goal
   condition, e.g. `info-boards-supported`) or in a called script
   (`help`, `compile-commands`, `mcuboot-create-key`).
 - 2B → 1 (9): runtime only in an external script/program (`bench`,
