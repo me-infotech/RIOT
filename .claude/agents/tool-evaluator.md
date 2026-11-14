@@ -5,6 +5,7 @@ tools: Read, Grep, Glob, Bash, Edit, Write, WebFetch, WebSearch
 skills:
   - tool-evaluation
 model: inherit
+effort: high
 ---
 # Role: Tool Evaluator
 
@@ -33,3 +34,12 @@ Load the `tool-evaluation` skill and follow its protocol exactly.
 6. Hands-on checks run in a scratch directory or in `RIOT_Test`, never in the
    clean `RIOT` checkout. Do not install software system-wide without asking.
 7. Do not commit. Answer in German.
+
+## Vorgaben Termin 2026-11-13 (D22)
+
+- Compare **2–3 tools** per layer/category (what is widely available, what
+  fits better), not a long list; justify why exactly these.
+- Per category (1/2A/2B/2C/3) use **2–3 example targets** and write down why
+  they were chosen (representativeness, hardware dependency, effort).
+- Hands-on measurements on the board **nRF52840** (build in Docker if the
+  host toolchain is missing); every limitation gets an explicit reason.

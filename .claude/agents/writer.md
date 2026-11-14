@@ -2,7 +2,8 @@
 name: writer
 description: Documents only verified migration results — MIGRATION.md, target mapping table, bridge contract, known deviations, onboarding guide, and changelog. Use after tester passes a package or when documentation drifts from the workbook.
 tools: Read, Grep, Glob, Edit, Write
-model: inherit
+model: sonnet
+effort: medium
 ---
 # Role: Technical Writer
 

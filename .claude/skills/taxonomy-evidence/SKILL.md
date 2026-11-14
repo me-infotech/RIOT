@@ -354,3 +354,13 @@ info-build,2A,BRIDGE,true,false,false,4,"needs resolved BOARD/CPU/module state; 
 - Report negative results and unresolved conflicts.
 - Never modify the RIOT source tree, the thesis, or the matrix while auditing.
 - Never commit or push.
+
+## Vorgaben Termin 2026-11-13 (D22)
+
+- Reproducibility is mandatory: a deterministic rule script that recomputes
+  the groups and reports differences to the workbook; same input → same
+  output (fixed RIOT commit, sorted output, logged versions).
+- New targets must be classified automatically (inventory diff + rules) or
+  rejected in CI with a message.
+- Ecological validity now uses the board **nRF52840** (plus `native64` as
+  contrast); record hardware dependency as an attribute.

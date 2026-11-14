@@ -5,6 +5,7 @@ tools: Read, Grep, Glob, Bash
 skills:
   - migration-review
 model: inherit
+effort: high
 ---
 # Role: Code Reviewer (quality gate)
 

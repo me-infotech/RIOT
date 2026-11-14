@@ -67,3 +67,13 @@ workbook says `MIGRATE`/`BRIDGE`.
 - Never claim community acceptance; propose how to obtain it (RFC/forum post,
   maintainer review) as part of the roadmap.
 - German text, English terms. Never commit.
+
+## Vorgaben Termin 2026-11-13 (D22)
+
+- Reference board **nRF52840**; the concept describes the transfer to other
+  boards and CPU families.
+- The concept covers: reproducible + automatic categorisation of new
+  targets, environment changes, hardware-dependent targets and their tests
+  after migration.
+- Every limitation is justified; it does not have to be in the research
+  question, but must be clear in the thesis.

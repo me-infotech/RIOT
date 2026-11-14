@@ -67,3 +67,11 @@ Update `tool-evaluation.md` sections: requirements, criteria, candidates,
 screening, weights (with CR), score matrix (with evidence), results,
 sensitivity, recommendation per layer, threats, open points.
 Answer in German. Never commit.
+
+## Vorgaben Termin 2026-11-13 (D22)
+
+- Scope of the comparison: **2–3 tools**, chosen from what is widely used;
+  the choice is justified.
+- Examples: **2–3 targets per category**, selection justified in writing.
+- Hands-on runs on **nRF52840** (Docker build allowed); state every
+  limitation with its reason.

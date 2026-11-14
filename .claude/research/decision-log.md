@@ -252,7 +252,7 @@ Details: `just-scope.md`. Kurz: 28 `MIGRATE` rein make-frei umsetzbar
 `download_binary` → 2A (+2C-Voraussetzung), `bin`/`mock_suit_sec`/
 `warn_release_tests` → Teil von Gruppe 3 bzw. 2B.
 
-## D19 — Umsetzung der just-Schicht (Roadmap P3) — **umgesetzt 2026-11-12 (uncommitted)**
+## D19 — Umsetzung der just-Schicht (Roadmap P3) — **umgesetzt 2026-11-12, committet 2026-11-13 (Branch `migration/just-group1-extraction`)**
 
 Freigabe Nutzer 2026-11-12: „Fange mit der Umsetzung an … nur Targets, die
 nach Vorschriften in just geschrieben werden können.“
@@ -278,7 +278,7 @@ nach Vorschriften in just geschrieben werden können.“
   (für `doc-ci`), Starlight-`install` (Name gehört zu Gruppe 2C). Beide mit
   „keep in sync“-Kommentar auf beiden Seiten.
 
-## D20 — Vollständige Auslagerung aus Make — **umgesetzt 2026-11-12 (uncommitted)**
+## D20 — Vollständige Auslagerung aus Make — **umgesetzt 2026-11-12, committet 2026-11-13 (`f6e2445482`, Fixes `8a39e8ebb9`)**
 
 Nutzer: (1) migrierte Targets haben keinen Eintrag mehr in Make, (2) ihre
 Funktion ändert sich nicht, (3) zentrale Konfigurationsdatei, (4) justfile je
@@ -295,4 +295,109 @@ Kategorie aufteilen. Rückfragen entschieden:
 - Dokumentation auf just umgeschrieben (Release-Notes/Changelog unverändert).
 
 Damit entfallen die Weiterleitungs-Regeln aus D17/D19 (Make → just als
-Übergang). Abweichungen W1–W13 im Testprotokoll.
+Übergang). Abweichungen W1–W14 im Testprotokoll.
+
+## D21 — Konfigurations-Schicht (Roadmap P4) — **entschieden 2026-11-13**
+
+Grundsatz des Nutzers: **Make wird am Ende durch neue Werkzeuge ersetzt**; es
+wird keine Makefiles und keine Make-Abhängigkeiten mehr geben. Die zentrale
+Konfigurationsdatei ist deshalb die maßgebliche Quelle; jede Make-Anbindung
+ist nur Übergang, bis die Build-Werkzeuge aus P6 (CMake bzw. Meson) die
+Datei direkt lesen.
+
+Entscheidungen (Rückfragen 2026-11-13):
+- Format **YAML** (Vorbild `features.yaml`, PyYAML vorhanden).
+- Umfang des ersten PoC: **alle Eingaben, ohne Bedingungen**
+  (`hello-world`, `gnrc_networking`; `native64`/`native`); Bedingungen wie
+  `USE_ZEP` und Includes nach `Makefile.include` bleiben vorerst als Rest im
+  App-Makefile.
+- Make-Anbindung (Übergang): **generierte, eingecheckte `.inc.mk`**, die das
+  App-Makefile inkludiert; ein CI-Check prüft, dass sie aktuell ist
+  (Muster `features.yaml` → `features_existing.inc.mk`).
+- Vorrang **wie heute**: der Generator erzeugt `?=` bzw. `+=`; Umgebung und
+  Kommandozeile überschreiben weiterhin.
+- **Abhängigkeitsauflösung nicht in P4**: Make löst übergangsweise auf; ein
+  tool-unabhängiger Resolver (Modul-Abhängigkeiten als Daten statt
+  `Makefile.dep`) kommt in P6 mit den Build-Werkzeugen.
+- Schema: **JSON Schema**, geprüft im Generator; der Nutzer erlaubt, dafür
+  nur die nötige Bibliothek (`jsonschema`) zu installieren.
+- Ort: **je App, eigener Dateiname** (z. B. `riot-app.yaml`). Kconfig bleibt
+  unangetastet; ob Kconfig die Datei mit aufgreift, ist laut Nutzer kein
+  Problem, da Kconfig nicht ersetzt werden soll.
+- just liest weder aufgelösten Zustand noch die App-Konfiguration (D17).
+
+Grundlage: `config-analysis.md`, Baseline `p4-baseline/`.
+
+Nachtrag D21 (Rückfragen nach der Umsetzung, 2026-11-13):
+- CI-Check `check_riot_app_config_up_to_date.sh` wird in `static_tests.sh`
+  eingehängt; `jsonschema` wird (wie `just`) als Voraussetzung für die
+  CI-Images dokumentiert.
+- Pflichtfeld `schema_version: 1` in jeder `riot-app.yaml`; der Generator
+  lehnt unbekannte Versionen ab.
+- App-Makefiles brechen mit klarer Meldung ab, wenn `riot-app.inc.mk` fehlt.
+- Kein SPDX-Kopf in YAML/JSON (wie in RIOT üblich); SPDX nur bei `.py`/`.sh`.
+- Zusätzliches just-Rezept `generate-app-config` (`just-scope.md`, Abschnitt F).
+- Präzisierung zu "just liest … nicht die App-Konfiguration": just selbst
+  liest sie nie; das repo-weite Generator-Rezept `generate-app-config` ruft
+  ein Python-Werkzeug auf, das sie liest (dieselbe Ausnahme wie
+  `generate-features` mit `features.yaml`).
+
+## D22 — Termin 2026-11-13: Board nRF52840, reproduzierbare Kategorisierung, Tool-Vergleich je Kategorie — **festgelegt (Betreuung, 2026-11-13; übernommen 2026-11-14)**
+
+Quelle: `riot-build-config-thesis/docs/00-project/meeting-notes.md`
+(Abschnitt 2026-11-13).
+
+1. **Board:** Die Arbeit wird auf **nRF52840** begrenzt (ersetzt D16
+   `native64`/`native` als Ziel-Board). Grund laut Termin: auf `native` haben
+   viele Targets keine Bedeutung (kein board-spezifisches Bauen, kein
+   Flashen/Debuggen). Die Begrenzung muss in der Arbeit begründet werden
+   (z. B. zeitlicher Aufwand) und es muss beschrieben werden, was bei der
+   Migration weiterer Boards passiert (Übertragbarkeit).
+   **Nutzer 2026-11-14: Board `nrf52840dk`, keine Hardware vorhanden.**
+   Hardwareabhängige Targets werden deshalb gebaut/statisch geprüft, ihr
+   Lauf auf dem Board als "nicht ausgeführt (keine Hardware)" protokolliert
+   und als Begrenzung der Arbeit begründet. Toolchain (`arm-none-eabi-gcc` fehlt auf dem Host; `docker` vorhanden →
+   `BUILD_IN_DOCKER=1`).
+2. **Kategorien reproduzierbar:** Die Einteilung 1/2A/2B/2C/3 ist Grundlage
+   und muss reproduzierbar sein (Skript mit festen Regeln statt manueller
+   Zuordnung; gleiche Eingabe → gleiches Ergebnis).
+3. **Neue Targets:** Es muss geprüft werden, dass neu hinzugefügte Targets
+   automatisch kategorisiert werden und funktionsfähig sind (z. B. CI-Check,
+   der unklassifizierte Targets meldet).
+4. **Tool-Vergleich:** 2–3 Tools vergleichen ("welche gibt es überall, welche
+   ist sinnvoller"); je Kategorie 2–3 Beispiel-Targets, deren Auswahl
+   begründet wird.
+5. **Begrenzungen** müssen jeweils aussagekräftig begründet sein; sie müssen
+   nicht in der Forschungsfrage stehen, aber in der Ausarbeitung klar sein.
+   Die Forschungsfrage wird an die neuen Beschränkungen angepasst.
+6. **Umgebungsänderungen:** prüfen, was passiert, wenn sich die Environments
+   ändern. Nutzer 2026-11-14: gemeint ist die Umgebung aus
+   `riot-build-config-thesis/experiments/environment/environment.md`
+   (Host-Maschine: OS, Kernel, CPU, RAM; Software: Make, Git, Python, GCC,
+   just, CMake, Ninja, Meson, Toolchain/Docker). Beispiel schon jetzt: Kernel
+   dort 7.0.0-38, auf dem Host inzwischen 7.0.0-43.
+7. **Hardwareabhängige Targets** identifizieren; sie müssen nach der Migration
+   auf dem Board getestet werden.
+
+Folgen:
+- D16 ist für neue Arbeit überholt. P3 (Gruppe 1, board-unabhängig) bleibt
+  gültig; P4 (`native`) wird für nRF52840 wiederholt bzw. ergänzt.
+- Agents/Skills/CLAUDE.md angepasst (2026-11-14): `CLAUDE.md` Regel 7,
+  `taxonomy-evidence`, `tool-evaluator`, `tester`, `migration-lead`,
+  `concept-architect`, Skills `taxonomy-evidence`, `tool-evaluation`,
+  `migration-concept`, `riot-make-to-just`; Thesis-Repo `CLAUDE.md`,
+  `thesis-writing`, `thesis-writer`, `thesis-reviewer`.
+
+## D23 — Reproduzierbare Kategorisierung (D22 Punkte 2/3) — **entschieden 2026-11-14, umgesetzt (uncommittet)**
+
+Nutzer (Rückfrage 2026-11-14): Methode **Regeln + Make-Datenbank**, Ort
+**`RIOT_Test/dist/tools`** mit CI-Hook.
+- `dist/tools/target_taxonomy/target_taxonomy.py`: Workbook-Regeln als Code
+  (Regel-IDs B1–B7, L1, R1, K1–K3, S0/S1, N0), Kontext `BOARD=nrf52840dk`,
+  Fallback `native64`; deterministisch (zwei Läufe byte-gleich).
+- Ergebnis gegen die 323 Workbook-Targets: Übereinstimmung 0,749,
+  Cohens κ 0,650 (Testlog `2026-11-14-target-taxonomy-rules.md`). Die
+  81 Abweichungen sind Eingabe für die Klärung in P1 (zweiter Kodierer).
+- `check-new` + `dist/tools/ci/check_new_make_targets.sh` (in
+  `static_tests.sh`): neue Targets seit `CI_BASE_BRANCH` werden automatisch
+  klassifiziert; CI schlägt fehl, bis sie in `inventory.csv` stehen.

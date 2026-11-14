@@ -1,0 +1,324 @@
+target,group,scope,evidence
+CHECK_VERSION,2A,Package,pkg/wamr/Makefile:102 (new in complete inventory)
+all,3,App / help,Makefile.include:190
+all-asan,3,App / help,makefiles/arch/native.inc.mk:127
+all-cachegrind,3,App / help,makefiles/arch/native.inc.mk:156
+all-gprof,3,App / help,makefiles/arch/native.inc.mk:122
+all-interrupt,3,Test,tests/drivers/pir/Makefile:11
+all-polling,3,Test,tests/drivers/pir/Makefile:7
+all-ubsan,3,App / help,makefiles/ubsan.inc.mk:34
+all-valgrind,3,App / help,makefiles/arch/native.inc.mk:120
+bench,2B,Test,tests/periph/gpio/Makefile:42-43
+bin,1,Tool,dist/tools/uhcpd/Makefile:5-6
+bindist,3,App / help,makefiles/bindist.inc.mk:14
+binfile,3,App / help,Makefile.include:595; %.bin :700
+bplib_cla_ble,3,Package,pkg/bplib/Makefile:36
+bplib_cla_udp,3,Package,pkg/bplib/Makefile:39
+bplib_fwp,3,Package,pkg/bplib/Makefile:19
+bplib_init,3,Package,pkg/bplib/Makefile:25
+bplib_nc,3,Package,pkg/bplib/Makefile:22
+bplib_stor_vfs,3,Package,pkg/bplib/Makefile:29
+bplib_stor_void,3,Package,pkg/bplib/Makefile:32
+build,1,Doc,doc/starlight/Makefile:12 (new in complete inventory)
+build-system-utils-tests,3,Test,tests/build_system/utils/Makefile:37
+build_source,3,Tool,dist/tools/doxygen/Makefile:89
+build_tests,3,Package,pkg/cryptoauthlib/Makefile:52
+cargo-command,3,App / help,makefiles/cargo-targets.inc.mk:71
+cargo-preflight,2A,App / help,makefiles/cargo-targets.inc.mk:42
+check,1,Doc,doc/doxygen/Makefile:94 (new in complete inventory)
+check-kconfig-errors,2A,Root,makefiles/kconfig.mk:250
+check-toolchain-supported,2A,App / help,makefiles/info.inc.mk:263-264
+check_bindist,3,App / help,makefiles/bindist.inc.mk:31
+cksum_test,3,Tool,dist/tools/lpc2k_pgm/Makefile:31
+clang-tidy,3,App / help,makefiles/clang_tidy.inc.mk:16
+clean,2C,App / help,Makefile:45-47; Makefile.include:750
+clean-intermediates,2C,App / help,Makefile.include:760
+clean-pkg,2C,App / help,Makefile.include:766
+cleanterm,2B,App / help,Makefile.include:818
+code_of_conduct,1,Doc,doc/starlight/Makefile:33 (new in complete inventory)
+coding_conventions,1,Doc,doc/starlight/Makefile:49 (new in complete inventory)
+coding_conventions_cpp,1,Doc,doc/starlight/Makefile:54 (new in complete inventory)
+compile-commands,2A,App / help,Makefile.include:653-657; Makefile.base:94
+compile-tests,3,Test,tests/build_system/cortexm_common_ldscript/Makefile:44
+compressed-image,3,Test,tests/pkg/fatfs/Makefile:27-28
+contributing,1,Doc,doc/starlight/Makefile:71 (new in complete inventory)
+cosy,3,App / help,Makefile.include:801
+cryptoauth,3,Package,pkg/cryptoauthlib/Makefile:35
+debug,2B,App / help,Makefile.include:830-838
+debug-client,2B,App / help,Makefile.include:843-851
+debug-server,2B,App / help,Makefile.include:856-864
+debug-valgrind,2B,App / help,makefiles/arch/native.inc.mk:164
+debug-valgrind-server,2B,App / help,makefiles/arch/native.inc.mk:115
+dependency-debug,2A,App / help,makefiles/dependencies_debug.inc.mk:30
+dependency-debug-features-provided-kconfig,2A,App / help,makefiles/dependencies_debug.inc.mk:40
+dev,1,Doc,doc/starlight/Makefile:21 (new in complete inventory)
+dhcpv6_server,2B,Test,tests/net/gnrc_dhcpv6_client/Makefile:49-51
+distclean,2C,App / help,Makefile:48-56; Makefile.include:769
+doc,1,App / help,Makefile:9-14
+doc-ci,1,Root,Makefile:9-13
+doc-latex,1,App / help,Makefile:9-14
+doc-man,1,App / help,Makefile:9-14
+doc-starlight,1,Root,Makefile:15-16
+docclean,2C,Root,Makefile:18-20
+dose,3,Tool,dist/tools/dose/Makefile:3-4
+download_binary,1,Tool,dist/tools/doxygen/Makefile:81-87
+doxygen-version,1,Doc,doc/doxygen/Makefile:62 (new in complete inventory)
+eclipsesym,2A,App / help,makefiles/eclipse.inc.mk:4
+ed25519_sign_msg,3,Tool,tests/pkg/wolfcrypt-ed25519-verify/tools/Makefile:4-5
+elffile,3,App / help,Makefile.include:593; link :674
+emulate,2B,Root,Makefile.include:869-871
+esp-qemu,3,Test,makefiles/tools/esptool.inc.mk:39-63
+esptool,2A,Tool,makefiles/tools/esptool.inc.mk:65-74
+ethos,3,Tool,dist/tools/ethos/Makefile:3-4
+eval-cachegrind,2B,App / help,makefiles/arch/native.inc.mk:177
+eval-gprof,2B,App / help,makefiles/arch/native.inc.mk:174
+fetch_nrfx_vendor_headers,2A,Package,cpu/nrf5x_common/Makefile.include:14-16
+fido2-test,2B,Test,tests/sys/fido2_ctap_hid/Makefile:29-31
+fido2-test-up,2B,Test,tests/sys/fido2_ctap_hid/Makefile:41-43
+fixdep,3,Tool,dist/tools/fixdep/Makefile:6-7
+flash,3,App / help,Makefile.include:786
+flash-only,2B,App / help,Makefile.include:789
+flashdb_fal,3,Package,pkg/flashdb/Makefile:24
+flashfile,3,App / help,Makefile.include:600
+flashfile-format-check,2B,Tool,makefiles/tools/uf2conv.inc.mk:13-18
+fuzz,2B,App / help,Makefile.include:882-884; dist/tools/fuzzing/afl.sh
+generate-Makefile.ci,3,App / help,makefiles/info-global.inc.mk:149-150; dist/tools/insufficient_memory/create_makefile.ci.sh:55
+generate-board,1,Root,makefiles/tools/riotgen.inc.mk:16-21
+generate-driver,1,Root,makefiles/tools/riotgen.inc.mk:16-21
+generate-example,1,Root,makefiles/tools/riotgen.inc.mk:16-21
+generate-features,1,Root,Makefile:29-32
+generate-module,1,Root,makefiles/tools/riotgen.inc.mk:16-21
+generate-pkg,1,Root,makefiles/tools/riotgen.inc.mk:16-21
+generate-test,1,Root,makefiles/tools/riotgen.inc.mk:16-21
+git-download,2A,Package,pkg/cryptoauthlib/Makefile:63
+governance,1,Doc,doc/starlight/Makefile:39 (new in complete inventory)
+graph,2B,Tool,dist/tools/zep_dispatch/Makefile:47-49
+graphviz-check,1,Doc,doc/doxygen/Makefile:74 (new in complete inventory)
+hello.wasm,3,Example,examples/lang_support/community/wasm/Makefile:28 (new in complete inventory)
+hello_prebuild.wasm,3,Example,examples/lang_support/community/wasm/wasm_sample/Makefile:115 (new in complete inventory)
+help,2A,App / help,Makefile.include:1000-1001
+hexfile,3,App / help,Makefile.include:594; %.hex :697
+host-tools,3,Tool,examples/advanced/suit_update/Makefile:135-136
+html,1,Doc,doc/doxygen/Makefile:88 (new in complete inventory)
+image,2A,Test,tests/pkg/fatfs/Makefile:22-25
+info-applications,1,Root,makefiles/app_dirs.inc.mk:26-27
+info-applications-supported-boards,2A,Root,makefiles/app_dirs.inc.mk:30-33
+info-boards,1,App / help,makefiles/boards.inc.mk:20
+info-boards-collect,2A,Root,makefiles/info-global.inc.mk:158
+info-boards-features-blacklisted,2A,Root,makefiles/info-global.inc.mk:143
+info-boards-features-conflicting,2A,Root,makefiles/info-global.inc.mk:146
+info-boards-features-missing,2A,Root,makefiles/info-global.inc.mk:140
+info-boards-supported,2A,App / help,makefiles/info-global.inc.mk:137
+info-build,2A,App / help,makefiles/info.inc.mk:33
+info-build-json,2A,App / help,makefiles/info.inc.mk:165
+info-buildsize,2B,App / help,makefiles/info.inc.mk:30
+info-buildsizes-diff,2B,Root,makefiles/info-global.inc.mk:77-115
+info-cpu,2A,App / help,makefiles/info.inc.mk:237
+info-emulated-boards,1,App / help,makefiles/boards.inc.mk:32
+info-features-missing,2A,App / help,makefiles/info.inc.mk:246
+info-features-provided,2A,App / help,makefiles/info.inc.mk:240
+info-features-required,2A,App / help,makefiles/info.inc.mk:243
+info-features-used,2A,App / help,makefiles/info.inc.mk:249
+info-files,2A,App / help,makefiles/info.inc.mk:213
+info-iotlab-node,2A,Root,dist/testbed-support/makefile.iotlab.single.inc.mk:175
+info-kconfig-variables,2A,App / help,makefiles/info.inc.mk:254
+info-modules,2A,App / help,makefiles/info.inc.mk:231
+info-objsize,2B,App / help,makefiles/info.inc.mk:12
+info-packages,2A,App / help,makefiles/info.inc.mk:234
+info-programmers-supported,2A,App / help,makefiles/info.inc.mk:266
+info-rust,2A,App / help,makefiles/info.inc.mk:269
+info-stm32,2A,Root,cpu/stm32/Makefile.include:53-58
+info-toolchains-supported,2A,App / help,makefiles/info.inc.mk:260
+info-unittests,2A,Root,tests/unittests/Makefile:86-87
+install,2C,Tool,dist/tools/lpc2k_pgm/Makefile:47-48
+integrate_outside_files,1,Doc,doc/starlight/Makefile:30 (new in complete inventory)
+iotlab-debug-server,2B,Tool,dist/testbed-support/Makefile.iotlab:97-104
+iotlab-exp,3,Tool,dist/testbed-support/Makefile.iotlab:67
+iotlab-flash,3,Tool,dist/testbed-support/Makefile.iotlab:91
+iotlab-reset,2B,Tool,dist/testbed-support/Makefile.iotlab:94-95
+iotlab-stop,2B,Tool,dist/testbed-support/Makefile.iotlab:105-107
+iotlab-term,2B,Tool,dist/testbed-support/Makefile.iotlab:111
+latex,1,Doc,doc/doxygen/Makefile:114 (new in complete inventory)
+libcoap,3,Package,pkg/libcoap/Makefile:17
+libcoap_oscore,3,Package,pkg/libcoap/Makefile:21
+libfixmath-unittests,3,Package,pkg/libfixmath/Makefile:11
+link,3,App / help,Makefile.include:666
+list-ttys,1,App / help,Makefile.include:823
+lorabasics_smtc_ral,3,Package,pkg/lorabasics/Makefile:19
+lorabasics_sx1280_driver,3,Package,pkg/lorabasics/Makefile:22
+lostandfound,1,Doc,doc/starlight/Makefile:44 (new in complete inventory)
+lpc2k_pgm,3,Tool,dist/tools/lpc2k_pgm/Makefile:15-17
+lstfile,3,App / help,Makefile.include:596; %.lst :703
+lvgl_draw_sw,3,Package,pkg/lvgl/Makefile:73
+lvgl_extra,3,Package,pkg/lvgl/Makefile:70
+lwip,3,Package,pkg/lwip/Makefile:27
+lwip_api,3,Package,pkg/lwip/Makefile:30
+lwip_app_lwiperf,3,Package,pkg/lwip/Makefile:33
+lwip_core,3,Package,pkg/lwip/Makefile:36
+lwip_ipv4,3,Package,pkg/lwip/Makefile:39
+lwip_ipv6,3,Package,pkg/lwip/Makefile:42
+lwip_netif,3,Package,pkg/lwip/Makefile:45
+lwip_netif_ppp,3,Package,pkg/lwip/Makefile:48
+lwip_polarssl,3,Package,pkg/lwip/Makefile:51
+man,1,Doc,doc/doxygen/Makefile:98 (new in complete inventory)
+mcuboot,3,App / help,makefiles/mcuboot.mk:25
+mcuboot-create-key,2A,Root,makefiles/mcuboot.mk:17-23
+mcuboot-flash,3,Root,makefiles/mcuboot.mk:49-52
+mcuboot-flash-bootloader,2B,Root,makefiles/mcuboot.mk:44-47
+menuconfig,2A,Root,makefiles/kconfig.mk:135-139
+mock_suit_sec,1,Test,tests/riotctrl_shell/suit/Makefile:10
+monocypher_optional,3,Package,pkg/monocypher/Makefile:14
+mosquitto_rsmb,3,App / help,makefiles/tools/targets.inc.mk:41-47
+mpy-test,2B,Test,examples/lang_support/community/micropython/Makefile:44
+nimble_addr,3,Package,pkg/nimble/Makefile:85
+nimble_autoconn,3,Package,pkg/nimble/Makefile:88
+nimble_controller,3,Package,pkg/nimble/Makefile:78
+nimble_drivers_nrf5x,3,Package,pkg/nimble/Makefile:81
+nimble_host,3,Package,pkg/nimble/Makefile:55
+nimble_host_store_ram,3,Package,pkg/nimble/Makefile:61
+nimble_host_util,3,Package,pkg/nimble/Makefile:58
+nimble_netif,3,Package,pkg/nimble/Makefile:91
+nimble_npl_riot,3,Package,pkg/nimble/Makefile:44
+nimble_porting_nimble,3,Package,pkg/nimble/Makefile:41
+nimble_riot_contrib,3,Package,pkg/nimble/Makefile:38
+nimble_rpble,3,Package,pkg/nimble/Makefile:94
+nimble_scanlist,3,Package,pkg/nimble/Makefile:97
+nimble_scanner,3,Package,pkg/nimble/Makefile:100
+nimble_statconn,3,Package,pkg/nimble/Makefile:103
+nimble_svc_bas,3,Package,pkg/nimble/Makefile:65
+nimble_svc_gap,3,Package,pkg/nimble/Makefile:68
+nimble_svc_gatt,3,Package,pkg/nimble/Makefile:71
+nimble_svc_ipss,3,Package,pkg/nimble/Makefile:74
+nimble_transport,3,Package,pkg/nimble/Makefile:48
+nimble_transport_hci_h4,3,Package,pkg/nimble/Makefile:51
+objdump,2B,App / help,Makefile.include:889
+openv-clean,2C,Tool,dist/tools/openvisualizer/makefile.openvisualizer.inc.mk:88-90
+openv-serial,2B,Tool,dist/tools/openvisualizer/makefile.openvisualizer.inc.mk:92-93
+openv-setroot,2B,Tool,dist/tools/openvisualizer/makefile.openvisualizer.inc.mk:85-86
+openv-term,2B,Tool,dist/tools/openvisualizer/makefile.openvisualizer.inc.mk:73-75
+openv-termroot,2B,Tool,dist/tools/openvisualizer/makefile.openvisualizer.inc.mk:77-79
+openv-termtun,2B,Tool,dist/tools/openvisualizer/makefile.openvisualizer.inc.mk:81-83
+patch,2A,Package,pkg/Makefile.http:17
+picosdk,2A,Package,dist/tools/picotool/Makefile:29
+pioasm,3,Tool,pkg/picosdk/Makefile:17-24
+pkg-build,3,App / help,Makefile.include:747
+pkg-clean,2C,Root,Makefile:22-24
+pkg-prepare,2A,App / help,Makefile.include:742
+preflash,2B,App / help,Makefile.include:795
+preflash-delay,2B,Tool,makefiles/tools/usb_board_reset.mk:33-34
+prepare,2A,Package,pkg/local.mk:15-16
+prepare_check_bindist,2A,App / help,makefiles/bindist.inc.mk:25
+preview,1,Doc,doc/starlight/Makefile:17 (new in complete inventory)
+print-size,3,App / help,Makefile.include:693-694
+print-versions,1,Root,Makefile:26-27
+print_build_target,2A,Root,pkg/wamr/Makefile:91-97
+pseudoterm,3,Tool,dist/tools/lpc2k_pgm/Makefile:19-21
+remove,2C,Tool,dist/tools/kconfiglib/Makefile:14-15
+reset,2A,App / help,Makefile.include:874
+riotboot,3,Root,makefiles/boot/riotboot.mk:74
+riotboot/bootloader/binfile,3,Root,makefiles/boot/riotboot.mk:82-93
+riotboot/bootloader/clean,2C,Root,makefiles/boot/riotboot.mk:82-93
+riotboot/bootloader/flash,3,Root,makefiles/boot/riotboot.mk:82-93
+riotboot/combined-slot0,3,Root,makefiles/boot/riotboot.mk:115-117
+riotboot/flash,3,Root,makefiles/boot/riotboot.mk:157
+riotboot/flash-bootloader,3,Root,makefiles/boot/riotboot.mk:78
+riotboot/flash-combined-slot0,3,Root,makefiles/boot/riotboot.mk:129-131
+riotboot/flash-extended-slot0,3,Root,makefiles/boot/riotboot.mk:134-136
+riotboot/flash-slot0,3,Root,makefiles/boot/riotboot.mk:139-143
+riotboot/flash-slot1,3,Root,makefiles/boot/riotboot.mk:146-150
+riotboot/slot0,3,Root,makefiles/boot/riotboot.mk:153
+riotboot/slot1,3,Root,makefiles/boot/riotboot.mk:154
+riotboot_serial,3,Tool,dist/tools/riotboot_serial/Makefile:9-10
+riotgen-installed,1,Root,makefiles/tools/riotgen.inc.mk:8-14
+rm_riot_provided_headers,2C,Package,pkg/mynewt-core/Makefile:43-47
+run,2B,Tool,dist/tools/mosquitto_rsmb/Makefile:28-29
+scan-build,3,App / help,makefiles/scan-build.inc.mk:67
+scan-build-analyze,3,App / help,makefiles/scan-build.inc.mk:78
+security,1,Doc,doc/starlight/Makefile:59 (new in complete inventory)
+sliptty,3,Tool,examples/networking/gnrc/border_router/Makefile:186-187
+softcore_c,3,Package,pkg/ficl/Makefile:55
+static,3,Tool,dist/tools/lpc2k_pgm/Makefile:25
+static-test,1,Root,makefiles/tests.inc.mk:2-3; dist/tools/ci/static_tests.sh
+stdio_tinyusb_cdc_acm,3,Package,pkg/tinyusb/Makefile:18
+suit/genkey,2A,Root,makefiles/suit.base.inc.mk:89
+suit/manifest,3,Root,makefiles/suit.inc.mk:81
+suit/notify,2B,Root,makefiles/suit.inc.mk:91-95
+suit/publish,3,Root,makefiles/suit.inc.mk:83-89
+term,2B,App / help,Makefile.include:812
+term-cachegrind,2B,App / help,makefiles/arch/native.inc.mk:118
+term-delay,2B,Tool,makefiles/tools/usb_board_reset.mk:39-40
+term-gprof,2B,App / help,makefiles/arch/native.inc.mk:119
+term-valgrind,2B,App / help,makefiles/arch/native.inc.mk:110
+termdeps,2B,App / help,Makefile.include:810
+test,3,App / help,makefiles/tests/tests.inc.mk:28
+test-as-root,3,App / help,makefiles/tests/tests.inc.mk:55
+test-as-root/available,2A,Test,makefiles/tests/tests.inc.mk:60-61
+test-assert_overflow_offset_and_romlen,3,Test,tests/build_system/cortexm_common_ldscript/Makefile:153
+test-assert_overflow_too_big_for_rom,3,Test,tests/build_system/cortexm_common_ldscript/Makefile:150
+test-chars_from,1,Test,makefiles/utils/test-strings.mk:32
+test-chars_upto,1,Test,makefiles/utils/test-strings.mk:23
+test-elffile-fw_rom_length,3,Test,tests/build_system/cortexm_common_ldscript/Makefile:67
+test-elffile-overflow,3,Test,tests/build_system/cortexm_common_ldscript/Makefile:55
+test-ensure_value,1,Test,makefiles/utils/test-checks.mk:3
+test-ensure_value-negative,1,Test,makefiles/utils/test-checks.mk:6
+test-exported-variables,1,Test,makefiles/utils/test-variables.mk:14
+test-fw_len_half_rom,3,Test,tests/build_system/cortexm_common_ldscript/Makefile:127
+test-input-hash,3,App / help,makefiles/tests/tests.inc.mk:104
+test-input-hash-changed,3,App / help,"makefiles/tests/tests.inc.mk:115,119,122"
+test-is_number,1,Test,makefiles/utils/test-strings.mk:86
+test-kinetis-lptmr,3,Test,tests/bench/timers/Makefile:49
+test-lowercase,1,Test,makefiles/utils/test-strings.mk:8
+test-max_number,1,Test,makefiles/utils/test-strings.mk:72
+test-memoized-variables,1,Test,makefiles/utils/test-variables.mk:28
+test-murdock,2B,App / help,makefiles/murdock.inc.mk:16
+test-on-ci-enabled,2A,App / help,makefiles/murdock.inc.mk:47
+test-split_chars,1,Test,makefiles/utils/test-strings.mk:17
+test-uppercase,1,Test,makefiles/utils/test-strings.mk:11
+test-uppercase_and_underscore,1,Test,makefiles/utils/test-strings.mk:14
+test-version_is_greater,1,Test,makefiles/utils/test-strings.mk:51
+test-version_is_greater_or_equal,1,Test,makefiles/utils/test-strings.mk:60
+test-version_tuple,1,Test,makefiles/utils/test-strings.mk:97
+test-with-config,3,App / help,makefiles/tests/tests.inc.mk:76
+test-with-config/available,2A,Test,makefiles/tests/tests.inc.mk:64-80
+test-with-config/check-config,2A,Test,makefiles/tests/tests.inc.mk:64-80
+test-xtimer,3,Test,tests/bench/timers/Makefile:43
+test/available,2A,Test,makefiles/tests/tests.inc.mk:37-48
+tests-fw_rom_len,3,Test,tests/build_system/cortexm_common_ldscript/Makefile:124
+tests-offsets,3,Test,tests/build_system/cortexm_common_ldscript/Makefile:95
+tests-rom-overflow,3,Test,tests/build_system/cortexm_common_ldscript/Makefile:146
+tinyusb_class_audio,3,Package,pkg/tinyusb/Makefile:33
+tinyusb_class_bth,3,Package,pkg/tinyusb/Makefile:36
+tinyusb_class_cdc,3,Package,pkg/tinyusb/Makefile:39
+tinyusb_class_dfu,3,Package,pkg/tinyusb/Makefile:42
+tinyusb_class_dfu_runtime,3,Package,pkg/tinyusb/Makefile:45
+tinyusb_class_hid,3,Package,pkg/tinyusb/Makefile:48
+tinyusb_class_midi,3,Package,pkg/tinyusb/Makefile:51
+tinyusb_class_msc,3,Package,pkg/tinyusb/Makefile:54
+tinyusb_class_net,3,Package,pkg/tinyusb/Makefile:57
+tinyusb_class_usbtmc,3,Package,pkg/tinyusb/Makefile:60
+tinyusb_class_vendor,3,Package,pkg/tinyusb/Makefile:63
+tinyusb_class_video,3,Package,pkg/tinyusb/Makefile:66
+tinyusb_common,3,Package,pkg/tinyusb/Makefile:69
+tinyusb_contrib,3,Package,pkg/tinyusb/Makefile:21
+tinyusb_device,3,Package,pkg/tinyusb/Makefile:72
+tinyusb_dfu,3,Package,pkg/tinyusb/Makefile:24
+tinyusb_host,3,Package,pkg/tinyusb/Makefile:75
+tinyusb_hw,3,Package,pkg/tinyusb/Makefile:27
+tinyusb_lib_networking,3,Package,pkg/tinyusb/Makefile:78
+tinyusb_netdev,3,Package,pkg/tinyusb/Makefile:30
+tinyusb_portable_espressif,3,Package,pkg/tinyusb/Makefile:81
+tinyusb_portable_microchip,3,Package,pkg/tinyusb/Makefile:84
+tinyusb_portable_nrf5x,3,Package,pkg/tinyusb/Makefile:87
+tinyusb_portable_stm32_fsdev,3,Package,pkg/tinyusb/Makefile:90
+tinyusb_portable_synopsys_dwc2,3,Package,pkg/tinyusb/Makefile:93
+ubasic,3,Package,pkg/ubasic/Makefile:21
+ucglib_sdl,3,Package,pkg/ucglib/Makefile:14
+uf2-softdevice-check,2B,Tool,makefiles/tools/uf2conv.inc.mk:25
+uhcpd-daemon,3,Tool,examples/networking/gnrc/border_router/Makefile:180-181
+uninstall,2C,Tool,dist/tools/tunslip/Makefile:9-10
+unittests,1,Doc,doc/starlight/Makefile:65 (new in complete inventory)
+usb_id_check,2A,App / help,makefiles/usb-codes.inc.mk:21
+warn_release_tests,1,Test,tests/riotctrl_shell/Makefile.riotctrl_shell_common:14
+welcome,1,Root,Makefile:81
+wolfcrypt,3,Package,pkg/wolfssl/Makefile:28
+zep_dispatch,3,Tool,tests/net/gnrc_sixlowpan_frag_sfr_congure_impl/Makefile:60-61

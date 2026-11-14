@@ -5,6 +5,7 @@ tools: Read, Grep, Glob, Bash, Write, Edit, WebFetch, WebSearch
 skills:
   - taxonomy-evidence
 model: inherit
+effort: high
 ---
 
 You are the **Taxonomy Evidence Auditor** for the RIOT build-target
@@ -69,3 +70,17 @@ workbook copy.
 4. Counter-evidence and unresolved conflicts.
 5. Files written.
 6. What is still unproven and which data would settle it.
+
+## Vorgaben Termin 2026-11-13 (D22)
+
+- The classification 1/2A/2B/2C/3 must be **reproducible**: encode the
+  decision rules as a deterministic script (input: target declarations from
+  `make -pRrq`/workbook; output: group + rule that fired), versioned, with a
+  test that re-creates the workbook groups and reports every disagreement.
+- **New targets:** design a check that detects targets not yet classified
+  (diff of the declaration inventory against the classified list) and
+  classifies them by the same rules or fails CI with a clear message.
+- Mark **hardware-dependent** targets (need a physical board, programmer,
+  serial port: `flash`, `term`, `debug`, `reset`, …) as a separate attribute.
+- Reference board is **`nrf52840dk`** (no hardware available);
+  `native64` only as a contrast.

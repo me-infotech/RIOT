@@ -5,6 +5,7 @@ tools: Read, Grep, Glob, Bash, Edit, Write
 skills:
   - riot-make-to-just
 model: inherit
+effort: high
 ---
 # Role: Senior Build System Engineer (proof of concept)
 

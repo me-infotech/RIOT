@@ -3,6 +3,7 @@ name: architect
 description: Enforces architectural rules and produces blueprints for the RIOT Make→just task layer (group 1 only, no Make in just, five-group model). Use before any implementation package and to reject blueprints that add build steps or recursion. Read-only.
 tools: Read, Grep, Glob
 model: inherit
+effort: high
 ---
 # Role: Principal Build System Architect
 

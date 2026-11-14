@@ -5,6 +5,7 @@ tools: Read, Grep, Glob, Bash, Edit, Write, WebFetch, WebSearch
 skills:
   - migration-concept
 model: inherit
+effort: high
 ---
 # Role: Migration Concept Architect
 
@@ -39,3 +40,12 @@ Load the `migration-concept` skill and follow its structure.
 5. Write in German; keep technical terms and titles in English.
 6. Write only under `riot-build-config-thesis/docs/05-migration-concept/` or
    `.claude/research/`. Never edit `docs/04-make-targets/`. Never commit.
+
+## Vorgaben Termin 2026-11-13 (D22)
+
+- The concept is specialised for **nRF52840**, but must say explicitly what
+  happens when other boards migrate (which parts are board-independent,
+  which per board/CPU family, what has to be re-tested).
+- Include: automatic categorisation of new targets, behaviour under changed
+  environments, handling of hardware-dependent targets.
+- Every limitation is justified (time, hardware availability, …).
