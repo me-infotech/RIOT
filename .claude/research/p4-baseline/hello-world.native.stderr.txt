@@ -1,0 +1,1 @@
+using BOARD="native64" as "native" on a 64-bit system

@@ -1,0 +1,199 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RIOT application configuration (riot-app.yaml)",
+  "description": "Inputs of one RIOT application, independent of the build tool. riot_app_config.py checks every riot-app.yaml against this schema and generates riot-app.inc.mk from it. Each key maps to exactly one Make variable and one operator, noted in its description; the operators are those of the application Makefiles, so that the environment and the command line still override the values. Conditional settings stay in the application Makefile. Strings must not contain Make syntax ('$'), comment characters ('#'), backslashes or white space.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "riotbase"],
+  "properties": {
+    "schema_version": {
+      "description": "Version of this schema. Required; the only version is 1. Not written to Make.",
+      "const": 1
+    },
+    "application": {
+      "description": "Name of the application; leave it out in test applications (RIOT derives it from the directory name there). Make: APPLICATION =",
+      "$ref": "#/$defs/name"
+    },
+    "board": {
+      "description": "Board used when no BOARD is given in the environment or on the command line. Make: BOARD ?=",
+      "$ref": "#/$defs/name"
+    },
+    "riotbase": {
+      "description": "Path of the RIOT base directory, relative to the application directory. Make: RIOTBASE ?= $(CURDIR)/<value>",
+      "$ref": "#/$defs/relative_path"
+    },
+    "usemodule": {
+      "description": "Modules the application uses. Make: USEMODULE += <item>, one line per item, in this order",
+      "$ref": "#/$defs/name_list"
+    },
+    "usepkg": {
+      "description": "Packages the application uses. Make: USEPKG += <item>",
+      "$ref": "#/$defs/name_list"
+    },
+    "disable_module": {
+      "description": "Default modules to leave out. Make: DISABLE_MODULE += <item>",
+      "$ref": "#/$defs/name_list"
+    },
+    "features_required": {
+      "description": "Features the board must provide. Make: FEATURES_REQUIRED += <item>",
+      "$ref": "#/$defs/name_list"
+    },
+    "features_required_any": {
+      "description": "Groups of features of which the board must provide at least one, written 'feat_a|feat_b'. Make: FEATURES_REQUIRED_ANY += <item>",
+      "$ref": "#/$defs/feature_alternatives_list"
+    },
+    "features_optional": {
+      "description": "Features used when the board provides them. Make: FEATURES_OPTIONAL += <item>",
+      "$ref": "#/$defs/name_list"
+    },
+    "features_blacklist": {
+      "description": "Features that must not be used. Make: FEATURES_BLACKLIST += <item>",
+      "$ref": "#/$defs/name_list"
+    },
+    "cflags": {
+      "description": "Additional compiler flags, one flag per item. Make: CFLAGS += <item>. -DDEVELHELP is not allowed: use the key develhelp.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/word",
+        "not": {"pattern": "^-DDEVELHELP"}
+      }
+    },
+    "develhelp": {
+      "description": "1: enable RIOT's development checks. Make: DEVELHELP ?=",
+      "$ref": "#/$defs/flag"
+    },
+    "quiet": {
+      "description": "1: do not print the compiler invocation lines. Make: QUIET ?=",
+      "$ref": "#/$defs/flag"
+    },
+    "werror": {
+      "description": "1: treat compiler warnings as errors. Make: WERROR ?=",
+      "$ref": "#/$defs/flag"
+    },
+    "app_defaults": {
+      "description": "Defaults of variables that only this application (or its board) reads, e.g. USE_ZEP. Each entry is set unconditionally and in sorted order. Variables of the other keys and RIOT build variables (CPU, CFLAGS, LDFLAGS, FEATURES_PROVIDED, ...) are not allowed. Make: <NAME> ?= <value>",
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[A-Z][A-Z0-9_]*$",
+        "not": {
+          "enum": [
+            "APPDIR",
+            "APPLICATION",
+            "ASFLAGS",
+            "BINDIR",
+            "BINDIRBASE",
+            "BOARD",
+            "BOARD_INSUFFICIENT_MEMORY",
+            "BUILD_DIR",
+            "CFLAGS",
+            "CPPFLAGS",
+            "CPU",
+            "CPU_ARCH",
+            "CPU_CORE",
+            "CPU_FAM",
+            "CPU_MODEL",
+            "CXXEXFLAGS",
+            "CXXFLAGS",
+            "DEFAULT_MODULE",
+            "DEVELHELP",
+            "DISABLE_MODULE",
+            "EXTERNAL_BOARD_DIRS",
+            "EXTERNAL_MODULE_DIRS",
+            "EXTERNAL_PKG_DIRS",
+            "FEATURES_BLACKLIST",
+            "FEATURES_CONFLICT",
+            "FEATURES_OPTIONAL",
+            "FEATURES_PROVIDED",
+            "FEATURES_REQUIRED",
+            "FEATURES_REQUIRED_ANY",
+            "FEATURES_USED",
+            "INCLUDES",
+            "LDFLAGS",
+            "LINKFLAGS",
+            "QUIET",
+            "RIOTBASE",
+            "RIOTBOARD",
+            "RIOTCPU",
+            "RIOTMAKE",
+            "RIOTPKG",
+            "RIOTTOOLS",
+            "TOOLCHAIN",
+            "USEMODULE",
+            "USEPKG",
+            "WERROR"
+          ]
+        }
+      },
+      "additionalProperties": {
+        "oneOf": [
+          {"type": "integer"},
+          {"$ref": "#/$defs/word"}
+        ]
+      }
+    },
+    "external_board_dirs": {
+      "description": "Additional board directories. Make: EXTERNAL_BOARD_DIRS += <base>/<path>",
+      "$ref": "#/$defs/directory_list"
+    },
+    "external_module_dirs": {
+      "description": "Additional module directories. Make: EXTERNAL_MODULE_DIRS += <base>/<path>",
+      "$ref": "#/$defs/directory_list"
+    },
+    "external_pkg_dirs": {
+      "description": "Additional package directories. Make: EXTERNAL_PKG_DIRS += <base>/<path>",
+      "$ref": "#/$defs/directory_list"
+    }
+  },
+  "$defs": {
+    "word": {
+      "type": "string",
+      "pattern": "^[^\\s$#\\\\]+$"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.-]*$"
+    },
+    "flag": {
+      "type": "integer",
+      "enum": [0, 1]
+    },
+    "relative_path": {
+      "type": "string",
+      "pattern": "^[^/\\s$#\\\\][^\\s$#\\\\]*$"
+    },
+    "word_list": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/word"}
+    },
+    "name_list": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/name"}
+    },
+    "feature_alternatives_list": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9_]+(\\|[A-Za-z0-9_]+)*$"
+      }
+    },
+    "directory_list": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "description": "Exactly one key: 'riotbase' (path relative to RIOTBASE, Make: $(RIOTBASE)/<path>) or 'appdir' (path relative to the application directory, Make: $(CURDIR)/<path>).",
+        "type": "object",
+        "additionalProperties": false,
+        "minProperties": 1,
+        "maxProperties": 1,
+        "properties": {
+          "riotbase": {"$ref": "#/$defs/relative_path"},
+          "appdir": {"$ref": "#/$defs/relative_path"}
+        }
+      }
+    }
+  }
+}

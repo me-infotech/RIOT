@@ -15,15 +15,16 @@ TEST_PATHS[any_shell_files]="*.sh"
 TEST_PATHS[any_python_files]="*.py *pyterm"
 TEST_PATHS[any_rust_files]="*Cargo.toml *.rs"
 TEST_PATHS[any_text_files]="*.md *.mdx *.txt"
-TEST_PATHS[any_make_files]="*Makefile* makefiles/*"
+TEST_PATHS[any_make_files]="*Makefile* makefiles/* *riot-app.inc.mk"
 TEST_PATHS[any_doc_files]="doc/* ${TEST_PATHS[any_text_files]}"
 TEST_PATHS[any_example_files]="examples/*"
 TEST_PATHS[any_c_files]="${TEST_PATHS[any_c_headers]} ${TEST_PATHS[any_c_sources]}"
-TEST_PATHS[any_build_files]="features.yaml ${TEST_PATHS[any_make_files]} boards/* cpu/*"
+TEST_PATHS[any_build_files]="features.yaml *riot-app.yaml ${TEST_PATHS[any_make_files]} boards/* cpu/*"
 
 # Test specific path patterns, e.g. if multiple checks are needed.
 # Tests matching a single group use the group name directly.
 TEST_PATHS[features]="features.yaml makefiles/features_existing.inc.mk"
+TEST_PATHS[riot_app_config]="*riot-app.yaml *riot-app.inc.mk dist/tools/riot_app_config/* dist/tools/ci/check_riot_app_config_up_to_date.sh"
 TEST_PATHS[doccheck]="${TEST_PATHS[any_doc_files]} ${TEST_PATHS[any_c_files]} makefiles/pseudomodules.inc.mk"
 TEST_PATHS[board_doc]="boards/*"
 TEST_PATHS[codespell]="${TEST_PATHS[any_c_files]} ${TEST_PATHS[any_shell_files]} ${TEST_PATHS[any_python_files]} ${TEST_PATHS[any_text_files]}"

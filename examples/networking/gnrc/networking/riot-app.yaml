@@ -1,0 +1,77 @@
+# Configuration of the gnrc_networking application. riot-app.inc.mk is
+# generated from this file: after changing it, run `just generate-app-config`
+# in the root of the RIOT repository. Keys and their meaning:
+# dist/tools/riot_app_config/README.md
+# Settings that depend on a condition (USE_ZEP) stay in the Makefile.
+
+# Version of the format of this file (required):
+schema_version: 1
+
+# name of your application
+application: gnrc_networking
+
+# If no BOARD is found in the environment, use this default:
+board: native
+
+# Path to the RIOT base directory, relative to this directory:
+riotbase: ../../../..
+
+usemodule:
+  # Include packages that pull up and auto-init the link layer.
+  # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
+  - netdev_default
+  - auto_init_gnrc_netif
+  # Activate ICMPv6 error messages
+  - gnrc_icmpv6_error
+  # Specify the mandatory networking module for a IPv6 routing node
+  - gnrc_ipv6_router_default
+  # Add a routing protocol
+  - gnrc_rpl
+  - auto_init_gnrc_rpl
+  # Additional networking modules that can be dropped if not needed
+  - gnrc_icmpv6_echo
+  - gnrc_pktshark_default
+  # Add also the shell, some shell commands
+  - shell
+  - shell_cmds_default
+  - shell_cmd_udp_server
+  - ps
+  - netstats_l2
+  - netstats_ipv6
+  - netstats_rpl
+  # Optionally include DNS support. This includes resolution of names at an
+  # upstream DNS server and the handling of RDNSS options in Router
+  # Advertisements to auto-configure that upstream DNS server.
+  # - sock_dns              # include DNS client
+  # - gnrc_ipv6_nib_dns     # include RDNSS option handling
+
+# Additional compiler flags: uncomment `cflags:` and the flags you need.
+# cflags:
+#   # Specify a static link local IPv6 address; this might be useful for
+#   # testing, in cases where you cannot or do not want to run a shell with
+#   # ifconfig to get the real link local address. (The Makefile used to take
+#   # the address from IPV6_STATIC_LLADDR; this file holds no Make variables,
+#   # so the address is part of the flag.)
+#   - -DCONFIG_GNRC_IPV6_STATIC_LLADDR='"fe80::cafe:cafe:cafe:1"'
+#   # Join RPL DODAGs even if DIOs do not contain
+#   # DODAG Configuration Options (see the doc for more info)
+#   - -DCONFIG_GNRC_RPL_DODAG_CONF_OPTIONAL_ON_JOIN
+
+# Comment this out to disable code in RIOT that does safety checking
+# which is not needed in a production environment but helps in the
+# development process:
+develhelp: 1
+
+# Change this to 0 show compiler invocation lines by default:
+quiet: 1
+
+app_defaults:
+  # Instead of simulating an Ethernet connection, we can also simulate
+  # an IEEE 802.15.4 radio using ZEP (USE_ZEP=1 adds the module socket_zep,
+  # see Makefile)
+  USE_ZEP: 0
+  # set the ZEP port for native
+  ZEP_PORT_BASE: 17754
+
+external_board_dirs:
+  - riotbase: tests/build_system/external_board_dirs/esp-ci-boards

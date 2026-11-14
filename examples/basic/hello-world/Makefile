@@ -1,18 +1,10 @@
-# name of your application
-APPLICATION = hello-world
-
-# If no BOARD is found in the environment, use this default:
-BOARD ?= native
-
-# This has to be the absolute path to the RIOT base directory:
-RIOTBASE ?= $(CURDIR)/../../..
-
-# Comment this out to disable code in RIOT that does safety checking
-# which is not needed in a production environment but helps in the
-# development process:
-DEVELHELP ?= 1
-
-# Change this to 0 show compiler invocation lines by default:
-QUIET ?= 1
+# The application settings are in riot-app.yaml; riot-app.inc.mk is generated
+# from it (`just generate-app-config` in the root of the RIOT repository).
+# Its path is taken from this Makefile, so `make -f <dir>/Makefile` finds it.
+RIOT_APP_CONFIG_MK := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))/riot-app.inc.mk
+ifeq (,$(wildcard $(RIOT_APP_CONFIG_MK)))
+  $(error $(RIOT_APP_CONFIG_MK) missing: run 'just generate-app-config' in the RIOT root)
+endif
+include $(RIOT_APP_CONFIG_MK)
 
 include $(RIOTBASE)/Makefile.include
