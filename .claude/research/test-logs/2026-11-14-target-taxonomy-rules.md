@@ -112,3 +112,36 @@ to the stored CSV). Fixed in the working tree:
 
 `npm ci` (doc site) is not counted as install (I1): tool provisioning of
 the documentation, consistent with `just-scope.md` A.
+
+## Hardware attribute (D22 point 7, 2026-11-14)
+
+`classify` now also marks whether a target needs hardware (README
+"Hardware attribute"). Run against RIOT `0be9299ca9` with `nrf52840dk`:
+two runs byte-identical, reference checkout unchanged, groups unchanged
+(0 differences to the earlier CSV).
+
+| hardware | targets |
+|---|---:|
+| yes | 24 (2B: 11, 3: 13) |
+| no | 278 |
+| ? (not found, N0) | 21 |
+
+yes: `cleanterm`, `debug`, `debug-client`, `debug-server`, `flash`,
+`flash-only`, `iotlab-debug-server`, `iotlab-exp`, `iotlab-flash`,
+`iotlab-reset`, `iotlab-stop`, `iotlab-term`, `mcuboot-flash`,
+`mcuboot-flash-bootloader`, `reset`, `riotboot/flash`,
+`riotboot/flash-combined-slot0`, `riotboot/flash-extended-slot0`,
+`riotboot/flash-slot0`, `riotboot/flash-slot1`, `term`, `test`,
+`test-as-root`, `test-with-config`.
+
+Corrections during development: a first version counted every recipe that
+mentions an `IOTLAB_*` variable (also `riotboot/bootloader/clean`) and
+`debug-valgrind`/`term-gprof`, which exist only for native (host); fixed
+by requiring an `iotlab-*` command and by treating native contexts as
+"no". Known gap: `riotboot/bootloader/flash` and
+`riotboot/flash-bootloader` (pattern rule `riotboot/bootloader/%`, goal
+`$*` only known at run time) are marked `no` although they flash.
+
+Of the D24 examples, `flash-only`, `term`, `flash` and `test` are marked
+`yes` — consistent with the selection (E5). Without hardware none of the
+24 can be run; they were built/compared (build layer) or dry-run.

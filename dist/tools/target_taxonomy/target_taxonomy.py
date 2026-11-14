@@ -128,6 +128,14 @@ QUERY_RE = re.compile(r"^\S*\s+(?:--version|-dump\w*|-print-\S*|--help)\b")
 # (workbook: test, test-as-root, test-with-config are group 3).
 TEST_RE = re.compile(CMD + r"\$[({]TEST_EXECUTOR[)}]"
                      r"|\bfor\s+\w+\s+in\s+\$[({]TESTS\w*[)}]", re.M)
+# Hardware attribute (D22 point 7), independent of the group: the target
+# runs a program that talks to a board (programmer, debugger, reset,
+# serial terminal) or to a remote testbed, or runs the application's tests
+# (which talk to the board through the terminal).
+HW_RE = re.compile(CMD + r"\$[({](FLASHER|DEBUGGER|DEBUGSERVER|DEBUGCLIENT|"
+                   r"RESET|TERMPROG|PROGRAMMER)[)}]", re.M)
+# remote testbed: an iotlab-* command (or ssh to a testbed node) is run
+HW_REMOTE_RE = re.compile(CMD + r"(iotlab-[a-z-]+|ssh\b[^\n]*IOTLAB)", re.M)
 # Rule I1: installing files (lifecycle, 2C). `npm ci` of the documentation
 # site is tool provisioning, not an artifact lifecycle (just-scope.md, A).
 INSTALL_RE = re.compile(CMD + r"(install\s+-)", re.M)
@@ -532,6 +540,44 @@ class Classifier:
                 break
         return best
 
+    def hardware_in(self, db: Database, target: str,
+                    visiting: frozenset[str] = frozenset()) -> str:
+        """Why the target needs hardware ('' if it does not): checked on
+        the recipe at every expansion level and on all prerequisites."""
+        rule = db.rules.get(target)
+        if rule is None or target in visiting or len(visiting) > 50:
+            return ""
+        visiting = visiting | {target}
+        text = "\n".join(rule.recipe)
+        text = re.sub(r"\$(?:@|\(@\)|\{@\})", target, text)
+        for _ in range(6):
+            m = HW_RE.search(text)
+            if m:
+                return f"runs $({m.group(1)})"
+            m = HW_REMOTE_RE.search(text)
+            if m:
+                return f"remote testbed ({m.group(1).split()[0]})"
+            if TEST_RE.search(text):
+                return "runs the application's tests on the board"
+            for mk in MAKE_RE.finditer(text):
+                goals = set(mk.group(1).split()) & HW_GOALS
+                if goals:
+                    return f"sub-make {' '.join(sorted(goals))}"
+            new = re.sub(r"\$[({]([A-Za-z0-9_.-]+)[)}]",
+                         lambda x: db.variables.get(x.group(1), x.group(0))
+                         if x.group(1) not in HW_NAMES else x.group(0), text)
+            new = re.sub(r"\$[({]call\s+([A-Za-z0-9_.-]+)[^\n]*?[)}]",
+                         lambda x: db.variables.get(x.group(1), x.group(0)),
+                         new)
+            if new == text:
+                break
+            text = new
+        for pre in rule.prereqs:
+            why = self.hardware_in(db, pre, visiting)
+            if why:
+                return f"prerequisite '{pre}': {why}"
+        return ""
+
     def contexts_for(self, scope: str, evidence: str) -> list[tuple[str, str]]:
         """(directory, makefile) pairs to try, most specific first."""
         path = re.split(r"[:\s;]", evidence.strip(), maxsplit=1)[0]
@@ -574,6 +620,12 @@ class Classifier:
                     if v:
                         return v, (ctx, makefile, board, goal)
         return Verdict("?", "N0", "target not defined in any context"), None
+
+
+# goals of a sub-make that talk to the board (e.g. riotboot/bootloader/flash)
+HW_GOALS = {"flash", "flash-only", "term", "debug", "debug-server", "reset"}
+HW_NAMES = {"FLASHER", "DEBUGGER", "DEBUGSERVER", "DEBUGCLIENT", "RESET",
+            "TERMPROG", "PROGRAMMER", "TEST_EXECUTOR"}
 
 
 def first_build(regex: re.Pattern, text: str) -> re.Match | None:
@@ -675,13 +727,24 @@ def cmd_classify(args) -> int:
     clf = Classifier(args.repo.resolve(), args.board)
     rows = []
     for item in read_inventory(args.inventory):
-        v, ctx = clf.classify(item["target"], item.get("scope", ""),
-                              item.get("evidence", ""))
+        v, ctx = clf.locate(item["target"], item.get("scope", ""),
+                            item.get("evidence", ""))
+        hw = ""
+        if ctx is not None:
+            hw = clf.hardware_in(clf.db(ctx[0], ctx[2], ctx[1], ctx[3]),
+                                 item["target"])
+            if hw and ctx[2].startswith("native"):
+                # native boards run on the host: no board hardware involved
+                hw = ""
         rows.append({"target": item["target"], "group": v.group,
-                     "rule": v.rule, "context": ctx, "evidence": v.evidence})
+                     "rule": v.rule, "context": format_context(ctx),
+                     "evidence": v.evidence,
+                     "hardware": "?" if ctx is None else ("yes" if hw else "no"),
+                     "hardware_evidence": hw})
     rows.sort(key=lambda r: r["target"])
     write_csv(args.output, rows,
-              ["target", "group", "rule", "context", "evidence"])
+              ["target", "group", "rule", "context", "evidence", "hardware",
+               "hardware_evidence"])
     return 0
 
 

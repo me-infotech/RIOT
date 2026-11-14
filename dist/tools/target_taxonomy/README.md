@@ -46,6 +46,19 @@ A command position may start with `env …`, `sudo`, `nice`, `command` or
 `exec`. Results that depend on where a dependency cycle is entered are not
 cached, so the order of the targets does not change a result.
 
+## Hardware attribute (D22 point 7)
+
+`classify` also writes `hardware` (yes / no / ? when the target was not
+found) and `hardware_evidence`, independent of the group. A target needs
+hardware if its recipe, at any expansion level, or one of its
+prerequisites runs `$(FLASHER)`, `$(DEBUGGER)`, `$(DEBUGSERVER)`,
+`$(DEBUGCLIENT)`, `$(RESET)`, `$(TERMPROG)` or `$(PROGRAMMER)` at a command
+position, runs an `iotlab-*` command (remote testbed), runs the
+application's tests, or runs a sub-make with a goal such as `flash`/`term`.
+Targets found only in a `native*` context run on the host and count as
+`no`. Not covered: pattern rules whose goal is only known at run time
+(`riotboot/bootloader/%` with `$*`).
+
 ## Usage
 
 ```sh
