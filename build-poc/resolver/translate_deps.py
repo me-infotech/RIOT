@@ -232,6 +232,7 @@ def translate(text: str, path: str, unsupported: list) -> list:
                 if kind in ("export", "override") and ASSIGN_RE.match(rest):
                     s = rest                  # an ordinary assignment below
                     exported = kind == "export"
+                    overridden = kind == "override"
                 elif kind in ("export", "unexport"):
                     emit({kind: rest.split(), "line": n})
                     continue
@@ -242,6 +243,7 @@ def translate(text: str, path: str, unsupported: list) -> list:
                     raise Unsupported(f"{kind} {rest[:40]}")
             else:
                 exported = False
+                overridden = False
             in_rule = False
             m = MSG_RE.match(s)
             if m:
@@ -270,7 +272,8 @@ def translate(text: str, path: str, unsupported: list) -> list:
                 words = value.split()
                 if all(SIMPLE_WORD.match(w) for w in words):
                     emit({"assign": var, "op": op, "words": words, "line": n,
-                          **({"export": True} if exported else {})})
+                          **({"export": True} if exported else {}),
+                          **({"override": True} if overridden else {})})
                     continue
                 try:
                     check(value)
@@ -283,7 +286,8 @@ def translate(text: str, path: str, unsupported: list) -> list:
                           "unchecked": str(e), "line": n})
                     continue
                 emit({"assign": var, "op": op, "expr": value, "line": n,
-                      **({"export": True} if exported else {})})
+                      **({"export": True} if exported else {}),
+                      **({"override": True} if overridden else {})})
                 continue
             if is_rule(s):
                 in_rule = True

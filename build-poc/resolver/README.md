@@ -8,7 +8,7 @@ of concept: hello-world and gnrc_networking.
 | File | Purpose |
 |---|---|
 | `translate_deps.py` | translates every `Makefile.dep`, `Makefile.features`, `*.dep`, `Makefile.default` and the plain-rule pipeline files (`makefiles/defaultmodules_*.inc.mk`, `features_modules.inc.mk`), plus every file they include, into an ordered rule list (JSON) and counts what it cannot translate |
-| `makeexpr.py` | evaluator for the subset of Make functions used as fallback in the rules (`filter`, `filter-out`, `findstring`, `sort`, `words`, `word`, `wordlist`, `subst`, `patsubst`, `strip`, `if`, `or`, `and`, `foreach`, `call`, substitution references) |
+| `makeexpr.py` | evaluator for the Make functions used in RIOT's make files (text, file name, `foreach`, `call` with parameters, `eval`, `file`, `wildcard`, `shell` through hooks, substitution references, computed names); known gaps: see the test log §7 |
 | `resolver.py` | evaluates the rules for `riot-app.yaml` + board in Make's order (features, default modules, features check, fixpoint over `Makefile.dep`, finalisation); the features check (`makefiles/features_check.inc.mk`) is implemented in Python |
 
 Rule format (`riot-dep-rules/0`): per file a list of items, each one of
@@ -28,9 +28,9 @@ build-poc/resolver/resolver.py <riot> rules.json <app>/riot-app.yaml nrf52840dk
 
 | File | Purpose |
 |---|---|
-| `flags.py` | evaluates `Makefile.include` as data (CFLAGS, INCLUDES, LINKFLAGS, …); `$(shell …)` through named blocks (`SHELL_BLOCKS`) |
+| `flags.py` | evaluates `Makefile.include` as data (CFLAGS, INCLUDES, LINKFLAGS, …); `$(shell …)` through named blocks (`SHELL_BLOCKS`; 5 of them run the host command verbatim) |
 | `submake.py` | the per-module sub-makes (DIRS recursion, package `all` recipes): objects, sources, exact compile flags |
-| `prestep.py` | minimal recipe runner for `BUILDDEPS` (package preparation, vendor headers, `riotbuild.h`, `preprocessor_successor.h`); commands run unchanged, recursive `$(MAKE)` is evaluated from the rules |
+| `prestep.py` | minimal recipe runner for `BUILDDEPS` (package preparation, vendor headers, `riotbuild.h`, `preprocessor_successor.h`): time stamps, order-only prerequisites, Make's exported environment, target-specific variables; commands run unchanged; recursive `$(MAKE)` is evaluated from the rules; refuses `rm -r/-f` outside the build directories |
 | `build_state.py` | `resolved-state.json` for `gen_cmake.py` / `gen_meson.py`, without Make |
 
 ```sh

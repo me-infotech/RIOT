@@ -1,0 +1,82 @@
+
+
+[make] -C /riot/examples/networking/gnrc/networking -f /riot/cpu/nrf5x_common/Makefile.nrfx 
+if test -f /riot/build/nrf5x_nrfx_mdk/nrf52.sparse; then \
+	test "$(cat /riot/build/nrf5x_nrfx_mdk/nrf52.sparse)" = "mdk/nrf52.h mdk/nrf52_bitfields.h mdk/nrf52810.h mdk/nrf52810_bitfields.h mdk/nrf52
+/usr/bin/env echo -n "" 1>&2; /usr/bin/env echo "" | sed -e 's/^(\|)$//g' 1>&2; /usr/bin/env echo -n "" 1>&2
+rm -Rf /riot/build/nrf5x_nrfx_mdk/nrf52
+mkdir -p /riot/build/nrf5x_nrfx_mdk/nrf52
+git init --quiet /riot/build/nrf5x_nrfx_mdk/nrf52
+if [ -n "mdk/nrf52.h mdk/nrf52_bitfields.h mdk/nrf52810.h mdk/nrf52810_bitfields.h mdk/nrf52810_name_change.h mdk/nrf52810_peripherals.h mdk/nrf52811.h mdk/nrf52811_bitfields.h mdk/nrf52811_peripheral
+git -C /riot/build/nrf5x_nrfx_mdk/nrf52 --git-dir=.git --work-tree=. remote add origin https://github.com/NordicSemiconductor/nrfx
+git -C /riot/build/nrf5x_nrfx_mdk/nrf52 --git-dir=.git --work-tree=. config remote.origin.promisor true
+git -C /riot/build/nrf5x_nrfx_mdk/nrf52 --git-dir=.git --work-tree=. config remote.origin.partialclonefilter blob:none
+git -C /riot/build/nrf5x_nrfx_mdk/nrf52 --git-dir=.git --work-tree=. config advice.detachedHead false
+git -C /riot/build/nrf5x_nrfx_mdk/nrf52 --git-dir=.git --work-tree=. fetch --quiet --depth=1 -t --filter=blob:none origin 11f57e578c7feea13f21c79ea0efab2630ac68c7
+git -C /riot/build/nrf5x_nrfx_mdk/nrf52 --git-dir=.git --work-tree=. checkout --quiet 11f57e578c7feea13f21c79ea0efab2630ac68c7 2>&1 | cat
+if ! git -C /riot/build/nrf5x_nrfx_mdk/nrf52 --git-dir=.git --work-tree=. cat-file -e 11f57e578c7feea13f21c79ea0efab2630ac68c7; then \
+	 \
+	git -C /riot/build/nrf5x_nrfx_mdk/nrf52 --git-dir=.git --wor
+echo 11f57e578c7feea13f21c79ea0efab2630ac68c7 > /riot/build/nrf5x_nrfx_mdk/nrf52/.pkg-state.git-downloaded
+git -C /riot/build/nrf5x_nrfx_mdk/nrf52 --git-dir=.git --work-tree=. clean --quiet -xdff '**' -e '.pkg-state.git*'
+git -C /riot/build/nrf5x_nrfx_mdk/nrf52 --git-dir=.git --work-tree=. checkout --quiet -f 11f57e578c7feea13f21c79ea0efab2630ac68c7
+if test -n "/riot/cpu/nrf5x_common/include/vendor/patches/0001-RIOT-specific-changes-nRF51.patch /riot/cpu/nrf5x_common/include/vendor/patches/0002-RIOT-specific-changes-nRF52.patch /riot/cpu/nrf5x_co
+touch /riot/build/nrf5x_nrfx_mdk/nrf52/.pkg-state.git-patched
+mkdir -p /riot/build/nrf5x_nrfx_mdk/nrf52/vendor
+touch /riot/build/nrf5x_nrfx_mdk/nrf52/.pkg-state.git-prepared
+:
+cp /riot/build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52.h /riot/build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52.h
+cp /riot/build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52_bitfields.h /riot/build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52_bitfields.h
+cp /riot/build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52810.h /riot/build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52810.h
+cp /riot/build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52810_bitfields.h /riot/build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52810_bitfields.h
+cp /riot/build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52810_name_change.h /riot/build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52810_name_change.h
+cp /riot/build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52810_peripherals.h /riot/build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52810_peripherals.h
+cp /riot/build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52811.h /riot/build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52811.h
+cp /riot/build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52811_bitfields.h /riot/build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52811_bitfields.h
+cp /riot/build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52811_peripherals.h /riot/build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52811_peripherals.h
+cp /riot/build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52832_peripherals.h /riot/build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52832_peripherals.h
+cp /riot/build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52833.h /riot/build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52833.h
+cp /riot/build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52833_bitfields.h /riot/build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52833_bitfields.h
+cp /riot/build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52833_peripherals.h /riot/build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52833_peripherals.h
+cp /riot/build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52840.h /riot/build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52840.h
+cp /riot/build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52840_bitfields.h /riot/build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52840_bitfields.h
+cp /riot/build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52840_name_change.h /riot/build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52840_name_change.h
+cp /riot/build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52840_peripherals.h /riot/build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52840_peripherals.h
+mkdir -p '/riot/examples/networking/gnrc/networking/bin/nrf52840dk/preprocessor/'
+'/riot/dist/tools/generate_pp_successor_header/generate_pp_successor_header.sh' 9999 > /riot/examples/networking/gnrc/networking/bin/nrf52840dk/preprocessor/preprocessor_successor.h
+mkdir -p '/riot/examples/networking/gnrc/networking/bin/nrf52840dk/riotbuild/'
+'/riot/dist/tools/genconfigheader/genconfigheader.sh' -DDEVELHELP -Werror -DCPU_FAM_NRF52 -mno-thumb-interwork -mcpu=cortex-m4 -mlittle-endian -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -ffunction-sec
+sed -n -e '1i\
+/* Generated file do not edit */' -e '/^#.*/ p' /riot/examples/networking/gnrc/networking/bin/nrf52840dk/riotbuild/riotbuild.h.in > /riot/examples/networking/gnrc/networking/bin/nrf5284
+[make] -C /riot/pkg/cmsis/ -f None prepare
+if test -f /riot/build/pkg/cmsis.sparse; then \
+	test "$(cat /riot/build/pkg/cmsis.sparse)" = "CMSIS/Core/Include" && exit 0; \
+fi ; mkdir -p $(dirname /riot/build/pkg/cmsis.sparse) && echo "CMSIS/Cor
+/usr/bin/env echo -n "" 1>&2; /usr/bin/env echo "" | sed -e 's/^(\|)$//g' 1>&2; /usr/bin/env echo -n "" 1>&2
+rm -Rf /riot/build/pkg/cmsis
+mkdir -p /riot/build/pkg/cmsis
+git init --quiet /riot/build/pkg/cmsis
+if [ -n "CMSIS/Core/Include" ]; then \
+  # iff the package uses sparse paths, initialize the repository as sparse \
+   \
+  git -C /riot/build/pkg/cmsis --git-dir=.git --work-tree=. sparse-checkout ini
+git -C /riot/build/pkg/cmsis --git-dir=.git --work-tree=. remote add origin https://github.com/ARM-software/CMSIS_5
+git -C /riot/build/pkg/cmsis --git-dir=.git --work-tree=. config remote.origin.promisor true
+git -C /riot/build/pkg/cmsis --git-dir=.git --work-tree=. config remote.origin.partialclonefilter blob:none
+git -C /riot/build/pkg/cmsis --git-dir=.git --work-tree=. config advice.detachedHead false
+git -C /riot/build/pkg/cmsis --git-dir=.git --work-tree=. fetch --quiet --depth=1 -t --filter=blob:none origin 2b7495b8535bdcb306dac29b9ded4cfb679d7e5c
+git -C /riot/build/pkg/cmsis --git-dir=.git --work-tree=. checkout --quiet 2b7495b8535bdcb306dac29b9ded4cfb679d7e5c 2>&1 | cat
+if ! git -C /riot/build/pkg/cmsis --git-dir=.git --work-tree=. cat-file -e 2b7495b8535bdcb306dac29b9ded4cfb679d7e5c; then \
+	 \
+	git -C /riot/build/pkg/cmsis --git-dir=.git --work-tree=. fetch --quiet
+echo 2b7495b8535bdcb306dac29b9ded4cfb679d7e5c > /riot/build/pkg/cmsis/.pkg-state.git-downloaded
+git -C /riot/build/pkg/cmsis --git-dir=.git --work-tree=. clean --quiet -xdff '**' -e '.pkg-state.git*'
+git -C /riot/build/pkg/cmsis --git-dir=.git --work-tree=. checkout --quiet -f 2b7495b8535bdcb306dac29b9ded4cfb679d7e5c
+if test -n "/riot/pkg/cmsis/patches/0001-arm_math-add-clang-branch-for-optimization.patch" ; then \
+       if test "" = "1" ; then \
+         git -C /riot/build/pkg/cmsis --git-dir=.git --work-tree=. 
+touch /riot/build/pkg/cmsis/.pkg-state.git-patched
+touch /riot/build/pkg/cmsis/.pkg-state.git-prepared
+:
+[make] -C /riot/pkg/mpaland-printf/ -f None prepare
+:

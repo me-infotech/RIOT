@@ -3,7 +3,7 @@
 Decisions (user, D26): flags from the translated `Makefile.include` files,
 `$(shell …)` as named Python blocks; sources from the translated module
 Makefiles; prerequisites by calling RIOT's own scripts/commands; scope
-hello-world on `nrf52840dk`. Code (working tree, uncommitted):
+hello-world on `nrf52840dk`. Code (commit `ab4ad980fc`, review fixes in the working tree, §7):
 `build-poc/resolver/` (`translate_deps.py`, `makeexpr.py`, `resolver.py`,
 `flags.py`, `submake.py`, `prestep.py`, `build_state.py`) and
 `build-poc/gen_cmake.py`, `gen_meson.py`. Evidence:
@@ -38,7 +38,7 @@ so the Python value was passed through the same `echo`):
 | CFLAGS (44 words), INCLUDES (16), LINKFLAGS (49), CFLAGS_WITH_MACROS (110, input of riotbuild.h), BASELIBS (24), USEMODULE (61) | **identical** (same order) |
 
 `$(shell …)`: 21 distinct calls for hello-world/nrf52840dk, covered by 13
-named blocks (`flags.py` `SHELL_BLOCKS`): pure Python for `getconf
+named blocks (5 of them run the matched host command verbatim, see below) (`flags.py` `SHELL_BLOCKS`): pure Python for `getconf
 LONG_BIT`, `uname -m -s`, `$((…))` arithmetic, `command -v`, `date`; git
 (`rev-parse --show-toplevel`, `describe`, `rev-parse --abbrev-ref`) run
 directly; toolchain probes (compiler/linker flag tests, include
@@ -112,11 +112,59 @@ reference:
 
 Every docker run was a one-shot container (`--rm`); none was left running.
 
+## 6. Second application: gnrc_networking (user decision 2026-11-14)
+
+Same fresh clone (Make had never run for this application), same tools
+(commit `ab4ad980fc`), unchanged code: `prestep.py` exit 0,
+`build_state.py` exit 0 (208 modules, 153 objects), CMake + Ninja and
+Meson + Ninja built from the Python state, then `make all` in the same
+clone as the reference (evidence: `gnrc_networking/`):
+
+| | size text/data/bss | `nm` (1074 lines) | firmware image SHA-256 |
+|---|---|---|---|
+| Make | 95860 / 220 / 19956 | – | see `firmware-sha256.txt` |
+| CMake + Ninja (no Make) | 95860 / 220 / 19956 | identical | **identical** |
+| Meson + Ninja (no Make) | 95860 / 220 / 19956 | identical | **identical** |
+
+(text 95860 here vs. 95864 in `2026-11-14-build-layer-nrf52840dk.md` §6:
+other commit, the version string in the firmware differs in length.)
+
+## 7. Independent review and fixes (2026-11-14)
+
+A read-only review (subagent) of `ab4ad980fc` found 8 major and about 15
+minor/nit findings; it confirmed the measured results for the two
+applications but showed that the evaluator did not reproduce GNU Make in
+general. Fixed (working tree):
+
+| Finding | Fix | Verified |
+|---|---|---|
+| `$(1)`/`${1}` inside `$(call)` read a global variable "1" | parameters from the call | `version_is_greater_or_equal` = RIOT's `test-strings.mk` expectations in 10/10 cases (`make … test-version_is_greater_or_equal` passes in RIOT) |
+| command-line variables assigned with `:=`, overridable, not passed on | protected command-line layer, `override` honoured, passed to every sub-make (MAKEFLAGS) | test Makefile vs. GNU Make 4.3: same values |
+| target-/pattern-specific variables dropped (LTOFLAGS hard-coded) | recorded and applied when a target is made / an object is compiled; on the link step they stop the run | same test Makefile: same value |
+| nested sub-makes got only the top-level environment | children inherit the exported variables of their parent sub-make | — (code) |
+| packages built only from text directly under `all:` | default goal of the package make built with the recipe runner; recursive makes are module builds; other commands in the goal recipe stop the run | both applications: same objects |
+| recipe runner without time stamps, order-only treated as normal, Python's environment, no guards | time-stamp comparison, order-only separate, Make's exported environment, `rm -r/-f` only inside `BUILD_DIR`/`BINDIRBASE`/`PKGDIRBASE`, `make` inside another command refused, missing directories refused | second `prestep.py` run in the same clone: no `git init`/`rm -Rf` (before: nrfx and cmsis deleted and re-fetched) |
+
+After the fixes, `build_state.py` for both applications gives the same
+modules, objects (44/44, 153/153), flags and link command as before the
+fixes, so the byte-identical firmware results of §5/§6 stay valid.
+Resolver parity (`2026-11-14-resolver.md`, 10 comparisons) unchanged.
+
+Not fixed (documented limits): comment and continuation edge cases
+outside rules, `::=` and computed assignment names, double expansion of
+`:=` values, approximate `flavor`/`origin`, `$((…))` with Python division,
+double-colon and static pattern rules, `FEATURES_MISSING`/`CONFLICTING`
+not reported by the resolver's Python features check, 5 of 13 shell
+blocks run the host command verbatim, and the timing in
+`2026-11-14-resolver.md` compares Python on the host with Make in the
+container.
+
 ## Not covered / limits
 
-Only hello-world on `nrf52840dk` (gnrc_networking: decision open);
+Two applications on `nrf52840dk` (hello-world, gnrc_networking);
 C sources only (`SRCXX`, `ASMSRC`, `ASSMSRC`, `GENSRC` stop with a
-message); the recipe runner is minimal (see §4); host toolchain probes
+message); the recipe runner is minimal (see §4, §7); generality beyond
+the two applications is not shown; host toolchain probes
 still run host tools; the generated CMake/Meson projects still list every
 object (generated from the state, not hand-written).
 
@@ -128,5 +176,8 @@ module layout, prerequisite recipes) is used as data and evaluated by
 small Python tools, and the build itself runs in CMake or Meson. The data
 is still written in Make syntax (translated, not yet migrated to a new
 format); the translation coverage (99.8 % of the build files fully
-translated) shows that converting it once into a tool-independent format
-is feasible.
+parsed) is not yet a tool-independent format: the review (§7) counted 401
+rules and 694 recipes kept as Make/shell text, 626 assignment and 359
+condition expressions in Make syntax and 69 top-level calls among the
+"structured" items. Converting the data once into a format independent of
+Make is future work.

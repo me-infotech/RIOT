@@ -41,10 +41,14 @@ def main() -> int:
                    "APPLICATION_ASMSRC": s.get("ASMSRC"),
                    "APPLICATION_ASSMSRC": s.get("ASSMSRC")}
         sm.run_dir(appdir, os.path.join(root, "makefiles/application.inc.mk"),
-                   env_extra=app_env)
+                   None, dict(sm.env, **app_env))
         for p in s.words("PKG_PATHS"):
             sm.run_package(p.rstrip("/"))
         makeexpr.CWD = appdir
+        # target-specific variables on the link step are not modelled
+        for t in (s.get("ELFFILE").strip(), "link"):
+            if t in s.target_vars:
+                raise MakeError(f"target-specific variables on {t}: not supported")
         link_flags = shlex.split(s.expand(
             "$(ARCHIVES_GROUP) $(LINKFLAGS) $(LINKFLAGPREFIX)-Map=$(BINDIR)/$(APPLICATION).map"))
         objects = sorted(({k: o[k] for k in ("compiler", "source", "object", "flags")}
@@ -57,6 +61,7 @@ def main() -> int:
                  "link": {"linker": s.get("LINK").strip(), "flags": link_flags,
                           "output": s.get("ELFFILE").strip()},
                  "runtime": {v: s.get(v).strip() for v in RUNTIME},
+                 "package_objects": sm.package_objects,
                  "produced_by": "build-poc/resolver (without Make)"}
     except (MakeError, makeexpr.UnsupportedExpr) as e:
         print(f"error: {e}", file=sys.stderr)

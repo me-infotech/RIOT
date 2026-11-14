@@ -48,6 +48,11 @@ class State:
     def __init__(self):
         self.vars: dict[str, tuple[str, str]] = {}
         self.exports: set[str] = set()
+        # command-line variables: only `override` may change them; passed
+        # on to every sub-make (MAKEFLAGS)
+        self.cmdline: dict[str, str] = {}
+        # target-specific variables: target -> [(var, op, text)]
+        self.target_vars: dict[str, list] = {}
         # rules read so far: [targets, prerequisites (expanded), recipe lines]
         self.rules: list = []
         self.default_goal: str | None = None
@@ -69,7 +74,13 @@ class State:
     def expand(self, text: str) -> str:
         return evaluate(text, self.raw)
 
-    def assign(self, name, op, text):
+    def set_cmdline(self, name, value):
+        self.cmdline[name] = value
+        self.vars[name] = ("r", value)
+
+    def assign(self, name, op, text, override=False):
+        if name in self.cmdline and not override:
+            return                        # command line wins (GNU Make)
         cur = self.vars.get(name)
         if op == ":=":
             self.vars[name] = ("s", self.expand(text))
@@ -144,19 +155,48 @@ class Resolver:
                 break
         targets = s.expand(text[:k]).split()
         rest = text[k + 1:].lstrip(":")
-        if re.match(r"^\s*[\w.-]+\s*(\+=|:=|\?=|=)", rest):
-            s.rules.append(None)         # target-specific variable: ignored
+        m = re.match(r"^\s*(?:(?:export|override)\s+)*([\w.-]+)\s*(\+=|:=|\?=|=)\s*(.*)$",
+                     rest, re.S)
+        if m:
+            # target-specific variable: applied when the target is made
+            var, op, value = m.groups()
+            if op == ":=":
+                value, op = s.expand(value), "s="
+            for t in targets:
+                s.target_vars.setdefault(t, []).append((var, op, value))
+            s.rules.append(None)
             return
         if ";" in rest:
             rest, inline = rest.split(";", 1)
         else:
             inline = None
-        prereqs = s.expand(rest).replace("|", " ").split()
-        s.rules.append([targets, prereqs, [inline] if inline else []])
+        normal, _, order_only = rest.partition("|")
+        prereqs = s.expand(normal).split()
+        s.rules.append([targets, prereqs, [inline] if inline else [],
+                        s.expand(order_only).split()])
         if s.default_goal is None:
             first = [t for t in targets if not t.startswith(".") and "%" not in t]
             if first:
                 s.default_goal = first[0]
+
+    def target_overlay(self, target: str):
+        """Apply the target-specific variables of target (explicit and
+        pattern) to the state; returns a function that restores it."""
+        s = self.s
+        entries = []
+        for t, vs in s.target_vars.items():
+            if t == target or ("%" in t and _pattern_match(t, target)):
+                entries += vs
+        saved = dict(s.vars)
+        for var, op, value in entries:
+            if op == "s=":
+                s.vars[var] = ("s", value)
+            else:
+                s.assign(var, op, value, override=True)
+
+        def restore():
+            s.vars = saved
+        return restore
 
     def run(self, items: list, where: str):
         for it in items:
@@ -165,7 +205,8 @@ class Resolver:
                          where)
             elif "assign" in it:
                 text = it["expr"] if "expr" in it else " ".join(it["words"])
-                self.s.assign(it["assign"], it["op"], text)
+                self.s.assign(it["assign"], it["op"], text,
+                              override=it.get("override", False))
                 if it["assign"] == ".DEFAULT_GOAL" and not self.s.get(".DEFAULT_GOAL").strip():
                     self.s.default_goal = None   # next target becomes default
                 if it.get("export"):

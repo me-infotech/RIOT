@@ -128,6 +128,10 @@ def evaluate(expr: str, lookup, args: list[str] | None = None) -> str:
 
 
 def _ref(body: str, lookup, args) -> str:
+    if body.isdigit() and args is not None:
+        # $(1) / ${1}: parameter of the function being called
+        k = int(body)
+        return args[k - 1] if 0 < k <= len(args) else ""
     m = re.match(r"^([\w.-]+)\s+(.*)$", body, re.S)
     if m and m.group(1) in FUNCS:
         fn, rest = m.group(1), m.group(2)

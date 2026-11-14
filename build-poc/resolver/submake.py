@@ -49,46 +49,54 @@ class SubMake:
                     if n in top.s.vars}
         self.objects: list = []
         self.visited: set = set()
+        self.package_objects: dict = {}
 
     def run_dir(self, directory: str, makefile: str | None = None,
-                extra: dict | None = None, env_extra: dict | None = None):
+                cmdvars: dict | None = None, env: dict | None = None):
+        """One sub-make: environment = the parent's exported variables,
+        command-line variables protected and passed on (MAKEFLAGS)."""
         directory = os.path.normpath(directory)
-        key = (directory, makefile, tuple(sorted((extra or {}).items())))
+        env = self.env if env is None else env
+        cmdvars = cmdvars or {}
+        key = (directory, makefile, tuple(sorted(cmdvars.items())))
         if key in self.visited:
             return
         self.visited.add(key)
+        if not os.path.isdir(directory):
+            raise MakeError(f"sub-make directory {directory} does not exist "
+                            "(prerequisites not prepared?)")
         r = Resolver(self.top.root, {"files": {}})
         r.rules = self.rules["files"]
         s = r.s
-        for k, v in self.env.items():
+        for k, v in env.items():
             s.vars[k] = ("r", v.replace("$", "$$"))   # environment variables
-        s.exports = set(self.env)
-        for k, v in (env_extra or {}).items():
-            s.vars[k] = ("r", v.replace("$", "$$"))   # only this sub-make
-        for k, v in (extra or {}).items():
-            s.assign(k, ":=", v)                      # command-line variables
-        s.assign("CURDIR", ":=", directory)
-        s.assign("MAKEFILE_LIST", ":=", "")
-        s.assign("MAKE", ":=", "make")
+        s.exports = set(env)
+        for k, v in cmdvars.items():
+            s.set_cmdline(k, v)                       # command-line variables
+        s.assign("CURDIR", ":=", directory, override=True)
+        s.assign("MAKEFILE_LIST", ":=", "", override=True)
+        s.assign("MAKE", ":=", "make", override=True)
         makeexpr.CWD = directory
         mk = makefile or os.path.join(directory, "Makefile")
-        s.assign("MAKEFILE_LIST", "+=", mk)
+        s.assign("MAKEFILE_LIST", "+=", mk, override=True)
         r.run(rules_of(mk, self.rules), os.path.relpath(mk, self.top.root))
         module = s.get("MODULE").strip()
         cc = s.get("CC").strip()
         if not cc:
             raise MakeError(f"{directory}: CC is empty")
-        # Makefile.base: `$(OBJC_LTO): CFLAGS+=$(LTOFLAGS)`, recipe
-        # `$(CC) $(CFLAGS) $(RCFLAGS) $(INCLUDES) -MQ … -c -o $@ $<`
-        flags_nolto = shlex.split(s.expand("$(CFLAGS) $(RCFLAGS) $(INCLUDES)"))
-        flags_lto = shlex.split(s.expand(
-            "$(CFLAGS) $(LTOFLAGS) $(RCFLAGS) $(INCLUDES)"))
-        for srcvar, objvar, fl in (("SRC", "OBJC_LTO", flags_lto),
-                                   ("SRC_NOLTO", "OBJC_NOLTO", flags_nolto)):
+        # Makefile.base recipe: `$(CC) $(CFLAGS) $(RCFLAGS) $(INCLUDES) -MQ …
+        # -c -o $@ $<`; target-specific variables of the object (e.g.
+        # `$(OBJC_LTO): CFLAGS+=$(LTOFLAGS)`) apply while it is compiled
+        for srcvar, objvar in (("SRC", "OBJC_LTO"), ("SRC_NOLTO", "OBJC_NOLTO")):
             srcs, objs = s.words(srcvar), s.words(objvar)
             if len(srcs) != len(objs):
                 raise MakeError(f"{directory}: {srcvar}/{objvar} differ")
             for src, obj in zip(srcs, objs):
+                restore = r.target_overlay(obj)
+                try:
+                    fl = shlex.split(s.expand("$(CFLAGS) $(RCFLAGS) $(INCLUDES)"))
+                finally:
+                    restore()
                 self.objects.append({
                     "compiler": cc,
                     "source": os.path.normpath(os.path.join(directory, src)),
@@ -96,40 +104,44 @@ class SubMake:
         for name in ("SRCXX", "ASMSRC", "ASSMSRC", "GENSRC"):
             if s.words(name):
                 raise MakeError(f"{directory}: {name} not supported yet")
+        # children inherit this sub-make's exported variables (e.g. a
+        # `CFLAGS += …` before `DIRS += …`), not only the top level's
+        child_env = {n: s.get(n) for n in s.exports if n in s.vars}
         for d in s.words("DIRS"):
-            self.run_dir(d if os.path.isabs(d) else os.path.join(directory, d))
+            self.run_dir(d if os.path.isabs(d) else os.path.join(directory, d),
+                         None, dict(s.cmdline), child_env)
         makeexpr.CWD = self.top.root
 
     def run_package(self, pkg_dir: str):
-        """`all` recipe of pkg/<name>/Makefile: sub-makes with Makefile.base."""
-        r = Resolver(self.top.root, {"files": {}})
-        r.rules = self.rules["files"]
-        s = r.s
-        for k, v in self.env.items():
-            s.vars[k] = ("r", v.replace("$", "$$"))
-        s.exports = set(self.env)
-        s.assign("CURDIR", ":=", pkg_dir)
-        makeexpr.CWD = pkg_dir
-        mk = os.path.join(pkg_dir, "Makefile")
-        items = rules_of(mk, self.rules)
-        r.run(items, os.path.relpath(mk, self.top.root))
-        in_all = False
-        for it in items:
-            if "rule" in it:
-                in_all = it["rule"].split(":")[0].split() == ["all"]
-                continue
-            if in_all and "recipe" in it:
-                cmd = shlex.split(s.expand(it["recipe"]).lstrip("@+-"))
-                if "-C" not in cmd:
-                    continue
-                d = cmd[cmd.index("-C") + 1]
-                mf = cmd[cmd.index("-f") + 1] if "-f" in cmd else None
-                extra = dict(a.split("=", 1) for a in cmd if "=" in a and
-                             not a.startswith("-"))
-                # the sub-make inherits the package make's exported
-                # variables, e.g. pkg.mk's `CFLAGS += -Wno-maybe-uninitialized`
-                pkg_env = {n: s.get(n) for n in s.exports if n in s.vars}
-                self.run_dir(d, mf, extra, env_extra=pkg_env)
+        """`make -C pkg/<name>` (pkg-build): its default goal is made with
+        the recipe runner of prestep.py; every recursive make it reaches is
+        a module build (Makefile.base) and evaluated here; any other command
+        stops the run (package builds that run other tools are not
+        supported)."""
+        from prestep import Context, Runner   # noqa: avoid import cycle
+
+        def on_make(cwd, makefile, goals, env, cmdvars):
+            if goals and goals != ["all"]:
+                raise MakeError(f"package sub-make with goals {goals} in {cwd}")
+            self.run_dir(cwd, makefile, cmdvars, env)
+
+        goal = {}
+
+        def on_command(ctx, cmd, target):
+            # preparation steps (prerequisites of the goal) run normally;
+            # the goal's own recipe may only contain module builds
+            if target == goal.get("name"):
+                raise MakeError(f"package build in {ctx.cwd} runs a command "
+                                f"that is not a module build: {cmd[:120]}")
+            return False
+
+        runner = Runner(self.top.root, self.rules, on_make, on_command)
+        r = runner.state(pkg_dir, None, self.env, {})
+        ctx = Context(r, pkg_dir)
+        before = len(self.objects)
+        goal["name"] = r.s.default_goal
+        runner.build(ctx, r.s.default_goal)
+        self.package_objects[os.path.basename(pkg_dir)] = len(self.objects) - before
 
 
 def main() -> int:
@@ -149,7 +161,7 @@ def main() -> int:
                "APPLICATION_ASMSRC": s.get("ASMSRC"),
                "APPLICATION_ASSMSRC": s.get("ASSMSRC")}
     sm.run_dir(appdir, os.path.join(root, "makefiles/application.inc.mk"),
-               env_extra=app_env)
+               None, dict(sm.env, **app_env))
     for p in s.words("PKG_PATHS"):
         sm.run_package(p.rstrip("/"))
     sm.objects.sort(key=lambda o: o["object"])
