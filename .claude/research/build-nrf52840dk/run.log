@@ -1,0 +1,20 @@
+== clone 7de930980f build system: log the configuration-layer comparison on nrf52840dk
+== 2. Make baseline
+== 3. export + generate
+== 4. build
+== 5. parity
+cmake: size + nm identical to make (197 lines)
+meson: size + nm identical to make (197 lines)
+cmake: 44/44 sources; flags missing: none; extra flags: none; resolved flags in the same order: 44/44
+meson: 44/44 sources; flags missing: none; extra flags: {'-D_FILE_OFFSET_BITS=64': 44, '-fdiagnostics-color=always': 44, '-I.': 44, '-I../meson-src': 44, '-Ilibobjs0.a.p': 43, '-Ilibobjs1.a.p': 1}; resolved flags in the same order: 0/44
+== example targets
+cmake info-modules: identical to make
+cmake info-cpu: identical to make
+meson info-modules: identical to make
+meson info-cpu: identical to make
+== done
+== group 2B/3 targets: commands (no hardware: compared, not run)
+-- see <WORK>/out/c.*: make -n vs. ninja -t commands
+cmake clean: ELF removed
+meson clean: ELF removed
+== done 2

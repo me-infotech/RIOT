@@ -1,0 +1,1 @@
+env MESON_SOURCE_ROOT=/riot/poc/meson-src MESON_BUILD_ROOT=/riot/poc/meson-build MESON_SUBDIR= 'MESONINTROSPECT=/local/python-riot/bin/meson introspect' /riot/dist/tools/openocd/openocd.sh flash <ELF>

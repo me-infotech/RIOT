@@ -1,0 +1,1 @@
+cd /riot/poc/cmake-build && arm-none-eabi-size -d -B <ELF>

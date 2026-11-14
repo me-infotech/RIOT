@@ -1,0 +1,11 @@
+{
+  "FLASHER": "/riot/dist/tools/openocd/openocd.sh",
+  "FFLAGS": "flash /riot/examples/basic/hello-world/bin/nrf52840dk/hello-world.elf",
+  "TERMPROG": "/riot/dist/tools/pyterm/pyterm",
+  "TERMFLAGS": "-p /dev/ttyACM0 -b 115200 -ln /tmp/pyterm- -rn 2026-11-14_16.20.03-hello-world-nrf52840dk",
+  "PORT": "/dev/ttyACM0",
+  "SIZE": "arm-none-eabi-size",
+  "ELFFILE": "/riot/examples/basic/hello-world/bin/nrf52840dk/hello-world.elf",
+  "MODULES": ["auto_init", "board", "board_common_init", "boards_common_nrf52xxxdk", "core", "core_init", "core_lib", "core_msg", "core_panic", "core_thread", "cortexm_common", "cortexm_common_periph", "cortexm_fpu", "cpu", "cpu_check_address", "cpu_common", "div", "libc", "malloc_thread_safe", "mpu_stack_guard", "newlib", "newlib_nano", "newlib_syscalls_default", "nrf52_vectors", "nrf5x_common_periph", "periph", "periph_common", "periph_gpio", "periph_gpio_ll_disconnect", "periph_gpio_ll_input_pull_down", "periph_gpio_ll_input_pull_up", "periph_gpio_ll_irq_edge_triggered_both", "periph_gpio_ll_irq_unmask", "periph_gpio_ll_open_drain", "periph_gpio_ll_open_drain_pull_up", "periph_gpio_ll_open_source", "periph_gpio_ll_open_source_pull_down", "periph_init", "periph_init_buttons", "periph_init_gpio", "periph_init_led0", "periph_init_led1", "periph_init_led2", "periph_init_led3", "periph_init_led4", "periph_init_led5", "periph_init_led6", "periph_init_led7", "periph_init_leds", "periph_init_pm", "periph_init_uart", "periph_pm", "periph_uart", "preprocessor", "preprocessor_successor", "stdio", "stdio_default", "stdio_uart", "sys", "vdd_lc_filter_reg0", "vdd_lc_filter_reg1"],
+  "PACKAGES": ["cmsis", "mpaland-printf"]
+}

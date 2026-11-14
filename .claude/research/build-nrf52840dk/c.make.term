@@ -1,0 +1,1 @@
+/riot/dist/tools/pyterm/pyterm -p "/dev/ttyACM0" -b "115200" -ln "/tmp/pyterm-" -rn "<TIME>-hello-world-nrf52840dk"

@@ -1,0 +1,6 @@
+   text	   data	    bss	    dec	    hex	filename
+   6892	      0	   2320	   9212	   23fc	<ELF>
+   text	   data	    bss	    dec	    hex	filename
+   6892	      0	   2320	   9212	   23fc	<ELF>
+   text	   data	    bss	    dec	    hex	filename
+   6892	      0	   2320	   9212	   23fc	<ELF>

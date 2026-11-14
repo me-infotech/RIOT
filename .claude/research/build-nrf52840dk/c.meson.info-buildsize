@@ -1,0 +1,1 @@
+env MESON_SOURCE_ROOT=/riot/poc/meson-src MESON_BUILD_ROOT=/riot/poc/meson-build MESON_SUBDIR= 'MESONINTROSPECT=/local/python-riot/bin/meson introspect' /opt/gcc-arm-none-eabi-10.3-2021.10/bin/arm-none-eabi-size -d -B <ELF>

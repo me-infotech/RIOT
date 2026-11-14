@@ -1,0 +1,1 @@
+/riot/dist/tools/openocd/openocd.sh flash <ELF>
