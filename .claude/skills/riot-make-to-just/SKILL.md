@@ -41,7 +41,7 @@ that is rejected (user rule 2026-11-12, decision log D17).
 5. Nothing is committed. The user reviews every change. Work in the
    `RIOT_Test` working tree on `master`; only your own uncommitted changes may
    appear there.
-6. Proof-of-concept boards: `native64` and `native` only (D16) — relevant only
+6. Proof-of-concept boards: `native64` and `native` only (D16; for new work superseded by D22: target board nRF52840) — relevant only
    for app-context invocations such as `make -C examples/basic/hello-world
    BOARD=native64 info-boards`.
 

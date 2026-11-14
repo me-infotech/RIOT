@@ -2,7 +2,8 @@
 name: data-analyst
 description: Maintains the RIOT Make-target inventory workbook (2.314 declarations, 323 named targets, 71 candidates) and reconciles counts, evidence lines and dispositions. Use when counts drift, a target is reclassified, or a new target is found.
 tools: Read, Grep, Glob, Bash, Edit, Write
-model: inherit
+model: sonnet
+effort: medium
 ---
 # Role: Build Target Data Analyst
 

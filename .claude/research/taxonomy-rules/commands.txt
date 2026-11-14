@@ -1,0 +1,8 @@
+# commands (run in the clean reference checkout /home/mohammadjavad/Documents/RIOT @ 0be9299ca9)
+python3 ../RIOT_Test/dist/tools/target_taxonomy/target_taxonomy.py --repo . classify --output rules.csv   # twice, outputs byte-identical
+python3 ../RIOT_Test/dist/tools/target_taxonomy/target_taxonomy.py compare rules.csv --list
+# versions
+GNU Make 4.3
+Python 3.12.3
+git version 2.43.0
+# run time of classify: about 40 s (several make database runs per context and board)

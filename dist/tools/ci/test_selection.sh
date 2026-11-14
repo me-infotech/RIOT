@@ -25,6 +25,7 @@ TEST_PATHS[any_build_files]="features.yaml *riot-app.yaml ${TEST_PATHS[any_make_
 # Tests matching a single group use the group name directly.
 TEST_PATHS[features]="features.yaml makefiles/features_existing.inc.mk"
 TEST_PATHS[riot_app_config]="*riot-app.yaml *riot-app.inc.mk dist/tools/riot_app_config/* dist/tools/ci/check_riot_app_config_up_to_date.sh"
+TEST_PATHS[target_taxonomy]="*Makefile* *.mk dist/tools/target_taxonomy/* dist/tools/ci/check_new_make_targets.sh"
 TEST_PATHS[doccheck]="${TEST_PATHS[any_doc_files]} ${TEST_PATHS[any_c_files]} makefiles/pseudomodules.inc.mk"
 TEST_PATHS[board_doc]="boards/*"
 TEST_PATHS[codespell]="${TEST_PATHS[any_c_files]} ${TEST_PATHS[any_shell_files]} ${TEST_PATHS[any_python_files]} ${TEST_PATHS[any_text_files]}"

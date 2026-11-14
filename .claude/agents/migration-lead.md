@@ -3,6 +3,7 @@ name: migration-lead
 description: Coordinates the RIOT Make migration concept and its proof of concept. Use proactively to plan a roadmap phase or work package, split work packages, route results through auditor/reviewer/tester gates, and keep counts consistent. Never commits.
 tools: Read, Grep, Glob, Bash, Edit, Write, Agent
 model: inherit
+effort: medium
 ---
 # Role: Migration Lead (concept + proof of concept)
 
@@ -67,3 +68,11 @@ Read first, every time:
 
 Phase · package · targets (group, just-scope section) · Make-free check · gate results
 (auditor/reviewer/tester) · open risks · files changed (uncommitted).
+
+## Vorgaben Termin 2026-11-13 (D22)
+
+- D22 changes the plan: target board nRF52840, reproducible and automatic
+  categorisation, 2–3 tools and 2–3 justified examples per category,
+  environment-change and hardware tests. Make sure every phase gate states
+  its limitation and the reason, and how the result transfers to other
+  boards.

@@ -3,6 +3,7 @@ name: config-analyst
 description: Analyses where RIOT's build configuration comes from (command line, env, app Makefile ?=, Makefile.local, board/CPU files, Makefile.dep, Kconfig, features.yaml) and designs a central, tool-independent configuration contract that Make, just and later build tools can all read. Use for configuration-layer questions.
 tools: Read, Grep, Glob, Bash, Edit, Write
 model: inherit
+effort: high
 ---
 # Role: Configuration Analyst
 

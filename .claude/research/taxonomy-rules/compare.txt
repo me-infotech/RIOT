@@ -1,0 +1,78 @@
+targets compared: 323
+agreement: 255/323 = 0.789
+Cohen's kappa: 0.704
+confusion (rows = reference, columns = rules):
+ref\rule    1   2A   2B   2C    3    ?
+       1   55    1    0    0    0    1
+      2A   13   26    3    5    1    4
+      2B    9    2   27    1    1    4
+      2C    0    2    0    9    1    0
+       3    4    3    1    0  138   12
+DIFF CHECK_VERSION: reference 2A rules ?
+DIFF bench: reference 2B rules 1
+DIFF build-system-utils-tests: reference 3 rules 2A
+DIFF build_source: reference 3 rules ?
+DIFF clang-tidy: reference 3 rules 2A
+DIFF clean-pkg: reference 2C rules 2A
+DIFF compile-commands: reference 2A rules 1
+DIFF compile-tests: reference 3 rules ?
+DIFF compressed-image: reference 3 rules 1
+DIFF dependency-debug: reference 2A rules 2C
+DIFF dhcpv6_server: reference 2B rules 1
+DIFF download_binary: reference 1 rules ?
+DIFF emulate: reference 2B rules ?
+DIFF esp-qemu: reference 3 rules 2B
+DIFF esptool: reference 2A rules 1
+DIFF eval-cachegrind: reference 2B rules 2A
+DIFF fido2-test: reference 2B rules 1
+DIFF fido2-test-up: reference 2B rules 1
+DIFF generate-Makefile.ci: reference 3 rules 1
+DIFF git-download: reference 2A rules 1
+DIFF graph: reference 2B rules 1
+DIFF hello.wasm: reference 3 rules 1
+DIFF hello_prebuild.wasm: reference 3 rules ?
+DIFF help: reference 2A rules 1
+DIFF image: reference 2A rules 1
+DIFF info-applications-supported-boards: reference 2A rules 1
+DIFF info-boards: reference 1 rules 2A
+DIFF info-boards-features-blacklisted: reference 2A rules 2C
+DIFF info-boards-features-conflicting: reference 2A rules 2C
+DIFF info-boards-features-missing: reference 2A rules 2C
+DIFF info-boards-supported: reference 2A rules 1
+DIFF info-build: reference 2A rules 2B
+DIFF info-build-json: reference 2A rules 2B
+DIFF info-buildsizes-diff: reference 2B rules 2C
+DIFF info-iotlab-node: reference 2A rules ?
+DIFF info-kconfig-variables: reference 2A rules 1
+DIFF info-unittests: reference 2A rules 1
+DIFF mcuboot-flash-bootloader: reference 2B rules 3
+DIFF mpy-test: reference 2B rules ?
+DIFF openv-clean: reference 2C rules 2A
+DIFF patch: reference 2A rules ?
+DIFF picosdk: reference 2A rules 3
+DIFF preflash: reference 2B rules 1
+DIFF preflash-delay: reference 2B rules ?
+DIFF prepare: reference 2A rules 2C
+DIFF prepare_check_bindist: reference 2A rules 1
+DIFF print_build_target: reference 2A rules ?
+DIFF reset: reference 2A rules 2B
+DIFF riotboot/bootloader/clean: reference 2C rules 3
+DIFF riotboot/flash-bootloader: reference 3 rules 1
+DIFF run: reference 2B rules 1
+DIFF sliptty: reference 3 rules ?
+DIFF softcore_c: reference 3 rules 2A
+DIFF suit/genkey: reference 2A rules 1
+DIFF suit/notify: reference 2B rules 2A
+DIFF term-delay: reference 2B rules ?
+DIFF termdeps: reference 2B rules 1
+DIFF test-assert_overflow_offset_and_romlen: reference 3 rules ?
+DIFF test-assert_overflow_too_big_for_rom: reference 3 rules ?
+DIFF test-elffile-fw_rom_length: reference 3 rules ?
+DIFF test-elffile-overflow: reference 3 rules ?
+DIFF test-fw_len_half_rom: reference 3 rules ?
+DIFF test-with-config/available: reference 2A rules 1
+DIFF tests-fw_rom_len: reference 3 rules ?
+DIFF tests-offsets: reference 3 rules ?
+DIFF tests-rom-overflow: reference 3 rules ?
+DIFF uf2-softdevice-check: reference 2B rules 1
+DIFF usb_id_check: reference 2A rules 1
