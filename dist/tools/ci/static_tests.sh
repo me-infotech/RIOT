@@ -24,6 +24,7 @@ DEPS["./dist/tools/vera++/check.sh"]="vera++"
 DEPS["./dist/tools/coccinelle/check.sh"]="spatch"
 DEPS["./dist/tools/flake8/check.sh"]="python3 flake8"
 DEPS["./dist/tools/ci/check_riot_app_config_up_to_date.sh"]="python3"
+DEPS["./dist/tools/ci/check_riot_deps_up_to_date.sh"]="python3"
 DEPS["./dist/tools/ci/check_new_make_targets.sh"]="python3 git make"
 DEPS["./dist/tools/codespell/check.sh"]="codespell"
 DEPS["./dist/tools/uncrustify/uncrustify.sh"]="uncrustify"
@@ -120,6 +121,7 @@ should_run always ./dist/tools/whitespacecheck/check.sh "${BASE_BRANCH}"
 should_run any_c_files ./dist/tools/licenses/check.sh
 should_run features ./dist/tools/ci/check_features_existing_inc_mk_is_up_to_date.sh
 should_run riot_app_config ./dist/tools/ci/check_riot_app_config_up_to_date.sh
+should_run riot_deps ./dist/tools/ci/check_riot_deps_up_to_date.sh
 should_run target_taxonomy ./dist/tools/ci/check_new_make_targets.sh "${BASE_BRANCH}"
 should_run doccheck ./dist/tools/doccheck/check.sh
 should_run any_c_headers ./dist/tools/externc/check.sh

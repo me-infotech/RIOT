@@ -1,3 +1,6 @@
+# Generated from deps.yaml by dist/tools/riot_deps/riot_deps.py.
+# Do not edit: change the YAML and run `just generate-deps`.
+
 # SORT THIS ALPHABETICALLY BY COMMON BOARD NAME!
 ifneq (,$(filter boards_common_adafruit-nrf52-bootloader,$(USEMODULE)))
   include $(RIOTBOARD)/common/adafruit-nrf52-bootloader/Makefile.dep

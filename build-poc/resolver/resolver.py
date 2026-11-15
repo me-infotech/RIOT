@@ -106,6 +106,7 @@ class Resolver:
         self.root = os.path.abspath(root)
         self.rules = rules["files"]
         self.s = State()
+        self.yaml_used: set = set()
         makeexpr.EVAL = self.eval_text
 
     def eval_text(self, text: str):
@@ -245,8 +246,32 @@ class Resolver:
     NO_EFFECT: set = set()   # all includes are evaluated (colour helpers
     #                          define functions used in recipes)
 
+    def yaml_rules(self, rel: str):
+        """Rules of a dependency file from its authoritative YAML (D27), if
+        there is one next to it; None otherwise."""
+        base = os.path.basename(rel)
+        if base == "Makefile.dep":
+            y = os.path.join(os.path.dirname(rel), "deps.yaml")
+        elif base.startswith("Makefile.") and base.endswith(".dep"):
+            y = os.path.join(os.path.dirname(rel),
+                             base[len("Makefile."):-len(".dep")] + ".deps.yaml")
+        else:
+            return None
+        full = os.path.join(self.root, y)
+        if not os.path.isfile(full):
+            return None
+        sys.path.insert(0, os.path.join(self.root, "dist", "tools", "riot_deps"))
+        import riot_deps  # noqa: E402
+        self.yaml_used.add(y)
+        return riot_deps.load_yaml(full)
+
     def include(self, path: str, optional: bool, where: str = "-"):
         rel = os.path.relpath(os.path.normpath(path), self.root)
+        items = self.yaml_rules(rel)
+        if items is not None:
+            self.s.assign("MAKEFILE_LIST", "+=", os.path.join(self.root, rel))
+            self.run(items, rel)
+            return
         if rel in self.ENGINE:
             getattr(self, self.ENGINE[rel])()
             return

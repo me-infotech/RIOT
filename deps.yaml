@@ -1,0 +1,178 @@
+# Dependency rules of . (authoritative; Makefile.dep is generated from this file).
+schema_version: 1
+rules:
+- comment: include board specific application dependencies
+  include: [$(APPDIR)/Makefile.board.dep]
+  optional: true
+- include: [$(APPDIR)/Makefile.$(TOOLCHAIN).dep]
+  optional: true
+- comment: include board dependencies
+  include: [$(BOARDDIR)/Makefile.dep]
+  optional: true
+- comment: include cpu dependencies
+  include: [$(RIOTCPU)/$(CPU)/Makefile.dep]
+  optional: true
+- {comment: 'include external modules dependencies
+
+    processed before RIOT ones to be evaluated before the ''default'' rules.', include_make_expr: '$(EXTERNAL_MODULE_PATHS:%=%Makefile.dep)',
+  optional: true}
+- comment: pull dependencies from sys, drivers, (common) boards and (common) cpus
+  include: [$(RIOTBASE)/sys/Makefile.dep]
+- include: [$(RIOTBASE)/drivers/Makefile.dep]
+- include: [$(RIOTBASE)/boards/Makefile.dep]
+- include: [$(RIOTCPU)/Makefile.dep]
+- {comment: pull Makefile.dep of each driver modules if they exist, include_make_expr: '$(sort $(USEMODULE:%=$(RIOTBASE)/drivers/%/Makefile.dep))',
+  optional: true}
+- {comment: pull Makefile.dep of each sys modules if they exist, include_make_expr: '$(sort $(USEMODULE:%=$(RIOTBASE)/sys/%/Makefile.dep))',
+  optional: true}
+- {comment: pull dependencies from packages, include_make_expr: '$(PKG_PATHS:%=%Makefile.dep)', optional: true}
+- when:
+    USEMODULE:
+      any: [mpu_stack_guard]
+  then:
+  - add:
+      FEATURES_REQUIRED: [cortexm_mpu]
+- when:
+    USEMODULE:
+      any: [mpu_noexec_ram]
+  then:
+  - add:
+      FEATURES_REQUIRED: [cortexm_mpu]
+- when:
+    USEMODULE:
+      any: [pmp_noexec_ram]
+  then:
+  - add:
+      FEATURES_REQUIRED: [periph_pmp]
+- when:
+    USEMODULE:
+      any: [lwip_%]
+  then:
+  - add:
+      USEPKG: [lwip]
+- when:
+    USEMODULE:
+      any: [libfixmath-unittests]
+  then:
+  - add:
+      USEPKG: [libfixmath]
+  - add:
+      USEMODULE: [libfixmath]
+- when:
+    USEMODULE:
+      any: [spiffs]
+  then:
+  - add:
+      USEPKG: [spiffs]
+  - add:
+      USEMODULE: [vfs, spiffs_fs, mtd]
+- when:
+    USEMODULE:
+      any: [littlefs]
+  then:
+  - add:
+      USEPKG: [littlefs]
+  - add:
+      USEMODULE: [vfs, littlefs_fs, mtd]
+- when:
+    USEMODULE:
+      any: [littlefs2]
+  then:
+  - add:
+      USEPKG: [littlefs2]
+  - add:
+      USEMODULE: [vfs, littlefs2_fs, mtd]
+- when:
+    USEMODULE:
+      any: [fatfs_vfs]
+  then:
+  - add:
+      USEPKG: [fatfs]
+  - add:
+      USEMODULE: [vfs]
+- when:
+    USEMODULE:
+      any: [lwext%_vfs]
+  then:
+  - add:
+      USEPKG: [lwext4]
+  - add:
+      USEMODULE: [vfs]
+- when:
+    USEMODULE:
+      any: [xipfs]
+  then:
+  - add:
+      USEPKG: [xipfs]
+  - add:
+      USEMODULE: [vfs, xipfs_fs]
+- when:
+    USEMODULE:
+      any: [nimble_%]
+  then:
+  - add:
+      USEPKG: [nimble]
+- when:
+    USEMODULE:
+      any: [tlsf-malloc]
+  then:
+  - add:
+      USEPKG: [tlsf]
+- when:
+    USEMODULE:
+      any: [tinydtls_sock_dtls]
+  then:
+  - add:
+      USEPKG: [tinydtls]
+- when:
+    USEMODULE:
+      any: [flashdb_%]
+  then:
+  - add:
+      USEPKG: [flashdb]
+- when:
+    USEMODULE:
+      any: [tinyusb_%]
+  then:
+  - add:
+      USEPKG: [tinyusb]
+- comment: always select gpio (until explicit dependencies are sorted out)
+  add:
+    FEATURES_OPTIONAL: [periph_gpio]
+- comment: 'always select power management unless building the bootloader
+
+    pm is not needed by the bootloader and omitting it saves some ROM'
+  when:
+    RIOTBOOT_BUILD: {not_equals: '1'}
+  then:
+  - add:
+      FEATURES_OPTIONAL: [periph_pm]
+- comment: don't use idle thread if architecture has needed support
+  add:
+    FEATURES_OPTIONAL: [no_idle_thread]
+- when:
+    FEATURES_USED:
+      any: [libstdcpp]
+  then:
+  - comment: Also use C++ if libstdc++ is used
+    add:
+      USEMODULE: [cpp]
+  - add:
+      USEMODULE: [libstdcpp]
+- when:
+    FEATURES_USED:
+      any: [cpp]
+  then:
+  - comment: Also use C++ if libstdc++ is used
+    add:
+      USEMODULE: [cpp]
+- when:
+    USEMODULE:
+      any: [test_utils_interactive_sync]
+  then:
+  - when:
+      USEMODULE:
+        any: [shell]
+    then:
+    - add:
+        DEFAULT_MODULE: [test_utils_interactive_sync_shell]

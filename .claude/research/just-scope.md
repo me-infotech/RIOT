@@ -93,7 +93,9 @@ the other forwarded recipes do not read `BOARDS`.
 |---|---|---|
 | `generate-app-config` | `just/generate.just` (working tree 2026-11-13) | `riot_app_config.py --all`: regenerates every `riot-app.inc.mk` from its `riot-app.yaml`, repository-wide, like `generate-features`; no application context, no make, reads no resolved state. just itself never reads the application configuration; the recipe runs a Python tool that does (same exception as `generate-features`, which reads `features.yaml`). Its output is the transitional Make adapter of the configuration layer |
 
-Not counted in the 36 migrated targets (no Make predecessor).
+| `generate-deps` | `just/generate.just` (2026-11-14, D27) | `riot_deps.py generate --all`: regenerates every `Makefile.dep` from its `deps.yaml`, repository-wide; same kind of generator as `generate-app-config` |
+
+Not counted in the 36 migrated targets (no Make predecessor; `generate-app-config`, `generate-deps`).
 
 ### C — stay in Make for now (2; user decision 2026-11-12, D18)
 

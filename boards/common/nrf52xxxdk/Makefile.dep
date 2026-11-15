@@ -1,6 +1,7 @@
-ifneq (,$(filter saul_default,$(USEMODULE)))
-  USEMODULE += saul_gpio
-  USEMODULE += saul_pwm
-endif
+# Generated from deps.yaml by dist/tools/riot_deps/riot_deps.py.
+# Do not edit: change the YAML and run `just generate-deps`.
 
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio saul_pwm
+endif
 include $(RIOTBOARD)/common/nrf52/Makefile.dep

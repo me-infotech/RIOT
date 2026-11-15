@@ -1,0 +1,10 @@
+# Dependency rules of boards/common/nrf52xxxdk (authoritative; Makefile.dep is generated from this file).
+schema_version: 1
+rules:
+- when:
+    USEMODULE:
+      any: [saul_default]
+  then:
+  - add:
+      USEMODULE: [saul_gpio, saul_pwm]
+- include: [$(RIOTBOARD)/common/nrf52/Makefile.dep]

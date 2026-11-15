@@ -461,3 +461,28 @@ Grundlage: `riot-build-config-thesis/docs/05-migration-concept/examples-and-tool
   Vorstufen gibt es in RIOT keine eigenständigen Skripte, nur Rezepte:
   `prestep.py` führt sie als minimaler Rezept-Ausführer aus (Befehle
   unverändert, rekursives `$(MAKE)` aus den übersetzten Regeln).
+
+## D27 — Make-unabhängiges Format für Abhängigkeitsregeln — **entschieden 2026-11-14 (Nutzer)**
+
+- **Ablage:** je Modul (Verzeichnis mit `Makefile.dep`) eine YAML-Datei neben
+  der `Makefile.dep`.
+- **Rolle:** YAML ist **maßgeblich**; `Makefile.dep` wird daraus generiert und
+  eingecheckt (Make-Adapter, Muster `features.yaml` → `features_existing.inc.mk`
+  und `riot-app.yaml`, D21); CI-Check auf Aktualität; der Resolver liest die
+  YAML direkt.
+- **Umfang PoC:** die `Makefile.dep`, die hello-world auf `nrf52840dk` liest;
+  der Rest bleibt Make-Syntax. Parität: Auflösung mit generierten
+  `Makefile.dep` = Original (Make und Resolver), gnrc_networking als Gegenprobe.
+
+## D28 — Hands-on-Scores übernommen — **entschieden 2026-11-14 (Nutzer)**
+
+Die Neuberechnung (`riot-build-config-thesis/docs/05-migration-concept/evaluation/results-handson-2026-11-14.md`)
+wird übernommen: 6 geänderte Werte (Task K1 2→3, K5 1→2; Meson G7 3→2,
+G9 2→3, in S2 G2 2→3, G4 1→2); Rang 1/2 unverändert (just, YAML, CMake);
+AHP-Gewichte bleiben bis zum Paarvergleich mit dem Betreuer.
+Konfigurations-/Startzeit bleibt **Stresstest**, kein eigenes Kriterium.
+- Ergebnis D27 (Testlog `2026-11-14-deps-yaml.md`): 17 Dateien nach YAML
+  exportiert (6 Regeln bleiben markierte Make-Ausdrücke), `Makefile.dep`
+  daraus generiert; Make-Auflösung 12/12 identisch, Resolver liest die YAML
+  (10/10 identisch), Build-Zustand beider Apps unverändert; CI-Check und
+  `just generate-deps`.

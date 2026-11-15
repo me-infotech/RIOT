@@ -14,6 +14,11 @@ generate-features:
 generate-app-config:
     @./dist/tools/riot_app_config/riot_app_config.py --all
 
+# Regenerate every Makefile.dep that has a deps.yaml (dependency rules, D27).
+[group('generate')]
+generate-deps:
+    @./dist/tools/riot_deps/riot_deps.py generate --all
+
 # Check that `riotgen` is installed.
 [group('generate')]
 [no-exit-message]

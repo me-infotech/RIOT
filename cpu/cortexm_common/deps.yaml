@@ -1,0 +1,42 @@
+# Dependency rules of cpu/cortexm_common (authoritative; Makefile.dep is generated from this file).
+schema_version: 1
+rules:
+- comment: 'Tell the build system that the CPU depends on the Cortex-M common files:'
+  add:
+    USEMODULE: [cortexm_common]
+- comment: include common periph code
+  add:
+    USEMODULE: [cortexm_common_periph]
+- add:
+    FEATURES_REQUIRED_ANY: [newlib|picolibc]
+- when:
+    USEMODULE:
+      any: [newlib]
+  then:
+  - comment: use the nano-specs of Newlib when available
+    add:
+      DEFAULT_MODULE: [newlib_nano]
+- comment: 'Export the peripheral drivers to be linked into the final binary:'
+  add:
+    USEMODULE: [periph]
+- comment: Use Hardware FPU by default if present
+  add:
+    FEATURES_OPTIONAL: [cortexm_fpu]
+- when:
+    FEATURES_USED:
+      any: [cortexm_fpu]
+  then:
+  - add:
+      DEFAULT_MODULE: [cortexm_fpu]
+- comment: Enable the MPU stack guard if develhelp is enabled
+  when:
+    DEVELHELP: {equals: '1'}
+  then:
+  - add:
+      FEATURES_OPTIONAL: [cortexm_mpu]
+- comment: Make calls to malloc and friends thread-safe
+  add:
+    USEMODULE: [malloc_thread_safe]
+- comment: CMSIS headers are fetched using a package
+  add:
+    USEPKG: [cmsis]

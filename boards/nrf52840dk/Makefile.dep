@@ -1,13 +1,13 @@
-USEMODULE += boards_common_nrf52xxxdk
+# Generated from deps.yaml by dist/tools/riot_deps/riot_deps.py.
+# Do not edit: change the YAML and run `just generate-deps`.
 
+USEMODULE += boards_common_nrf52xxxdk
 ifneq (,$(filter mtd,$(USEMODULE)))
   USEMODULE += mtd_spi_nor
 endif
-
 # default to using littlefs2 on the external flash
 ifneq (,$(filter vfs_default,$(USEMODULE)))
   USEPKG += littlefs2
   USEMODULE += mtd
 endif
-
 include $(RIOTBOARD)/common/nrf52xxxdk/Makefile.dep

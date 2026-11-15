@@ -1,0 +1,49 @@
+# Dependency rules of boards (authoritative; Makefile.dep is generated from this file).
+schema_version: 1
+rules:
+- comment: SORT THIS ALPHABETICALLY BY COMMON BOARD NAME!
+  when:
+    USEMODULE:
+      any: [boards_common_adafruit-nrf52-bootloader]
+  then:
+  - include: [$(RIOTBOARD)/common/adafruit-nrf52-bootloader/Makefile.dep]
+- when:
+    USEMODULE:
+      any: [boards_common_esp32]
+  then:
+  - include: [$(RIOTBOARD)/common/esp32/Makefile.dep]
+- when:
+    USEMODULE:
+      any: [boards_common_esp32c3]
+  then:
+  - include: [$(RIOTBOARD)/common/esp32c3/Makefile.dep]
+- when:
+    USEMODULE:
+      any: [boards_common_esp32c6]
+  then:
+  - include: [$(RIOTBOARD)/common/esp32c6/Makefile.dep]
+- when:
+    USEMODULE:
+      any: [boards_common_esp32h2]
+  then:
+  - include: [$(RIOTBOARD)/common/esp32h2/Makefile.dep]
+- when:
+    USEMODULE:
+      any: [boards_common_esp32s2]
+  then:
+  - include: [$(RIOTBOARD)/common/esp32s2/Makefile.dep]
+- when:
+    USEMODULE:
+      any: [boards_common_esp32s3]
+  then:
+  - include: [$(RIOTBOARD)/common/esp32s3/Makefile.dep]
+- when:
+    USEMODULE:
+      any: [boards_common_esp32x]
+  then:
+  - include: [$(RIOTBOARD)/common/esp32x/Makefile.dep]
+- when:
+    USEMODULE:
+      any: [boards_common_seeedstudio-xiao-nrf52840]
+  then:
+  - include: [$(RIOTBOARD)/common/seeedstudio-xiao-nrf52840/Makefile.dep]

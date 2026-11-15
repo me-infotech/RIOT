@@ -1,0 +1,91 @@
+# Dependency rules of cpu/nrf52/periph (authoritative; Makefile.dep is generated from this file).
+schema_version: 1
+rules:
+- when:
+    USEMODULE:
+      any: [periph_ecc_p192r1]
+  then:
+  - add:
+      USEPKG: [driver_cryptocell_310]
+  - add:
+      USEMODULE: [psa_cryptocell_310_ecc_p192]
+- when:
+    USEMODULE:
+      any: [periph_ecc_p256r1]
+  then:
+  - add:
+      USEPKG: [driver_cryptocell_310]
+  - add:
+      USEMODULE: [psa_cryptocell_310_ecc_p256]
+- when:
+    USEMODULE:
+      any: [periph_ecc_ed25519]
+  then:
+  - add:
+      USEPKG: [driver_cryptocell_310]
+  - add:
+      USEMODULE: [psa_cryptocell_310_ecc_ed25519]
+- when:
+    USEMODULE:
+      any: [periph_hash_sha_1]
+  then:
+  - add:
+      USEPKG: [driver_cryptocell_310]
+  - add:
+      USEMODULE: [psa_cryptocell_310_hashes_sha1]
+- when:
+    USEMODULE:
+      any: [periph_hash_sha_224]
+  then:
+  - add:
+      USEPKG: [driver_cryptocell_310]
+  - add:
+      USEMODULE: [psa_cryptocell_310_hashes_sha224]
+- when:
+    USEMODULE:
+      any: [periph_hash_sha_256]
+  then:
+  - add:
+      USEPKG: [driver_cryptocell_310]
+  - add:
+      USEMODULE: [psa_cryptocell_310_hashes_sha256]
+- when:
+    USEMODULE:
+      any: [periph_hash_sha_512]
+  then:
+  - add:
+      USEPKG: [driver_cryptocell_310]
+  - add:
+      USEMODULE: [psa_cryptocell_310_hashes_sha512]
+- when:
+    USEMODULE:
+      any: [periph_cipher_aes_128_cbc]
+  then:
+  - add:
+      USEPKG: [driver_cryptocell_310]
+  - add:
+      USEMODULE: [psa_cryptocell_310_aes_cbc]
+- when:
+    USEMODULE:
+      any: [periph_cipher_chacha20]
+  then:
+  - add:
+      USEPKG: [driver_cryptocell_310]
+  - add:
+      USEMODULE: [psa_cryptocell_310_cipher_chacha20]
+- when:
+    USEMODULE:
+      any: [periph_aead_aes_128_ccm]
+  then:
+  - add:
+      USEPKG: [driver_cryptocell_310]
+  - add:
+      USEMODULE: [psa_cryptocell_310_aes_ccm]
+- when:
+    USEMODULE:
+      any: [periph_hmac_sha_256]
+  then:
+  - add:
+      USEPKG: [driver_cryptocell_310]
+  - add:
+      USEMODULE: [psa_cryptocell_310_hmac]

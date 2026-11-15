@@ -1,0 +1,962 @@
+# Dependency rules of sys (authoritative; Makefile.dep is generated from this file).
+schema_version: 1
+rules:
+- comment: cannot be moved to GNRC's Makefile.dep, as module name neither starts or ends with gnrc
+  when:
+    USEMODULE:
+      any: [auto_init_gnrc_netif]
+  then:
+  - add:
+      USEMODULE: [gnrc_netif_init_devs]
+- when:
+    USEMODULE:
+      any: [auto_init_wdt_thread]
+  then:
+  - add:
+      USEMODULE: [periph_wdt_auto_start, ztimer_msec]
+  - comment: we can only have either auto_init_wdt_event or auto_init_wdt_thread
+    when:
+      USEMODULE:
+        any: [auto_init_wdt_event]
+    then:
+    - message: {level: error, text: auto_init_wdt_event and auto_init_wdt_thread are mutually exclusive}
+- when:
+    USEMODULE:
+      any: [auto_init_wdt_event]
+  then:
+  - add:
+      USEMODULE: [event_periodic_callback, event_thread, periph_wdt_auto_start, ztimer_msec]
+- when:
+    USEMODULE:
+      any: [auto_init_sock_dns]
+  then:
+  - when:
+      USEMODULE:
+        any: [ipv4]
+    then:
+    - add:
+        USEMODULE: [ipv4_addr]
+  - when:
+      USEMODULE:
+        any: [ipv6]
+    then:
+    - add:
+        USEMODULE: [ipv6_addr]
+- when:
+    USEMODULE:
+      any: [congure_%]
+  then:
+  - add:
+      USEMODULE: [congure]
+- when:
+    USEMODULE:
+      any: [crc16_fast]
+  then:
+  - add:
+      USEMODULE: [checksum]
+- when:
+    USEMODULE:
+      any: [crc32_fast]
+  then:
+  - add:
+      USEMODULE: [checksum]
+- when:
+    USEMODULE:
+      any: [cpp]
+  then:
+  - add:
+      USEMODULE: [cpp_new_delete]
+- when:
+    USEMODULE:
+      any: [debug_irq_disable]
+  then:
+  - add:
+      USEMODULE: [fmt]
+- when:
+    USEMODULE:
+      any: [fmt_table]
+  then:
+  - add:
+      USEMODULE: [fmt]
+- when:
+    USEMODULE:
+      any: [prng_fortuna]
+  then:
+  - add:
+      USEMODULE: [crypto_aes_128]
+- when:
+    USEMODULE:
+      any: [crypto_%]
+  then:
+  - add:
+      USEMODULE: [crypto]
+- when:
+    USEMODULE:
+      any: [cipher_modes]
+  then:
+  - add:
+      USEMODULE: [crypto]
+- when:
+    USEMODULE:
+      any: [crypto]
+  then:
+  - add:
+      DEFAULT_MODULE: [crypto_aes_128]
+- when:
+    USEMODULE:
+      any: [sys_bus_%]
+  then:
+  - add:
+      USEMODULE: [sys_bus, core_msg_bus]
+- when:
+    USEMODULE:
+      any: [ieee802154_security]
+  then:
+  - add:
+      USEMODULE: [crypto, crypto_aes_128, cipher_modes]
+- when:
+    USEMODULE:
+      any: [shell_lock]
+  then:
+  - add:
+      USEMODULE: [ztimer_msec]
+- when:
+    USEMODULE:
+      any: [base64url]
+  then:
+  - add:
+      USEMODULE: [base64]
+- when:
+    USEMODULE:
+      any: [csma_sender]
+  then:
+  - add:
+      USEMODULE: [random, ztimer_usec]
+- when:
+    USEMODULE:
+      any: [dhcpv6_%]
+  then:
+  - add:
+      USEMODULE: [dhcpv6]
+- when:
+    USEMODULE:
+      any: [dhcpv6_client]
+  then:
+  - add:
+      DEFAULT_MODULE: [auto_init_dhcpv6_client]
+  - add:
+      USEMODULE: [event, event_timeout]
+  - when:
+      USEMODULE:
+        any: [ztimer]
+    then:
+    - add:
+        USEMODULE: [event_timeout_ztimer, ztimer_msec, ztimer_sec]
+  - add:
+      USEMODULE: [random]
+  - when:
+      USEMODULE:
+        any: [sock_dns]
+    then:
+    - add:
+        USEMODULE: [dhcpv6_client_dns]
+- when:
+    USEMODULE:
+      any: [dhcpv6_relay]
+  then:
+  - add:
+      DEFAULT_MODULE: [auto_init_dhcpv6_relay]
+  - add:
+      USEMODULE: [event, sock_async_event, sock_udp]
+- when:
+    USEMODULE:
+      any: [dns_%]
+  then:
+  - add:
+      USEMODULE: [dns]
+- when:
+    USEMODULE:
+      any: [fuzzing]
+  then:
+  - add:
+      USEMODULE: [netdev_test, gnrc_netif, gnrc_pktbuf_malloc]
+- comment: include GNRC dependencies
+  when:
+    USEMODULE:
+      any: [gnrc%, '%gnrc']
+  then:
+  - include: [$(RIOTBASE)/sys/net/gnrc/Makefile.dep]
+- when:
+    USEMODULE:
+      any: [sntp]
+  then:
+  - add:
+      USEMODULE: [sock_udp, ztimer64, ztimer64_usec]
+- when:
+    USEMODULE:
+      any: [sock_%]
+  then:
+  - add:
+      USEMODULE: [iolist]
+- when:
+    USEMODULE:
+      any: [netdev_ieee802154]
+  then:
+  - add:
+      USEMODULE: [ieee802154, random]
+- when:
+    USEMODULE:
+      any: [uhcpc]
+  then:
+  - add:
+      USEMODULE: [posix_inet, ztimer_msec]
+- when:
+    USEMODULE:
+      any: [netdev_tap]
+  then:
+  - add:
+      USEMODULE: [netif, netdev_eth, iolist]
+- when:
+    USEMODULE:
+      any: [netdev_test]
+  then:
+  - add:
+      USEMODULE: [netdev_legacy_api]
+- when:
+    USEMODULE:
+      any: [eui_provider]
+  then:
+  - add:
+      USEMODULE: [luid]
+- when:
+    USEMODULE:
+      any: [ieee802154, nrfmin, esp_now, cc110x]
+  then:
+  - when:
+      USEMODULE:
+        any: [lwip%]
+    then:
+    - add:
+        USEMODULE: [lwip_sixlowpan]
+- when:
+    USEMODULE:
+      any: [sixlowpan]
+  then:
+  - add:
+      USEMODULE: [ipv6_hdr]
+- when:
+    USEMODULE:
+      any: [ipv6_hdr]
+  then:
+  - add:
+      USEMODULE: [inet_csum, ipv6_addr]
+- when:
+    USEMODULE:
+      any: [ieee802154_submac]
+  then:
+  - add:
+      USEMODULE: [ztimer_usec, random]
+- when:
+    USEMODULE:
+      any: [l2util]
+  then:
+  - add:
+      USEMODULE: [fmt]
+- when:
+    USEMODULE:
+      any: [od_string]
+  then:
+  - add:
+      USEMODULE: [od]
+- when:
+    USEMODULE:
+      any: [od]
+  then:
+  - add:
+      USEMODULE: [fmt]
+- when:
+    USEMODULE:
+      any: [netutils]
+  then:
+  - add:
+      USEMODULE: [ipv6_addr]
+- when:
+    USEMODULE:
+      any: [newlib_gnu_source]
+  then:
+  - add:
+      FEATURES_REQUIRED: [newlib]
+- when:
+    USEMODULE:
+      any: [newlib_nano]
+  then:
+  - add:
+      FEATURES_REQUIRED: [newlib]
+- when:
+    USEMODULE:
+      any: [newlib]
+  then:
+  - comment: 'allow custom newlib syscalls implementations by adding
+
+      newlib_syscalls_XXX to USEMODULE'
+    when:
+      USEMODULE:
+        none: [newlib_syscalls_%]
+    then:
+    - add:
+        USEMODULE: [newlib_syscalls_default]
+  - when:
+      USEMODULE:
+        any: [newlib_syscalls_default]
+    then:
+    - add:
+        USEMODULE: [div]
+    - when:
+        USEMODULE:
+          any: [libc_gettimeofday]
+      then:
+      - add:
+          USEMODULE: [xtimer]
+      - when:
+          USEMODULE:
+            any: [ztimer_xtimer_compat]
+        then:
+        - comment: requires 64bit timestamps
+          add:
+            USEMODULE: [ztimer64_xtimer_compat]
+  - when:
+      FEATURES_USED:
+        any: [bug_newlib_broken_stdio]
+    then:
+    - comment: 'work around broken newlib stdio by using alternative stdio implementation,
+
+        unless stdio_null is used, which is inherently thread-safe :)'
+      when:
+        USEMODULE:
+          none: [stdio_null]
+      then:
+      - add:
+          USEPKG: [mpaland-printf]
+- when:
+    USEMODULE:
+      any: [posix_select]
+  then:
+  - when:
+      USEMODULE:
+        any: [posix_sockets]
+    then:
+    - add:
+        USEMODULE: [sock_async]
+  - add:
+      USEMODULE: [core_thread_flags, posix_headers, ztimer64_usec]
+- when:
+    USEMODULE:
+      any: [picolibc]
+  then:
+  - comment: 'allow custom picolibc syscalls implementations by adding
+
+      picolibc_syscalls_XXX to USEMODULE'
+    when:
+      USEMODULE:
+        none: [picolibc_syscalls_%]
+    then:
+    - add:
+        USEMODULE: [picolibc_syscalls_default]
+- when:
+    USEMODULE:
+      any: [posix_sockets]
+  then:
+  - add:
+      USEMODULE: [bitfield, random, vfs, posix_headers]
+- when:
+    USEMODULE:
+      any: [shell_cmd%]
+  then:
+  - comment: each and every command is a submodule of shell_cmds
+    add:
+      USEMODULE: [shell_cmds]
+- when:
+    USEMODULE:
+      any: [shell_cmds]
+  then:
+  - add:
+      USEMODULE: [shell]
+- comment: Include all stdio_% dependencies after all USEMODULE += stdio_%
+  include: [$(RIOTBASE)/makefiles/stdio.inc.mk]
+- when:
+    USEMODULE:
+      any: [isrpipe_read_timeout]
+  then:
+  - add:
+      USEMODULE: [isrpipe, ztimer_usec]
+- when:
+    USEMODULE:
+      any: [posix_semaphore]
+  then:
+  - add:
+      USEMODULE: [sema_deprecated, ztimer64_usec, posix_headers]
+- when:
+    USEMODULE:
+      any: [posix_sleep]
+  then:
+  - add:
+      USEMODULE: [ztimer_msec, ztimer_usec, posix_headers]
+- when:
+    USEMODULE:
+      any: [posix_inet]
+  then:
+  - add:
+      USEMODULE: [posix_headers]
+- when:
+    USEMODULE:
+      any: [sema_deprecated]
+  then:
+  - add:
+      USEMODULE: [sema, ztimer64, ztimer64_usec]
+- when:
+    USEMODULE:
+      any: [telnet]
+  then:
+  - add:
+      USEMODULE: [pipe, sock_tcp]
+- when:
+    USEMODULE:
+      any: [fib]
+  then:
+  - add:
+      USEMODULE: [universal_address, xtimer]
+  - when:
+      USEMODULE:
+        any: [ztimer_xtimer_compat]
+    then:
+    - add:
+        USEMODULE: [ztimer64_xtimer_compat]
+  - add:
+      USEMODULE: [posix_headers]
+- comment: if any log_* is used, also use LOG pseudomodule
+  when:
+    USEMODULE:
+      any: [log_%]
+  then:
+  - add:
+      USEMODULE: [log]
+- when:
+    USEMODULE:
+      any: [netstats_%]
+  then:
+  - add:
+      USEMODULE: [netstats]
+- when:
+    USEMODULE:
+      any: [netstats_neighbor_%]
+  then:
+  - add:
+      USEMODULE: [netstats_neighbor, xtimer]
+- when:
+    USEMODULE:
+      any: [pthread]
+  then:
+  - add:
+      USEMODULE: [ztimer64_usec, timex]
+  - when:
+      USEMODULE:
+        any: [ztimer_xtimer_compat]
+    then:
+    - comment: requires 64bit ftimestamps
+      add:
+        USEMODULE: [ztimer64_xtimer_compat]
+- when:
+    USEMODULE:
+      any: [saul_default]
+  then:
+  - add:
+      DEFAULT_MODULE: [auto_init_saul, saul_init_devs]
+  - add:
+      USEMODULE: [saul, saul_reg]
+- when:
+    USEMODULE:
+      any: [senml_%]
+  then:
+  - add:
+      USEMODULE: [senml]
+- when:
+    USEMODULE:
+      any: [evtimer_mbox]
+  then:
+  - add:
+      USEMODULE: [evtimer, core_mbox]
+- when:
+    USEMODULE:
+      any: [conn_can]
+  then:
+  - add:
+      USEMODULE: [can]
+- when:
+    USEMODULE:
+      any: [entropy_source_%]
+  then:
+  - add:
+      USEMODULE: [entropy_source]
+- when:
+    USEMODULE:
+      any: [hashes]
+  then:
+  - add:
+      USEMODULE: [crypto]
+- when:
+    USEMODULE:
+      any: [asymcute]
+  then:
+  - add:
+      USEMODULE: [sock_udp, sock_util, sock_async_event, random, event_timeout, event_callback]
+- when:
+    USEMODULE:
+      any: [event_periodic_callback]
+  then:
+  - add:
+      USEMODULE: [event_callback, event_periodic]
+- when:
+    USEMODULE:
+      any: [event_loop_debug]
+  then:
+  - add:
+      USEMODULE: [ztimer_usec]
+- when:
+    USEMODULE:
+      any: [emcute]
+  then:
+  - add:
+      USEMODULE: [core_thread_flags, sock_udp, xtimer]
+- when:
+    USEMODULE:
+      any: [constfs]
+  then:
+  - add:
+      USEMODULE: [vfs]
+- when:
+    USEMODULE:
+      any: [devfs]
+  then:
+  - add:
+      USEMODULE: [vfs]
+- when:
+    USEMODULE:
+      any: [vfs_default]
+  then:
+  - add:
+      USEMODULE: [vfs]
+- when:
+    USEMODULE:
+      any: [sock_async_event]
+  then:
+  - add:
+      USEMODULE: [sock_async, event]
+- when:
+    USEMODULE:
+      any: [sock_async]
+  then:
+  - when:
+      USEMODULE:
+        any: [openwsn%]
+    then:
+    - add:
+        USEMODULE: [openwsn_sock_async]
+- when:
+    USEMODULE:
+      any: [sock_dns]
+  then:
+  - add:
+      USEMODULE: [dns_msg, sock_udp, sock_util, posix_headers]
+- when:
+    USEMODULE:
+      any: [sock_dns_mock]
+  then:
+  - add:
+      USEMODULE: [dns]
+- when:
+    USEMODULE:
+      any: [sock_dodtls]
+  then:
+  - add:
+      USEMODULE: [dns_msg, sock_dtls, sock_udp, sock_util, posix_headers, ztimer_msec]
+- when:
+    USEMODULE:
+      any: [dns_cache]
+  then:
+  - add:
+      USEMODULE: [ztimer_msec, checksum]
+- when:
+    USEMODULE:
+      any: [sock_util]
+  then:
+  - add:
+      USEMODULE: [posix_inet, fmt]
+- when:
+    USEMODULE:
+      any: [event_%]
+  then:
+  - add:
+      USEMODULE: [event]
+- when:
+    USEMODULE:
+      any: [l2filter_%]
+  then:
+  - add:
+      USEMODULE: [l2filter]
+- when:
+    USEMODULE:
+      any: [gcoap_fileserver]
+  then:
+  - add:
+      USEMODULE: [gcoap, nanocoap_fileserver]
+- when:
+    USEMODULE:
+      any: [nanocoap_fileserver]
+  then:
+  - add:
+      USEMODULE: [checksum, vfs]
+- when:
+    USEMODULE:
+      any: [nanocoap_fileserver_delete]
+  then:
+  - add:
+      USEMODULE: [nanocoap_fileserver, vfs_util]
+- when:
+    USEMODULE:
+      any: [nanocoap_fileserver_put]
+  then:
+  - add:
+      USEMODULE: [nanocoap_fileserver]
+- when:
+    USEMODULE:
+      any: [gcoap_forward_proxy]
+  then:
+  - add:
+      USEMODULE: [gcoap, uri_parser]
+- when:
+    USEMODULE:
+      any: [gcoap_forward_proxy_thread]
+  then:
+  - add:
+      USEMODULE: [gcoap_forward_proxy]
+- when:
+    USEMODULE:
+      any: [gcoap_dtls]
+  then:
+  - add:
+      USEMODULE: [gcoap, dsm, sock_async_event, sock_dtls, ztimer_msec, ztimer_usec, event_thread, event_timeout_ztimer]
+- when:
+    USEMODULE:
+      any: [dsm]
+  then:
+  - add:
+      USEMODULE: [sock_dtls, xtimer]
+  - when:
+      USEMODULE:
+        any: [ztimer_xtimer_compat]
+    then:
+    - comment: requires 64bit timestamps when using xtimer
+      add:
+        USEMODULE: [ztimer64_xtimer_compat]
+- when:
+    USEMODULE:
+      any: [gcoap]
+  then:
+  - add:
+      USEMODULE: [nanocoap, sock_async_event, sock_aux_local, sock_udp, sock_util, ztimer_msec, event_callback,
+        event_timeout_ztimer, random]
+- when:
+    USEMODULE:
+      any: [gcoap_dns]
+  then:
+  - add:
+      USEMODULE: [dns_msg, gcoap, ipv4_addr, ipv6_addr, uri_parser, sock_util]
+- when:
+    USEMODULE:
+      any: [nanocoap_dtls]
+  then:
+  - add:
+      USEMODULE: [sock_dtls]
+  - add:
+      USEPKG: [tinydtls]
+- when:
+    USEMODULE:
+      any: [nanocoap_server_auto_init]
+  then:
+  - add:
+      USEMODULE: [nanocoap_server]
+- when:
+    USEMODULE:
+      any: [nanocoap_server_observe]
+  then:
+  - add:
+      USEMODULE: [nanocoap_server_separate]
+- when:
+    USEMODULE:
+      any: [nanocoap_server_separate]
+  then:
+  - add:
+      USEMODULE: [nanocoap_server, sock_aux_local]
+- when:
+    USEMODULE:
+      any: [nanocoap_server]
+  then:
+  - add:
+      USEMODULE: [nanocoap_resources, nanocoap_sock]
+- when:
+    USEMODULE:
+      any: [nanocoap_sock]
+  then:
+  - add:
+      USEMODULE: [sock_udp, sock_util, ztimer_msec]
+- when:
+    USEMODULE:
+      any: [nanocoap_cache]
+  then:
+  - add:
+      USEMODULE: [ztimer_sec, hashes]
+- when:
+    USEMODULE:
+      any: [nanocoap_fs]
+  then:
+  - add:
+      USEMODULE: [nanocoap_sock, nanocoap_link_format, vfs]
+- when:
+    USEMODULE:
+      any: [nanocoap_link_format]
+  then:
+  - add:
+      USEMODULE: [fmt]
+- when:
+    USEMODULE:
+      any: [nanocoap_sock_observe]
+  then:
+  - add:
+      USEMODULE: [event_thread, sock_async_event, nanocoap_sock]
+- when:
+    USEMODULE:
+      any: [nanocoap_vfs]
+  then:
+  - add:
+      USEMODULE: [nanocoap_sock, vfs]
+- when:
+    USEMODULE:
+      any: [nanocoap_%]
+  then:
+  - add:
+      USEMODULE: [nanocoap]
+- comment: 'bare nanocoap is supposed to be concerned only with parsing and building of
+
+    CoAP message and should not care about any networking, but it sadly contains
+
+    code such as coap_handle_request() that very much is intermixed with
+
+    networking. Until that get''s cleaned up, we have to model the dependency
+
+    that is there in the code.'
+  when:
+    USEMODULE:
+      any: [nanocoap]
+  then:
+  - add:
+      USEMODULE: [sock_udp]
+- comment: include unicoap dependencies
+  when:
+    USEMODULE:
+      any: [unicoap%]
+  then:
+  - include: [$(RIOTBASE)/sys/net/application_layer/unicoap/Makefile.dep]
+- when:
+    USEMODULE:
+      any: [skald_%]
+  then:
+  - add:
+      USEMODULE: [skald]
+- when:
+    USEMODULE:
+      any: [skald]
+  then:
+  - add:
+      FEATURES_REQUIRED: [radio_nrfble]
+  - add:
+      FEATURES_OPTIONAL: [periph_rtt]
+  - add:
+      USEMODULE: [nrfble, random, ztimer_msec]
+- when:
+    USEMODULE:
+      any: [bluetil_addr]
+  then:
+  - add:
+      USEMODULE: [fmt]
+- when:
+    USEMODULE:
+      any: [cord_common]
+  then:
+  - add:
+      USEMODULE: [fmt, luid, gcoap]
+- when:
+    USEMODULE:
+      any: [cord_lc, cord_ep]
+  then:
+  - add:
+      USEMODULE: [core_thread_flags, cord_common]
+  - when:
+      USEMODULE:
+        any: [ztimer_xtimer_compat]
+    then:
+    - comment: requires 64bit timestamps when using xtimer
+      add:
+        USEMODULE: [ztimer64_xtimer_compat]
+- when:
+    USEMODULE:
+      any: [cord_epsim]
+  then:
+  - add:
+      USEMODULE: [cord_common]
+- when:
+    USEMODULE:
+      any: [cord_ep_standalone]
+  then:
+  - add:
+      USEMODULE: [cord_ep, ztimer_msec]
+- when:
+    USEMODULE:
+      any: [cord_lc]
+  then:
+  - add:
+      USEMODULE: [clif]
+- when:
+    USEMODULE:
+      any: [usbus%]
+  then:
+  - add:
+      USEMODULE: [usbus]
+  - comment: 'usbus is not directly in a subdirectory of sys, so we have to include the
+
+      Makefile.dep manually'
+    include: [$(RIOTBASE)/sys/usb/usbus/Makefile.dep]
+- when:
+    USEMODULE:
+      any: [riotboot_%]
+  then:
+  - add:
+      USEMODULE: [riotboot]
+- when:
+    USEMODULE:
+      any: [irq_handler]
+  then:
+  - add:
+      USEMODULE: [event]
+- when:
+    USEMODULE:
+      any: [sock_dtls]
+  then:
+  - add:
+      USEMODULE: [credman, sock_udp]
+- when:
+    USEMODULE:
+      any: [credman_load]
+  then:
+  - add:
+      USEPKG: [tiny-asn1]
+- when:
+    USEMODULE:
+      any: [suit_%]
+  then:
+  - add:
+      USEMODULE: [suit]
+- when:
+    USEMODULE:
+      any: [tiny_strerror_as_strerror]
+  then:
+  - add:
+      USEMODULE: [tiny_strerror]
+- comment: include ztimer dependencies
+  when:
+    USEMODULE:
+      any: [ztimer, ztimer_%, '%ztimer']
+  then:
+  - include: [$(RIOTBASE)/sys/ztimer/Makefile.dep]
+- comment: include ztimer64 dependencies
+  when:
+    USEMODULE:
+      any: [ztimer64%]
+  then:
+  - include: [$(RIOTBASE)/sys/ztimer64/Makefile.dep]
+- comment: handle xtimer's deps. Needs to be done *after* ztimer
+  when:
+    USEMODULE:
+      any: [xtimer]
+  then:
+  - include: [$(RIOTBASE)/sys/xtimer/Makefile.dep]
+- when:
+    USEMODULE:
+      any: [devfs_hwrng]
+  then:
+  - add:
+      FEATURES_REQUIRED: [periph_hwrng]
+- when:
+    USEMODULE:
+      any: [devfs_random]
+  then:
+  - add:
+      USEMODULE: [random]
+- when:
+    USEMODULE:
+      any: [ecc_%]
+  then:
+  - add:
+      USEMODULE: [ecc]
+- when:
+    USEMODULE:
+      any: [bhp_%]
+  then:
+  - add:
+      USEMODULE: [bhp]
+- when:
+    USEMODULE:
+      any: [dbgpin]
+  then:
+  - add:
+      FEATURES_REQUIRED: [periph_gpio, dbgpin]
+- when:
+    USEMODULE:
+      any: [fido2_ctap%]
+  then:
+  - add:
+      USEMODULE: [fido2]
+- when:
+    USEMODULE:
+      any: [psa_crypto]
+  then:
+  - include: [$(RIOTBASE)/sys/psa_crypto/Makefile.dep]
+- when:
+    USEMODULE:
+      any: [psa_riot_cipher_aes_%]
+  then:
+  - add:
+      USEMODULE: [psa_riot_cipher_aes_common]
+- when:
+    USEMODULE:
+      any: [rust_riotmodules]
+  then:
+  - include: [$(RIOTBASE)/sys/rust_riotmodules/Makefile.dep]
+- when:
+    USEMODULE:
+      any: [auto_init%]
+  then:
+  - add:
+      USEMODULE: [preprocessor_successor]
+- when:
+    USEMODULE:
+      any: [walltime_default]
+  then:
+  - add:
+      USEMODULE: [walltime]
+- when:
+    USEMODULE:
+      any: [wifi_scan_list]
+  then:
+  - add:
+      USEMODULE: [l2scan_list]
+- include: [$(RIOTBASE)/sys/test_utils/Makefile.dep]

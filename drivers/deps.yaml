@@ -1,0 +1,523 @@
+# Dependency rules of drivers (authoritative; Makefile.dep is generated from this file).
+schema_version: 1
+rules:
+- comment: driver pseudo-modules dependencies (in alphabetical order)
+  when:
+    USEMODULE:
+      any: [adc%1c]
+  then:
+  - add:
+      USEMODULE: [adcxx1c]
+- when:
+    USEMODULE:
+      any: [ads101%, ads111%]
+  then:
+  - add:
+      USEMODULE: [ads1x1x]
+- when:
+    USEMODULE:
+      any: [amg88%]
+  then:
+  - add:
+      USEMODULE: [amg88xx]
+- when:
+    USEMODULE:
+      any: [apds99%]
+  then:
+  - add:
+      USEMODULE: [apds99xx]
+- when:
+    USEMODULE:
+      any: [at24c%]
+  then:
+  - add:
+      USEMODULE: [at24cxxx]
+- when:
+    USEMODULE:
+      any: [at86rf215%]
+  then:
+  - add:
+      USEMODULE: [at86rf215]
+- when:
+    make_expr: {op: ifneq, left: '', right: '$(filter at86rf%, $(filter-out at86rf215%, $(USEMODULE)))'}
+  then:
+  - add:
+      USEMODULE: [at86rf2xx]
+- when:
+    USEMODULE:
+      any: [bme680_%]
+  then:
+  - add:
+      USEMODULE: [bme680]
+- when:
+    USEMODULE:
+      any: [bm%280_i2c]
+  then:
+  - add:
+      USEMODULE: [bmx280]
+- when:
+    USEMODULE:
+      any: [bm%280_spi]
+  then:
+  - add:
+      USEMODULE: [bmx280]
+- when:
+    USEMODULE:
+      any: [bq2429x_int]
+  then:
+  - add:
+      USEMODULE: [bq2429x]
+- when:
+    USEMODULE:
+      any: [cc110%]
+  then:
+  - add:
+      USEMODULE: [cc110x]
+- when:
+    USEMODULE:
+      any: [ccs811_%]
+  then:
+  - add:
+      USEMODULE: [ccs811]
+- when:
+    USEMODULE:
+      any: [ethos_%]
+  then:
+  - add:
+      USEMODULE: [ethos]
+- when:
+    USEMODULE:
+      any: [ft6%, ft5%, ft3%]
+  then:
+  - add:
+      USEMODULE: [ft5x06]
+- when:
+    USEMODULE:
+      any: [gp8%]
+  then:
+  - add:
+      USEMODULE: [gp8xxx]
+- when:
+    USEMODULE:
+      any: [hmc5883l_%]
+  then:
+  - add:
+      USEMODULE: [hmc5883l]
+- when:
+    USEMODULE:
+      any: [hm330%]
+  then:
+  - add:
+      USEMODULE: [hm330x]
+- when:
+    USEMODULE:
+      any: [ina2%]
+  then:
+  - add:
+      USEMODULE: [ina2xx]
+- when:
+    USEMODULE:
+      any: [ina3221_%]
+  then:
+  - add:
+      USEMODULE: [ina3221]
+- when:
+    USEMODULE:
+      any: [itg320x_%]
+  then:
+  - add:
+      USEMODULE: [itg320x]
+- when:
+    USEMODULE:
+      any: [l3gxxxx_%]
+  then:
+  - add:
+      USEMODULE: [l3gxxxx]
+- when:
+    USEMODULE:
+      any: [lis2dh12%]
+  then:
+  - add:
+      USEMODULE: [lis2dh12]
+- when:
+    USEMODULE:
+      any: [llcc68]
+  then:
+  - add:
+      USEMODULE: [sx126x]
+- when:
+    USEMODULE:
+      any: [tmp1075, lm75%]
+  then:
+  - add:
+      USEMODULE: [lm75]
+- when:
+    USEMODULE:
+      any: [lps331ap, lps2%]
+  then:
+  - add:
+      USEMODULE: [lpsxxx]
+- when:
+    USEMODULE:
+      any: [lsm6ds%]
+  then:
+  - add:
+      USEMODULE: [lsm6dsxx]
+- when:
+    USEMODULE:
+      any: [ltc4150_%]
+  then:
+  - add:
+      USEMODULE: [ltc4150]
+- when:
+    USEMODULE:
+      any: [m24c%]
+  then:
+  - add:
+      USEMODULE: [at24cxxx]
+- when:
+    USEMODULE:
+      any: [max313%]
+  then:
+  - add:
+      USEMODULE: [max313xx]
+- when:
+    USEMODULE:
+      any: [mhz19_%]
+  then:
+  - add:
+      USEMODULE: [mhz19]
+- when:
+    USEMODULE:
+      any: [mpu9%50]
+  then:
+  - add:
+      USEMODULE: [mpu9x50]
+- when:
+    USEMODULE:
+      any: [mrf24j40m%]
+  then:
+  - add:
+      USEMODULE: [mrf24j40]
+- when:
+    USEMODULE:
+      any: [mcp23%17, mcp23x17_%]
+  then:
+  - add:
+      USEMODULE: [mcp23x17]
+- when:
+    USEMODULE:
+      any: [mtd_%]
+  then:
+  - add:
+      USEMODULE: [mtd]
+- comment: 'nrfmin is a concrete module but comes from cpu/nrf5x_common. Due to limitations
+
+    in the dependency resolution mechanism it''s not possible to move its
+
+    dependency resolution at cpu level.'
+  when:
+    USEMODULE:
+      any: [nrfmin]
+  then:
+  - add:
+      FEATURES_REQUIRED: [radio_nrfmin, periph_cpuid]
+- when:
+    USEMODULE:
+      any: [nrf24l01p_ng_%]
+  then:
+  - add:
+      USEMODULE: [nrf24l01p_ng]
+- when:
+    USEMODULE:
+      any: [pcf857%]
+  then:
+  - add:
+      USEMODULE: [pcf857x]
+- when:
+    FEATURES_USED:
+      any: [periph_flashpage_aux]
+  then:
+  - add:
+      FEATURES_REQUIRED: [periph_flashpage_pagewise]
+- when:
+    FEATURES_USED:
+      any: [periph_ptp_timer, periph_ptp_speed_adjustment]
+  then:
+  - add:
+      FEATURES_REQUIRED: [periph_ptp]
+- when:
+    USEMODULE:
+      any: [periph_usbdev]
+  then:
+  - add:
+      USEMODULE: [periph_usbdev_clk]
+- when:
+    USEMODULE:
+      any: [periph_usbdev_hs_ulpi]
+  then:
+  - add:
+      FEATURES_REQUIRED: [periph_usbdev_hs_ulpi]
+  - add:
+      USEMODULE: [periph_usbdev_hs]
+- when:
+    USEMODULE:
+      any: [periph_usbdev_hs_utmi]
+  then:
+  - add:
+      FEATURES_REQUIRED: [periph_usbdev_hs_utmi]
+  - add:
+      USEMODULE: [periph_usbdev_hs]
+- when:
+    USEMODULE:
+      any: [periph_usbdev_hs]
+  then:
+  - add:
+      FEATURES_REQUIRED: [periph_usbdev_hs]
+- when:
+    USEMODULE:
+      any: [pn532_i2c]
+  then:
+  - add:
+      FEATURES_REQUIRED: [periph_i2c]
+  - add:
+      USEMODULE: [pn532]
+- when:
+    USEMODULE:
+      any: [pn532_spi]
+  then:
+  - add:
+      FEATURES_REQUIRED: [periph_spi]
+  - add:
+      USEMODULE: [pn532]
+- when:
+    USEMODULE:
+      any: [qmc5883l_%]
+  then:
+  - add:
+      USEMODULE: [qmc5883l]
+- when:
+    USEMODULE:
+      any: [rn2%3]
+  then:
+  - add:
+      USEMODULE: [rn2xx3]
+- when:
+    USEMODULE:
+      any: [sdp3x_%]
+  then:
+  - add:
+      USEMODULE: [sdp3x]
+- when:
+    USEMODULE:
+      any: [sen5%]
+  then:
+  - add:
+      USEMODULE: [sen5x]
+- when:
+    USEMODULE:
+      any: [servo_%]
+  then:
+  - add:
+      USEMODULE: [servo]
+- when:
+    USEMODULE:
+      any: [shield_llcc68]
+  then:
+  - add:
+      FEATURES_REQUIRED: [arduino_pins, arduino_shield_uno, arduino_spi]
+  - add:
+      USEMODULE: [llcc68]
+- when:
+    USEMODULE:
+      any: [shield_sx1262]
+  then:
+  - add:
+      FEATURES_REQUIRED: [arduino_pins, arduino_shield_uno, arduino_spi]
+  - add:
+      USEMODULE: [sx1262]
+- when:
+    USEMODULE:
+      any: [shield_w5100]
+  then:
+  - add:
+      FEATURES_REQUIRED: [arduino_pins, arduino_shield_isp, arduino_shield_uno, arduino_spi]
+  - add:
+      USEMODULE: [w5100]
+- when:
+    USEMODULE:
+      any: [sht1%]
+  then:
+  - add:
+      USEMODULE: [sht1x]
+- when:
+    USEMODULE:
+      any: [shtc%]
+  then:
+  - add:
+      USEMODULE: [shtcx]
+- when:
+    USEMODULE:
+      any: [si114%]
+  then:
+  - add:
+      USEMODULE: [si114x]
+- when:
+    USEMODULE:
+      any: [si70%]
+  then:
+  - add:
+      USEMODULE: [si70xx]
+- when:
+    USEMODULE:
+      any: [slipdev]
+  then:
+  - add:
+      USEMODULE: [slipdev_net]
+- when:
+    USEMODULE:
+      any: [slipdev_%, stdio_slipdev]
+  then:
+  - add:
+      USEMODULE: [slipmux]
+- when:
+    USEMODULE:
+      any: [stmpe811_%]
+  then:
+  - add:
+      USEMODULE: [stmpe811]
+- when:
+    USEMODULE:
+      any: [st77%]
+  then:
+  - add:
+      USEMODULE: [st77xx]
+- when:
+    USEMODULE:
+      any: [sx126%]
+  then:
+  - add:
+      USEMODULE: [sx126x]
+- when:
+    USEMODULE:
+      any: [sx127%]
+  then:
+  - add:
+      USEMODULE: [sx127x]
+- when:
+    USEMODULE:
+      any: [tmp00%]
+  then:
+  - add:
+      USEMODULE: [tmp00x]
+- when:
+    USEMODULE:
+      any: [usbdev_synopsys_dwc2]
+  then:
+  - add:
+      FEATURES_REQUIRED: [periph_usbdev]
+  - add:
+      USEMODULE: [ztimer_msec]
+- when:
+    USEMODULE:
+      any: [vcnl40%0]
+  then:
+  - add:
+      USEMODULE: [vcnl40x0]
+- when:
+    USEMODULE:
+      any: [vl6180x_%]
+  then:
+  - add:
+      USEMODULE: [vl6180x]
+- when:
+    USEMODULE:
+      any: [ws281x_%]
+  then:
+  - add:
+      USEMODULE: [ws281x]
+- when:
+    USEMODULE:
+      any: [saul_bat_voltage]
+  then:
+  - add:
+      FEATURES_REQUIRED: [periph_adc, board_bat_voltage]
+- when:
+    USEMODULE:
+      any: [saul_adc]
+  then:
+  - add:
+      FEATURES_REQUIRED: [periph_adc]
+- when:
+    USEMODULE:
+      any: [saul_gpio]
+  then:
+  - add:
+      FEATURES_REQUIRED: [periph_gpio]
+- when:
+    USEMODULE:
+      any: [saul_pwm]
+  then:
+  - add:
+      FEATURES_REQUIRED: [periph_pwm]
+- when:
+    USEMODULE:
+      any: [saul]
+  then:
+  - add:
+      USEMODULE: [phydat]
+- when:
+    USEMODULE:
+      any: [saul_nrf_temperature]
+  then:
+  - add:
+      FEATURES_REQUIRED: [periph_temperature]
+- comment: Enable periph_uart when periph_uart_nonblocking is enabled
+  when:
+    USEMODULE:
+      any: [periph_uart_nonblocking]
+  then:
+  - add:
+      FEATURES_REQUIRED: [periph_uart]
+- comment: Enable periph_gpio when periph_gpio_irq is enabled
+  when:
+    USEMODULE:
+      any: [periph_gpio_irq]
+  then:
+  - add:
+      FEATURES_REQUIRED: [periph_gpio]
+- when:
+    USEMODULE:
+      any: [periph_timer_periodic]
+  then:
+  - add:
+      FEATURES_REQUIRED: [periph_timer]
+- when:
+    USEMODULE:
+      any: [periph_wdt_auto_start]
+  then:
+  - add:
+      FEATURES_REQUIRED: [periph_wdt]
+- when:
+    make_expr: {op: ifneq, left: '', right: '$(filter-out netdev_default netdev_new_api netdev_legacy_api,
+        $(filter netdev_%,$(USEMODULE)))'}
+  then:
+  - add:
+      USEMODULE: [netdev]
+  - comment: Don't register netdevs if there is only a single one of them
+    when:
+      USEMODULE:
+        none: [gnrc_netif_single]
+    then:
+    - add:
+        USEMODULE: [netdev_register]
+- when:
+    USEMODULE:
+      any: [gnrc_netif_timestamp]
+  then:
+  - when:
+      USEMODULE:
+        any: [netdev_ieee802154]
+    then:
+    - add:
+        USEMODULE: [netdev_ieee802154_rx_timestamp]

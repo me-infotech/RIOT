@@ -125,6 +125,10 @@ def logical_lines(text: str):
         i += 1
         if not buf:
             start = n
+            if raw.lstrip().startswith("#") and not raw.startswith("\t"):
+                # full-line comment: kept for the YAML format (D27)
+                yield n, raw.strip(), False, None
+                continue
             m = DEFINE_RE.match(raw.strip())
             if m and not raw.startswith("\t"):
                 body = []
@@ -162,12 +166,20 @@ def translate(text: str, path: str, unsupported: list) -> list:
     root: list = []
     stack = [{"body": root}]          # frames: {"rule", "body"}
 
+    pending: list = []                  # comment lines before the next item
+
     def emit(item):
+        if pending:
+            item["comment"] = "\n".join(pending)
+            pending.clear()
         stack[-1]["body"].append(item)
 
     in_rule = False
     for n, line, tab, define in logical_lines(text):
         s = line.strip()
+        if s.startswith("#") and define is None and not tab:
+            pending.append(s[1:].strip() if s != "#" else "")
+            continue
         if define is not None:
             m = DEFINE_RE.match(s)
             op = m.group(2) or "="
@@ -309,6 +321,8 @@ def translate(text: str, path: str, unsupported: list) -> list:
             unsupported.append({"file": path, "line": n, "reason": str(e),
                                 "text": s[:160]})
             emit({"unsupported": str(e), "text": s[:160], "line": n})
+    if pending:
+        stack[-1]["body"].append({"note": "\n".join(pending)})
     if len(stack) != 1:
         unsupported.append({"file": path, "line": 0,
                             "reason": "unbalanced conditionals", "text": ""})

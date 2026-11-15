@@ -1,5 +1,7 @@
-FEATURES_REQUIRED += cpu_core_cortexm
+# Generated from deps.yaml by dist/tools/riot_deps/riot_deps.py.
+# Do not edit: change the YAML and run `just generate-deps`.
 
+FEATURES_REQUIRED += cpu_core_cortexm
 ifneq (,$(filter cmsis-dsp,$(USEMODULE)))
   USEMODULE += cmsis-dsp_basicmathfunctions
   USEMODULE += cmsis-dsp_commontables
@@ -12,7 +14,6 @@ ifneq (,$(filter cmsis-dsp,$(USEMODULE)))
   USEMODULE += cmsis-dsp_supportfunctions
   USEMODULE += cmsis-dsp_transformfunctions
 endif
-
 ifneq (,$(filter cmsis-nn,$(USEMODULE)))
   USEMODULE += cmsis-nn_activationfunctions
   USEMODULE += cmsis-nn_convolutionfunctions

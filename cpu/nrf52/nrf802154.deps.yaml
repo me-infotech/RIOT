@@ -1,0 +1,13 @@
+# Dependency rules of cpu/nrf52 (authoritative; Makefile.dep is generated from this file).
+schema_version: 1
+rules:
+- when:
+    USEMODULE:
+      any: [netdev_default]
+  then:
+  - when:
+      USEMODULE:
+        none: [nimble_%, nrfmin, nrfble]
+    then:
+    - add:
+        USEMODULE: [nrf802154]

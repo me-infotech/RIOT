@@ -1,0 +1,20 @@
+# Dependency rules of pkg/cmsis (authoritative; Makefile.dep is generated from this file).
+schema_version: 1
+rules:
+- add:
+    FEATURES_REQUIRED: [cpu_core_cortexm]
+- when:
+    USEMODULE:
+      any: [cmsis-dsp]
+  then:
+  - add:
+      USEMODULE: [cmsis-dsp_basicmathfunctions, cmsis-dsp_commontables, cmsis-dsp_complexmathfunctions,
+        cmsis-dsp_controllerfunctions, cmsis-dsp_fastmathfunctions, cmsis-dsp_filteringfunctions, cmsis-dsp_matrixfunctions,
+        cmsis-dsp_statisticsfunctions, cmsis-dsp_supportfunctions, cmsis-dsp_transformfunctions]
+- when:
+    USEMODULE:
+      any: [cmsis-nn]
+  then:
+  - add:
+      USEMODULE: [cmsis-nn_activationfunctions, cmsis-nn_convolutionfunctions, cmsis-nn_fullyconnectedfunctions,
+        cmsis-nn_nnsupportfunctions, cmsis-nn_poolingfunctions, cmsis-nn_softmaxfunctions]

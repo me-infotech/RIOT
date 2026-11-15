@@ -1,3 +1,6 @@
+# Generated from nrf802154.deps.yaml by dist/tools/riot_deps/riot_deps.py.
+# Do not edit: change the YAML and run `just generate-deps`.
+
 ifneq (,$(filter netdev_default,$(USEMODULE)))
   ifeq (,$(filter nimble_% nrfmin nrfble,$(USEMODULE)))
     USEMODULE += nrf802154
