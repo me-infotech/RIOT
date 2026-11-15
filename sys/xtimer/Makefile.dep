@@ -1,3 +1,6 @@
+# Generated from deps.yaml by dist/tools/riot_deps/riot_deps.py.
+# Do not edit: change the YAML and run `just generate-deps`.
+
 DEFAULT_MODULE += auto_init_xtimer
 # In whatever combination of backends periph_timer will be required
 # - xtimer (only) -> periph_timer
@@ -6,7 +9,6 @@ DEFAULT_MODULE += auto_init_xtimer
 # But requesting it here avoid an ifeq dependency that would be subject to
 # dependency inclusion order issues
 FEATURES_REQUIRED += periph_timer
-
 ifeq (,$(filter xtimer_no_ztimer_default,$(USEMODULE)))
   ifeq (,$(filter xtimer_on_ztimer,$(USEMODULE)))
     USEMODULE += ztimer_xtimer_compat
@@ -18,12 +20,10 @@ else
     endif
   endif
 endif
-
 ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
   DISABLE_MODULE += auto_init_xtimer
   USEMODULE += div
 endif
-
 # make xtimer use ztimer_usec as low level timer
 ifneq (,$(filter xtimer_on_ztimer,$(USEMODULE)))
   USEMODULE += ztimer_usec

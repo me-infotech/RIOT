@@ -1,32 +1,24 @@
+# Generated from deps.yaml by dist/tools/riot_deps/riot_deps.py.
+# Do not edit: change the YAML and run `just generate-deps`.
+
 DEFAULT_MODULE += auto_init_random
 USEMODULE += prng
-
 ifneq (,$(filter prng_fortuna,$(USEMODULE)))
-  USEMODULE += fortuna
-  USEMODULE += hashes
-  USEMODULE += crypto
+  USEMODULE += fortuna hashes crypto
   ifneq (,$(filter fortuna_reseed,$(USEMODULE)))
-    USEMODULE += atomic_utils
-    USEMODULE += ztimer
-    USEMODULE += ztimer_msec
+    USEMODULE += atomic_utils ztimer ztimer_msec
   endif
 endif
-
 ifneq (,$(filter prng_tinymt32,$(USEMODULE)))
   USEMODULE += tinymt32
 endif
-
 ifneq (,$(filter prng_sha%prng,$(USEMODULE)))
-  USEMODULE += prng_shaxprng
-  USEMODULE += hashes
+  USEMODULE += prng_shaxprng hashes
 endif
-
 ifneq (,$(filter prng_hwrng,$(USEMODULE)))
   FEATURES_REQUIRED += periph_hwrng
 endif
-
 ifeq (,$(filter puf_sram,$(USEMODULE)))
   FEATURES_OPTIONAL += periph_hwrng
 endif
-
 USEMODULE += luid

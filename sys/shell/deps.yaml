@@ -1,0 +1,611 @@
+# Dependency rules of sys/shell (authoritative; Makefile.dep is generated from this file).
+schema_version: 1
+rules:
+- add:
+    USEMODULE: [stdin]
+- when:
+    USEMODULE:
+      any: [shell_cmds_default]
+  then:
+  - add:
+      USEMODULE: [shell_cmd_sys]
+  - when:
+      USEMODULE:
+        any: [netif]
+    then:
+    - add:
+        USEMODULE: [l2util]
+  - when:
+      USEMODULE:
+        any: [app_metadata]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_app_metadata]
+  - when:
+      USEMODULE:
+        any: [at30tse75x]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_at30tse75x]
+  - when:
+      USEMODULE:
+        any: [benchmark_udp]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_benchmark_udp]
+  - when:
+      USEPKG:
+        any: [bplib]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_bplib]
+  - when:
+      USEMODULE:
+        any: [ccn-lite-utils]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_ccn-lite-utils]
+  - when:
+      USEMODULE:
+        any: [conn_can]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_conn_can]
+  - when:
+      USEMODULE:
+        any: [cord_ep]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_cord_ep]
+  - when:
+      USEPKG:
+        any: [cryptoauthlib]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_cryptoauthlib]
+  - when:
+      USEMODULE:
+        any: [dfplayer]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_dfplayer]
+  - when:
+      USEMODULE:
+        any: [fib]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_fib]
+  - when:
+      USEMODULE:
+        any: [gnrc_ipv6_ext_frag_stats]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_gnrc_ipv6_frag_stats]
+  - when:
+      USEMODULE:
+        any: [gnrc_ipv6_nib]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_gnrc_ipv6_nib]
+  - when:
+      USEMODULE:
+        any: [gnrc_ipv6_whitelist]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_whitelist]
+  - when:
+      USEMODULE:
+        any: [gnrc_ipv6_blacklist]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_blacklist]
+  - when:
+      USEMODULE:
+        any: [gnrc_icmpv6_echo]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_gnrc_icmpv6_echo]
+  - when:
+      USEMODULE:
+        any: [gnrc_netif]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_gnrc_netif]
+    - when:
+        USEMODULE:
+          any: [lora]
+      then:
+      - add:
+          USEMODULE: [shell_cmd_gnrc_netif_lora]
+  - when:
+      USEMODULE:
+        any: [gnrc_txtsnd]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_gnrc_txtsnd]
+  - when:
+      USEMODULE:
+        any: [gnrc_netif_lorawan]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_gnrc_netif_lorawan]
+  - when:
+      USEMODULE:
+        any: [gnrc_rpl]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_gnrc_rpl]
+  - when:
+      USEMODULE:
+        any: [gnrc_sixlowpan_ctx]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_gnrc_sixlowpan_ctx]
+  - when:
+      USEMODULE:
+        any: [gnrc_sixlowpan_frag_stats]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_gnrc_sixlowpan_frag_stats]
+  - when:
+      USEMODULE:
+        any: [lpc2387]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_heap]
+  - when:
+      USEMODULE:
+        any: [lwip_netif]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_lwip_netif]
+  - when:
+      USEMODULE:
+        any: [mci]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_mci]
+  - when:
+      USEMODULE:
+        any: [nanocoap_vfs]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_nanocoap_vfs]
+  - when:
+      USEMODULE:
+        any: [netstats_neighbor]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_netstats_neighbor]
+  - when:
+      USEMODULE:
+        any: [nimble_netif]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_nimble_netif]
+  - when:
+      USEMODULE:
+        any: [nimble_statconn]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_nimble_statconn]
+  - when:
+      USEPKG:
+        any: [opendsme]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_opendsme]
+  - when:
+      USEMODULE:
+        any: [openthread-cli-%]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_openthread]
+  - when:
+      USEPKG:
+        any: [openwsn]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_openwsn]
+  - when:
+      USEMODULE:
+        any: [rtt_rtc, periph_rtc]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_rtc]
+  - when:
+      USEMODULE:
+        any: [saul_reg]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_saul_reg]
+  - when:
+      USEPKG:
+        any: [semtech-loramac]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_semtech-loramac]
+  - when:
+      USEMODULE:
+        any: [sntp]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_sntp]
+  - when:
+      USEMODULE:
+        any: [sock_udp]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_udp]
+  - when:
+      USEMODULE:
+        any: [unicoap_client]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_coap]
+  - when:
+      USEMODULE:
+        any: [periph_pm]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_pm]
+  - when:
+      USEMODULE:
+        any: [ps]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_ps]
+  - when:
+      USEMODULE:
+        any: [sht1x]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_sht1x]
+  - when:
+      USEMODULE:
+        any: [vfs]
+    then:
+    - add:
+        USEMODULE: [shell_cmd_vfs]
+- when:
+    USEMODULE:
+      any: [shell_cmd_app_metadata]
+  then:
+  - add:
+      USEMODULE: [app_metadata]
+- when:
+    USEMODULE:
+      any: [shell_cmd_at30tse75x]
+  then:
+  - add:
+      USEMODULE: [at30tse75x]
+- when:
+    USEMODULE:
+      any: [shell_cmd_benchmark_udp]
+  then:
+  - add:
+      USEMODULE: [benchmark_udp]
+- when:
+    USEMODULE:
+      any: [shell_cmd_ccn-lite-utils]
+  then:
+  - add:
+      USEMODULE: [ccn-lite-utils]
+- when:
+    USEMODULE:
+      any: [shell_cmd_coap]
+  then:
+  - add:
+      USEMODULE: [unicoap, unicoap_client, unicoap_client_uri]
+  - when:
+      USEMODULE:
+        any: [sock_udp]
+    then:
+    - add:
+        USEMODULE: [unicoap_driver_udp]
+  - when:
+      USEMODULE:
+        any: [sock_dtls]
+    then:
+    - add:
+        USEMODULE: [unicoap_driver_dtls]
+- when:
+    USEMODULE:
+      any: [shell_cmd_conn_can]
+  then:
+  - add:
+      USEMODULE: [conn_can]
+- when:
+    USEMODULE:
+      any: [shell_cmd_cord_ep]
+  then:
+  - add:
+      USEMODULE: [cord_ep, sock_util, uri_parser]
+- when:
+    USEPKG:
+      any: [shell_cmd_cryptoauthlib]
+  then:
+  - add:
+      USEMODULE: [cryptoauthlib]
+- when:
+    USEMODULE:
+      any: [shell_cmd_dfplayer]
+  then:
+  - add:
+      USEMODULE: [auto_init_multimedia, dfplayer, fmt]
+- when:
+    USEMODULE:
+      any: [shell_cmd_fib]
+  then:
+  - add:
+      USEMODULE: [fib, posix_inet]
+- when:
+    USEMODULE:
+      any: [shell_cmd_gnrc_icmpv6_echo]
+  then:
+  - add:
+      USEMODULE: [gnrc_icmpv6_echo, netutils, ztimer_usec]
+- when:
+    USEMODULE:
+      any: [shell_cmd_gnrc_ipv6_blacklist]
+  then:
+  - add:
+      USEMODULE: [gnrc_ipv6_blacklist]
+- when:
+    USEMODULE:
+      any: [shell_cmd_gnrc_ipv6_ext_frag_stats]
+  then:
+  - add:
+      USEMODULE: [gnrc_ipv6_frag_stats]
+- when:
+    USEMODULE:
+      any: [shell_cmd_gnrc_ipv6_nib]
+  then:
+  - add:
+      USEMODULE: [gnrc_ipv6_nib]
+- when:
+    USEMODULE:
+      any: [shell_cmd_gnrc_ipv6_whitelist]
+  then:
+  - add:
+      USEMODULE: [gnrc_ipv6_whitelist]
+- when:
+    USEMODULE:
+      any: [shell_cmd_gnrc_netif]
+  then:
+  - add:
+      USEMODULE: [gnrc_netif, fmt]
+- when:
+    USEMODULE:
+      any: [shell_cmd_gnrc_netif_lorawan]
+  then:
+  - add:
+      USEMODULE: [gnrc_netif_lorawan, shell_cmd_gnrc_netif_lora, shell_cmd_gnrc_netif]
+- when:
+    USEMODULE:
+      any: [shell_cmd_gnrc_pktbuf]
+  then:
+  - add:
+      USEMODULE: [gnrc_pktbuf]
+- when:
+    USEMODULE:
+      any: [shell_cmd_gnrc_rpl]
+  then:
+  - add:
+      USEMODULE: [gnrc_rpl]
+- when:
+    USEMODULE:
+      any: [shell_cmd_gnrc_sixlowpan_ctx]
+  then:
+  - add:
+      USEMODULE: [gnrc_sixlowpan_ctx]
+- when:
+    USEMODULE:
+      any: [shell_cmd_gnrc_sixlowpan_frag_stats]
+  then:
+  - add:
+      USEMODULE: [gnrc_sixlowpan_frag_stats]
+- when:
+    USEMODULE:
+      any: [shell_cmd_gnrc_udp]
+  then:
+  - add:
+      USEMODULE: [gnrc_udp, gnrc_pktdump, netutils]
+- when:
+    USEMODULE:
+      any: [shell_cmd_i2c_scan]
+  then:
+  - add:
+      FEATURES_REQUIRED: [periph_i2c]
+- when:
+    USEMODULE:
+      any: [shell_cmd_iw]
+  then:
+  - add:
+      USEMODULE: [ztimer_sec]
+- when:
+    USEMODULE:
+      any: [shell_cmd_lwip_netif]
+  then:
+  - add:
+      USEMODULE: [lwip_netif, posix_inet]
+  - when:
+      USEMODULE:
+        any: [lwip_ipv4]
+    then:
+    - add:
+        USEMODULE: [ipv4_addr]
+- when:
+    USEMODULE:
+      any: [shell_cmd_mci]
+  then:
+  - add:
+      USEMODULE: [mci]
+- when:
+    USEMODULE:
+      any: [shell_cmd_md5sum]
+  then:
+  - add:
+      USEMODULE: [shell_cmd_vfs]
+- when:
+    USEMODULE:
+      any: [shell_cmd_mtd]
+  then:
+  - add:
+      USEMODULE: [fmt, mtd, od]
+- when:
+    USEMODULE:
+      any: [shell_cmd_nanocoap_vfs]
+  then:
+  - add:
+      USEMODULE: [nanocoap_vfs, vfs_util, nanocoap_link_format]
+- when:
+    USEMODULE:
+      any: [shell_cmd_netstats_neighbor]
+  then:
+  - add:
+      USEMODULE: [netstats_neighbor]
+- when:
+    USEMODULE:
+      any: [shell_cmd_nimble_netif]
+  then:
+  - add:
+      USEMODULE: [fmt, nimble_netif, nimble_scanlist, nimble_scanner]
+- when:
+    USEMODULE:
+      any: [shell_cmd_nimble_statconn]
+  then:
+  - add:
+      USEMODULE: [nimble_statconn]
+- when:
+    USEMODULE:
+      any: [shell_cmd_openwsn]
+  then:
+  - add:
+      USEMODULE: [ipv6_addr, l2util, netif]
+  - add:
+      USEPKG: [openwsn]
+- when:
+    USEMODULE:
+      any: [shell_cmd_pm]
+  then:
+  - add:
+      FEATURES_REQUIRED: [periph_pm]
+- when:
+    USEMODULE:
+      any: [shell_cmd_ps]
+  then:
+  - add:
+      USEMODULE: [ps]
+- when:
+    USEMODULE:
+      any: [shell_cmd_random_cmd]
+  then:
+  - add:
+      USEMODULE: [random]
+- when:
+    USEMODULE:
+      any: [shell_cmd_rtc]
+  then:
+  - add:
+      FEATURES_REQUIRED_ANY: [periph_rtc|periph_rtt]
+  - comment: 'beware: this is a bit more tricky than it looks. Before the
+
+      FEAUTRES_REQUIRED_ANY is taken into account, neither periph_rtc nor
+
+      periph_rtt is used. Once it comes to affect, at least one will be in use.
+
+      If periph_rtc is not in used but periph_rtt is, we can provide the RTC
+
+      with rtt_rtc.'
+    when:
+      make_expr: {op: ifeq, left: periph_rtt, right: '$(filter periph_rtc periph_rtt,$(USEMODULE))'}
+    then:
+    - add:
+        USEMODULE: [rtt_rtc]
+- when:
+    USEMODULE:
+      any: [shell_cmd_rtt]
+  then:
+  - add:
+      FEATURES_REQUIRED: [periph_rtt]
+- when:
+    USEMODULE:
+      any: [shell_cmd_saul_reg]
+  then:
+  - add:
+      USEMODULE: [saul_reg]
+- when:
+    USEMODULE:
+      any: [shell_cmd_semtech-loramac]
+  then:
+  - add:
+      USEPKG: [semtech-loramac]
+  - add:
+      USEMODULE: [fmt]
+- when:
+    USEMODULE:
+      any: [shell_cmd_sha1sum]
+  then:
+  - add:
+      USEMODULE: [shell_cmd_vfs]
+- when:
+    USEMODULE:
+      any: [shell_cmd_sha256sum]
+  then:
+  - add:
+      USEMODULE: [shell_cmd_vfs]
+- when:
+    USEMODULE:
+      any: [shell_cmd_sht1x]
+  then:
+  - add:
+      USEMODULE: [sht1x]
+- when:
+    USEMODULE:
+      any: [shell_cmd_sntp]
+  then:
+  - add:
+      USEMODULE: [sntp]
+- when:
+    USEMODULE:
+      any: [shell_cmd_suit]
+  then:
+  - add:
+      USEMODULE: [suit_transport_worker]
+- when:
+    USEMODULE:
+      any: [shell_cmd_udp_server]
+  then:
+  - add:
+      USEMODULE: [od, shell_cmd_udp, sock_async_event]
+- when:
+    USEMODULE:
+      any: [shell_cmd_udp]
+  then:
+  - add:
+      USEMODULE: [fmt, sock_udp, sock_util]
+- when:
+    USEMODULE:
+      any: [shell_cmd_udptty]
+  then:
+  - add:
+      USEMODULE: [sock_async, sock_udp]
+- when:
+    USEMODULE:
+      any: [shell_cmd_vfs]
+  then:
+  - add:
+      USEMODULE: [vfs, tiny_strerror]
+- when:
+    USEMODULE:
+      any: [shell_cmd_xipfs]
+  then:
+  - add:
+      USEMODULE: [xipfs]
+- when:
+    USEMODULE:
+      any: [shell_democommands]
+  then:
+  - add:
+      USEMODULE: [rust_riotmodules, shell]

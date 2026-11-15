@@ -1,0 +1,23 @@
+# Dependency rules of sys/event (authoritative; Makefile.dep is generated from this file).
+schema_version: 1
+rules:
+- add:
+    USEMODULE: [core_thread_flags]
+- when:
+    USEMODULE:
+      any: [event_thread_%]
+  then:
+  - add:
+      USEMODULE: [event_thread]
+- when:
+    USEMODULE:
+      any: [event_timeout_ztimer]
+  then:
+  - add:
+      USEMODULE: [ztimer]
+- when:
+    USEMODULE:
+      any: [event_timeout]
+  then:
+  - add:
+      USEMODULE: [event_timeout_ztimer, ztimer_usec]

@@ -1,0 +1,743 @@
+# Dependency rules of sys/net/gnrc (authoritative; Makefile.dep is generated from this file).
+schema_version: 1
+rules:
+- when:
+    USEMODULE:
+      any: [bhp]
+  then:
+  - add:
+      USEMODULE: [bhp_event]
+- when:
+    USEMODULE:
+      any: [gcoap]
+  then:
+  - add:
+      USEMODULE: [gnrc_sock_async]
+- when:
+    USEMODULE:
+      any: [sock_async]
+  then:
+  - add:
+      USEMODULE: [gnrc_sock_async]
+- when:
+    USEMODULE:
+      any: [gnrc_lorawan]
+  then:
+  - add:
+      USEMODULE: [ztimer_msec, random, hashes, iolist, crypto_aes_128]
+- when:
+    USEMODULE:
+      any: [gnrc_lorawan_1_1]
+  then:
+  - add:
+      USEMODULE: [gnrc_lorawan]
+  - add:
+      FEATURES_REQUIRED: [periph_flashpage]
+- when:
+    USEMODULE:
+      any: [netdev_default]
+  then:
+  - add:
+      USEMODULE: [netdev, gnrc_netif]
+- when:
+    USEMODULE:
+      any: [gnrc_dhcpv6_%]
+  then:
+  - add:
+      USEMODULE: [gnrc_dhcpv6]
+- when:
+    USEMODULE:
+      any: [gnrc_dhcpv6_client]
+  then:
+  - add:
+      USEMODULE: [dhcpv6_client, gnrc_ipv6_nib, gnrc_netif, gnrc_sock_udp]
+- when:
+    USEMODULE:
+      any: [gnrc_dhcpv6_client_6lbr]
+  then:
+  - add:
+      USEMODULE: [gnrc_dhcpv6_client_simple_pd]
+- when:
+    USEMODULE:
+      any: [gnrc_dhcpv6_client_simple_pd]
+  then:
+  - add:
+      USEMODULE: [gnrc_dhcpv6_client, dhcpv6_client_ia_pd]
+- when:
+    USEMODULE:
+      any: [gnrc_uhcpc]
+  then:
+  - add:
+      DEFAULT_MODULE: [auto_init_gnrc_uhcpc]
+  - add:
+      USEMODULE: [uhcpc, gnrc_sock_udp, fmt]
+- when:
+    make_expr: {op: ifneq, left: '', right: '$(filter gnrc_%,$(filter-out gnrc_lorawan gnrc_lorawan_1_1
+        gnrc_netapi gnrc_netapi_notify gnrc_netreg gnrc_netif% gnrc_pkt%,$(USEMODULE)))'}
+  then:
+  - add:
+      USEMODULE: [gnrc]
+- when:
+    USEMODULE:
+      any: [gnrc_sock_%]
+  then:
+  - add:
+      USEMODULE: [iolist, gnrc_sock]
+  - when:
+      USEMODULE:
+        any: [sock_aux_timestamp]
+    then:
+    - add:
+        USEMODULE: [gnrc_netif_timestamp]
+- when:
+    USEMODULE:
+      any: [gnrc_sock_async]
+  then:
+  - add:
+      USEMODULE: [gnrc_netapi_callbacks]
+- when:
+    USEMODULE:
+      any: [gnrc_sock_udp]
+  then:
+  - add:
+      USEMODULE: [gnrc_udp, random]
+- when:
+    USEMODULE:
+      any: [gnrc_sock_tcp]
+  then:
+  - add:
+      USEMODULE: [gnrc_tcp]
+- when:
+    USEMODULE:
+      any: [gnrc_sock]
+  then:
+  - add:
+      USEMODULE: [gnrc_netapi_mbox, sock]
+- when:
+    USEMODULE:
+      any: [gnrc_netapi_mbox]
+  then:
+  - add:
+      USEMODULE: [core_mbox]
+- when:
+    USEMODULE:
+      any: [gnrc_rpl_p2p]
+  then:
+  - add:
+      USEMODULE: [gnrc_rpl]
+- when:
+    USEMODULE:
+      any: [gnrc_rpl]
+  then:
+  - add:
+      USEMODULE: [gnrc_ipv6, gnrc_icmpv6, gnrc_ipv6_nib, trickle]
+  - when:
+      USEMODULE:
+        none: [ztimer_msec]
+    then:
+    - add:
+        USEMODULE: [xtimer]
+  - add:
+      USEMODULE: [evtimer]
+- when:
+    USEMODULE:
+      any: [gnrc_ipv6_auto_subnets_eui]
+  then:
+  - add:
+      USEMODULE: [gnrc_ipv6_auto_subnets_simple]
+- when:
+    USEMODULE:
+      any: [gnrc_ipv6_auto_subnets_simple]
+  then:
+  - add:
+      USEMODULE: [gnrc_ipv6_auto_subnets]
+- when:
+    USEMODULE:
+      any: [gnrc_ipv6_auto_subnets]
+  then:
+  - add:
+      USEMODULE: [gnrc_ipv6_nib_rtr_adv_pio_cb, xtimer]
+  - when:
+      USEMODULE:
+        none: [gnrc_ipv6_auto_subnets_simple]
+    then:
+    - add:
+        DEFAULT_MODULE: [gnrc_ipv6_auto_subnets_auto_init]
+    - add:
+        USEMODULE: [gnrc_udp]
+- when:
+    USEMODULE:
+      any: [gnrc_netif]
+  then:
+  - add:
+      USEMODULE: [netif, l2util, fmt, ztimer_msec]
+  - when:
+      USEMODULE:
+        any: [netdev_ieee802154_submac]
+    then:
+    - add:
+        USEMODULE: [gnrc_netif_pktq]
+  - when:
+      USEMODULE:
+        any: [netdev_ieee802154]
+    then:
+    - add:
+        USEMODULE: [gnrc_netif_ieee802154]
+  - when:
+      USEMODULE:
+        any: [netdev_eth]
+    then:
+    - add:
+        USEMODULE: [gnrc_netif_ethernet]
+  - when:
+      USEMODULE:
+        any: [gnrc_lorawan]
+    then:
+    - add:
+        USEMODULE: [gnrc_netif_lorawan]
+- when:
+    USEMODULE:
+      any: [gnrc_netif_bus]
+  then:
+  - add:
+      USEMODULE: [core_msg_bus]
+- when:
+    USEMODULE:
+      any: [netdev_eth, slipdev]
+  then:
+  - when:
+      USEMODULE:
+        none: [gnrc_sixloenc]
+    then:
+    - when:
+        USEMODULE:
+          any: [gnrc_ipv6]
+      then:
+      - add:
+          USEMODULE: [gnrc_ipv6_classic]
+- when:
+    USEMODULE:
+      any: [ieee802154, nrfmin, esp_now, cc110x, gnrc_sixloenc]
+  then:
+  - when:
+      USEMODULE:
+        any: [gnrc_ipv6]
+    then:
+    - add:
+        USEMODULE: [gnrc_sixlowpan]
+  - when:
+      USEMODULE:
+        any: [gnrc_ipv6_default]
+    then:
+    - add:
+        USEMODULE: [gnrc_sixlowpan_default]
+  - when:
+      USEMODULE:
+        any: [gnrc_ipv6_router_default]
+    then:
+    - add:
+        USEMODULE: [gnrc_sixlowpan_router_default]
+- when:
+    USEMODULE:
+      any: [gnrc_sixlowpan_default]
+  then:
+  - add:
+      USEMODULE: [gnrc_ipv6_nib_6ln, gnrc_sixlowpan]
+  - when:
+      USEMODULE:
+        none: [gnrc_sixlowpan_frag_sfr]
+    then:
+    - add:
+        USEMODULE: [gnrc_sixlowpan_frag]
+  - add:
+      USEMODULE: [gnrc_sixlowpan_iphc]
+- when:
+    USEMODULE:
+      any: [gnrc_sixlowpan_router_default]
+  then:
+  - add:
+      USEMODULE: [gnrc_ipv6_nib_6lr]
+  - when:
+      USEMODULE:
+        none: [gnrc_sixlowpan_frag_sfr]
+    then:
+    - add:
+        USEMODULE: [gnrc_sixlowpan_frag]
+  - add:
+      USEMODULE: [gnrc_sixlowpan_iphc]
+- when:
+    USEMODULE:
+      any: [gnrc_sixlowpan_border_router_default]
+  then:
+  - add:
+      USEMODULE: [gnrc_ipv6_nib_6lbr, gnrc_ipv6_router_default]
+  - when:
+      USEMODULE:
+        none: [gnrc_sixlowpan_frag_sfr]
+    then:
+    - add:
+        USEMODULE: [gnrc_sixlowpan_frag]
+  - add:
+      USEMODULE: [gnrc_sixlowpan_iphc]
+- when:
+    USEMODULE:
+      any: [netdev_new_api]
+  then:
+  - when:
+      USEMODULE:
+        any: [gnrc_sixlowpan_frag%]
+    then:
+    - add:
+        USEMODULE: [gnrc_netif_pktq]
+- when:
+    USEMODULE:
+      any: [gnrc_sixlowpan_frag]
+  then:
+  - add:
+      USEMODULE: [gnrc_sixlowpan, gnrc_sixlowpan_frag_fb, gnrc_sixlowpan_frag_rb]
+- when:
+    USEMODULE:
+      any: [gnrc_sixlowpan_frag_fb]
+  then:
+  - add:
+      USEMODULE: [core_msg]
+- when:
+    USEMODULE:
+      any: [gnrc_sixlowpan_frag_minfwd]
+  then:
+  - add:
+      USEMODULE: [gnrc_netif_pktq, gnrc_sixlowpan_frag, gnrc_sixlowpan_frag_hint, gnrc_sixlowpan_frag_vrb]
+- when:
+    USEMODULE:
+      any: [gnrc_sixlowpan_frag_rb]
+  then:
+  - add:
+      USEMODULE: [xtimer]
+- when:
+    USEMODULE:
+      any: [gnrc_sixlowpan_frag_sfr]
+  then:
+  - add:
+      USEMODULE: [gnrc_sixlowpan, gnrc_sixlowpan_frag_fb, gnrc_sixlowpan_frag_vrb, gnrc_sixlowpan_frag_rb,
+        evtimer, xtimer]
+- when:
+    USEMODULE:
+      any: [gnrc_sixlowpan_frag_sfr_congure_%]
+  then:
+  - add:
+      USEMODULE: [gnrc_sixlowpan_frag_sfr_congure]
+- when:
+    USEMODULE:
+      any: [gnrc_sixlowpan_frag_sfr_congure_abe]
+  then:
+  - add:
+      USEMODULE: [gnrc_sixlowpan_frag_sfr_congure_reno, congure_abe]
+- when:
+    USEMODULE:
+      any: [gnrc_sixlowpan_frag_sfr_congure_quic]
+  then:
+  - add:
+      USEMODULE: [congure_quic]
+- when:
+    USEMODULE:
+      any: [gnrc_sixlowpan_frag_sfr_congure_reno]
+  then:
+  - add:
+      USEMODULE: [congure_reno]
+- when:
+    USEMODULE:
+      any: [gnrc_sixlowpan_frag_sfr_congure]
+  then:
+  - add:
+      USEMODULE: [gnrc_sixlowpan_frag_sfr]
+  - when:
+      USEMODULE:
+        none: [gnrc_sixlowpan_frag_sfr_congure_%, congure_mock]
+    then:
+    - comment: pick Appendix C as default congestion control
+      add:
+        USEMODULE: [gnrc_sixlowpan_frag_sfr_congure_sfr]
+- when:
+    USEMODULE:
+      any: [gnrc_sixlowpan_frag_sfr_ecn_%]
+  then:
+  - add:
+      USEMODULE: [gnrc_sixlowpan_frag_sfr_ecn]
+- when:
+    USEMODULE:
+      any: [gnrc_sixlowpan_frag_sfr_ecn_if_out]
+  then:
+  - add:
+      USEMODULE: [gnrc_netif_pktq]
+- when:
+    USEMODULE:
+      any: [gnrc_sixlowpan_frag_sfr_ecn]
+  then:
+  - add:
+      USEMODULE: [gnrc_sixlowpan_frag_sfr]
+- when:
+    USEMODULE:
+      any: [gnrc_sixlowpan_frag_sfr_stats]
+  then:
+  - add:
+      USEMODULE: [gnrc_sixlowpan_frag_sfr]
+- when:
+    USEMODULE:
+      any: [gnrc_sixlowpan_frag_vrb]
+  then:
+  - add:
+      USEMODULE: [xtimer, gnrc_sixlowpan_frag_fb]
+- when:
+    USEMODULE:
+      any: [gnrc_sixlowpan_iphc]
+  then:
+  - add:
+      USEMODULE: [gnrc_ipv6, gnrc_sixlowpan, gnrc_sixlowpan_ctx, gnrc_sixlowpan_iphc_nhc]
+- when:
+    USEMODULE:
+      any: [gnrc_sixlowpan]
+  then:
+  - add:
+      DEFAULT_MODULE: [auto_init_gnrc_sixlowpan]
+  - add:
+      USEMODULE: [gnrc_nettype_sixlowpan, sixlowpan]
+  - when:
+      USEMODULE:
+        any: [gnrc_netif]
+    then:
+    - add:
+        USEMODULE: [gnrc_netif_6lo]
+- when:
+    USEMODULE:
+      any: [gnrc_sixlowpan_ctx]
+  then:
+  - add:
+      USEMODULE: [ipv6_addr]
+  - when:
+      USEMODULE:
+        none: [ztimer_msec]
+    then:
+    - add:
+        USEMODULE: [xtimer]
+- when:
+    USEMODULE:
+      any: [gnrc_ipv6_default]
+  then:
+  - add:
+      USEMODULE: [gnrc_ipv6, gnrc_icmpv6]
+- when:
+    USEMODULE:
+      any: [gnrc_ipv6_router_default]
+  then:
+  - add:
+      USEMODULE: [gnrc_ipv6_nib_rio, gnrc_ipv6_router, gnrc_icmpv6]
+- when:
+    USEMODULE:
+      any: [gnrc_ndp]
+  then:
+  - add:
+      USEMODULE: [gnrc_icmpv6, gnrc_ipv6_hdr, gnrc_netif]
+- when:
+    USEMODULE:
+      any: [gnrc_icmpv6_echo]
+  then:
+  - add:
+      USEMODULE: [gnrc_icmpv6, gnrc_ipv6_hdr, gnrc_netif_hdr]
+- when:
+    USEMODULE:
+      any: [gnrc_icmpv6_error]
+  then:
+  - add:
+      USEMODULE: [gnrc_icmpv6, gnrc_ipv6_hdr, gnrc_netif_hdr]
+- when:
+    USEMODULE:
+      any: [gnrc_icmpv6]
+  then:
+  - add:
+      USEMODULE: [inet_csum, ipv6_hdr, gnrc_nettype_icmpv6, gnrc_nettype_ipv6, icmpv6]
+- when:
+    USEMODULE:
+      any: [gnrc_rpl_srh]
+  then:
+  - add:
+      USEMODULE: [gnrc_ipv6_ext_rh]
+- when:
+    USEMODULE:
+      any: [gnrc_ipv6%]
+  then:
+  - add:
+      USEMODULE: [ipv6]
+- when:
+    USEMODULE:
+      any: [gnrc_ipv6_ext_frag]
+  then:
+  - add:
+      USEMODULE: [gnrc_ipv6_ext, xtimer]
+- when:
+    USEMODULE:
+      any: [gnrc_ipv6_ext_opt]
+  then:
+  - add:
+      USEMODULE: [gnrc_ipv6_ext]
+- when:
+    USEMODULE:
+      any: [gnrc_ipv6_ext_rh]
+  then:
+  - add:
+      USEMODULE: [gnrc_ipv6_ext]
+- when:
+    USEMODULE:
+      any: [gnrc_ipv6_ext]
+  then:
+  - add:
+      USEMODULE: [gnrc_nettype_ipv6, gnrc_nettype_ipv6_ext]
+- when:
+    USEMODULE:
+      any: [gnrc_ipv6_whitelist]
+  then:
+  - add:
+      USEMODULE: [ipv6_addr]
+- when:
+    USEMODULE:
+      any: [gnrc_ipv6_blacklist]
+  then:
+  - add:
+      USEMODULE: [ipv6_addr]
+- when:
+    USEMODULE:
+      any: [gnrc_ipv6_router]
+  then:
+  - add:
+      USEMODULE: [gnrc_ipv6, gnrc_ipv6_nib_router]
+- when:
+    USEMODULE:
+      any: [gnrc_ipv6]
+  then:
+  - add:
+      DEFAULT_MODULE: [auto_init_gnrc_ipv6]
+  - add:
+      USEMODULE: [inet_csum, ipv6_addr, gnrc_ipv6_hdr, gnrc_ipv6_nib, gnrc_netif, gnrc_netif_ipv6, gnrc_nettype_ipv6]
+- when:
+    USEMODULE:
+      any: [gnrc_ipv6_hdr]
+  then:
+  - add:
+      USEMODULE: [ipv6_hdr, gnrc_pktbuf]
+- when:
+    USEMODULE:
+      any: [gnrc_ipv6_nib_6lbr]
+  then:
+  - add:
+      USEMODULE: [gnrc_ipv6_nib_6lr]
+- when:
+    USEMODULE:
+      any: [gnrc_ipv6_nib_6lr]
+  then:
+  - add:
+      USEMODULE: [gnrc_ipv6_nib_6ln, gnrc_ipv6_nib_router]
+- when:
+    USEMODULE:
+      any: [gnrc_ipv6_nib_6ln]
+  then:
+  - add:
+      USEMODULE: [gnrc_ipv6_nib, gnrc_sixlowpan_nd]
+- when:
+    USEMODULE:
+      any: [gnrc_ipv6_nib_dns]
+  then:
+  - add:
+      USEMODULE: [gnrc_ipv6_nib]
+- when:
+    USEMODULE:
+      any: [gnrc_ipv6_nib_router]
+  then:
+  - add:
+      USEMODULE: [gnrc_ipv6_nib]
+- when:
+    USEMODULE:
+      any: [gnrc_ipv6_nib]
+  then:
+  - add:
+      DEFAULT_MODULE: [auto_init_gnrc_ipv6_nib]
+  - add:
+      USEMODULE: [evtimer, gnrc_ndp, gnrc_netif, gnrc_netif_ipv6, ipv6_addr, random]
+- when:
+    USEMODULE:
+      any: [gnrc_udp]
+  then:
+  - add:
+      DEFAULT_MODULE: [auto_init_gnrc_udp]
+  - add:
+      USEMODULE: [gnrc_nettype_udp, gnrc_nettype_ipv6, inet_csum, udp]
+- when:
+    USEMODULE:
+      any: [gnrc_tcp]
+  then:
+  - add:
+      DEFAULT_MODULE: [auto_init_gnrc_tcp]
+  - add:
+      USEMODULE: [gnrc_nettype_tcp, inet_csum, random, tcp, evtimer_mbox]
+- when:
+    USEMODULE:
+      any: [gnrc_pktdump]
+  then:
+  - add:
+      DEFAULT_MODULE: [auto_init_gnrc_pktdump]
+  - add:
+      USEMODULE: [gnrc_pktbuf, od]
+- when:
+    USEMODULE:
+      any: [gnrc_pktshark_%]
+  then:
+  - add:
+      USEMODULE: [gnrc_pktshark]
+- when:
+    USEMODULE:
+      any: [gnrc_pktshark_all]
+  then:
+  - add:
+      USEMODULE: [gnrc_pktshark_4in6, gnrc_pktshark_coap, gnrc_pktshark_icmpv6]
+- when:
+    USEMODULE:
+      any: [gnrc_pktshark_default]
+  then:
+  - when:
+      USEMODULE:
+        any: [ipv4_addr]
+    then:
+    - add:
+        USEMODULE: [gnrc_pktshark_4in6]
+  - when:
+      USEMODULE:
+        any: [nanocoap]
+    then:
+    - add:
+        USEMODULE: [gnrc_pktshark_coap]
+  - when:
+      USEMODULE:
+        any: [gnrc_icmpv6]
+    then:
+    - add:
+        USEMODULE: [gnrc_pktshark_icmpv6]
+- when:
+    USEMODULE:
+      any: [shell_cmds_default]
+  then:
+  - add:
+      USEMODULE: [shell_cmd_gnrc_pktshark]
+- when:
+    USEMODULE:
+      any: [auto_init_gnrc_pktshark]
+  then:
+  - add:
+      USEMODULE: [gnrc_pktshark]
+- when:
+    USEMODULE:
+      any: [gnrc_pktshark]
+  then:
+  - add:
+      USEMODULE: [fmt, gnrc_pktbuf, od]
+- when:
+    USEMODULE:
+      any: [gnrc_pktshark_4in6]
+  then:
+  - add:
+      USEMODULE: [ipv4_addr]
+- when:
+    USEMODULE:
+      any: [gnrc_pktshark_coap]
+  then:
+  - add:
+      USEMODULE: [nanocoap, sock_udp]
+- when:
+    USEMODULE:
+      any: [gnrc]
+  then:
+  - add:
+      USEMODULE: [gnrc_netapi, gnrc_netreg, gnrc_netif, gnrc_netif_hdr, gnrc_pktbuf]
+  - when:
+      USEMODULE:
+        any: [gnrc_ipv6]
+    then:
+    - when:
+        USEMODULE:
+          any: [nimble_netif]
+      then:
+      - add:
+          USEMODULE: [gnrc_netapi_notify]
+  - when:
+      USEMODULE:
+        any: [sock_async]
+    then:
+    - add:
+        USEMODULE: [gnrc_sock_async]
+  - when:
+      USEMODULE:
+        any: [sock_ip]
+    then:
+    - add:
+        USEMODULE: [gnrc_sock_ip]
+  - when:
+      USEMODULE:
+        any: [sock_udp]
+    then:
+    - add:
+        USEMODULE: [gnrc_sock_udp]
+  - when:
+      USEMODULE:
+        any: [sock_tcp]
+    then:
+    - add:
+        USEMODULE: [gnrc_sock_tcp]
+- when:
+    USEMODULE:
+      any: [gnrc_netapi_notify]
+  then:
+  - add:
+      USEMODULE: [sema_inv]
+- when:
+    USEMODULE:
+      any: [gnrc_pktbuf]
+  then:
+  - when:
+      USEMODULE:
+        none: [gnrc_pktbuf_%]
+    then:
+    - add:
+        USEMODULE: [gnrc_pktbuf_static]
+  - when:
+      make_expr: {op: ifeq, left: shell_cmd_gnrc_pktbuf, right: '$(filter gnrc_pktbuf_%, $(USEMODULE))'}
+    then:
+    - add:
+        USEMODULE: [gnrc_pktbuf_static]
+  - add:
+      DEFAULT_MODULE: [auto_init_gnrc_pktbuf]
+  - add:
+      USEMODULE: [gnrc_pkt]
+- when:
+    USEMODULE:
+      any: [gnrc_pktbuf_%]
+  then:
+  - add:
+      USEMODULE: [gnrc_pktbuf]
+- when:
+    USEMODULE:
+      any: [shell_cmd_gnrc_pktbuf]
+  then:
+  - when:
+      USEMODULE:
+        any: [gnrc_pktbuf_static]
+    then:
+    - add:
+        USEMODULE: [od]
+- when:
+    make_expr: {op: ifneq, left: '', right: '$(filter gnrc_netif_%,$(filter-out gnrc_netif_pktq,$(USEMODULE)))'}
+  then:
+  - add:
+      USEMODULE: [gnrc_netif, core_thread_flags, event]
+- when:
+    USEMODULE:
+      any: [gnrc_netif_pktq]
+  then:
+  - add:
+      USEMODULE: [xtimer]

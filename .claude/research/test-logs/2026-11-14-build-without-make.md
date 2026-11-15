@@ -150,14 +150,42 @@ modules, objects (44/44, 153/153), flags and link command as before the
 fixes, so the byte-identical firmware results of §5/§6 stay valid.
 Resolver parity (`2026-11-14-resolver.md`, 10 comparisons) unchanged.
 
-Not fixed (documented limits): comment and continuation edge cases
-outside rules, `::=` and computed assignment names, double expansion of
-`:=` values, approximate `flavor`/`origin`, `$((…))` with Python division,
-double-colon and static pattern rules, `FEATURES_MISSING`/`CONFLICTING`
-not reported by the resolver's Python features check, 5 of 13 shell
-blocks run the host command verbatim, and the timing in
+Not fixed at first (fixed 2026-11-15, §8, except the verbatim shell
+blocks): comment and continuation edge cases outside rules, `::=` and
+computed assignment names, double expansion of `:=` values, approximate
+`flavor`/`origin`, `$((…))` with Python division, double-colon and static
+pattern rules, `FEATURES_MISSING`/`CONFLICTING` not reported by the
+resolver's Python features check, 5 of 13 shell blocks run the host
+command verbatim, and the timing in
 `2026-11-14-resolver.md` compares Python on the host with Make in the
 container.
+
+## 8. Minor findings fixed (2026-11-15)
+
+User decision (2026-11-15): fix the minor findings of §7 (subagent,
+working tree). Each fix was compared with GNU Make 4.3 on a small test
+Makefile (same output; the old code differed in each):
+comment/continuation handling (comment removed after joining, `\#`,
+`# … \`, tab lines outside rules, tab-indented conditionals in recipes),
+assignments to computed names, `::=`, `!=`; flavor and origin per variable
+(no double expansion of `:=` values, `$$` kept); computed names and
+automatic variables in substitution references; relative includes against
+CURDIR; double-colon and static pattern rules, pattern-rule choice;
+`$((…))` arithmetic like dash, shell-block patterns anchored (4 injection
+attempts rejected, all 21 real calls still matched);
+FEATURES_MISSING/CONFLICTING/USED_BLACKLISTED reported like Make;
+`wildcard`/`dir`/`notdir`/`basename`/`suffix` edge cases; MAKELEVEL and
+MAKECMDGOALS in sub-makes.
+
+Regression after the fixes: dependency-file translation 0 unsupported
+(before 1); `--build` 6 unsupported (before 7); resolver parity 10/10;
+`flags.py` variables identical to Make (hello-world, nrf52840dk); build
+state of both applications in the container identical to the
+firmware-checked state (§5/§6).
+
+Still not modelled: trailing whitespace in values, re-expansion of
+environment values in sub-makes, `$0` in `$(call)`, MAKECMDGOALS empty
+instead of undefined at the top level.
 
 ## Not covered / limits
 

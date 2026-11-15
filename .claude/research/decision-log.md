@@ -486,3 +486,7 @@ Konfigurations-/Startzeit bleibt **Stresstest**, kein eigenes Kriterium.
   daraus generiert; Make-Auflösung 12/12 identisch, Resolver liest die YAML
   (10/10 identisch), Build-Zustand beider Apps unverändert; CI-Check und
   `just generate-deps`.
+- Nachtrag D27 (Nutzer, 2026-11-15): auch die 13 zusätzlichen
+  Abhängigkeitsdateien von gnrc_networking nach YAML (30 von 756 Dateien);
+  Parität unverändert (Testlog `2026-11-14-deps-yaml.md`). Leichtere
+  Review-Befunde des Resolvers behoben (`2026-11-14-build-without-make.md` §8).

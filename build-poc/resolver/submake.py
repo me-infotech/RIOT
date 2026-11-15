@@ -68,17 +68,22 @@ class SubMake:
         r = Resolver(self.top.root, {"files": {}})
         r.rules = self.rules["files"]
         s = r.s
+        # MAKELEVEL comes through the environment (one more than the
+        # parent's); the sub-makes of DIRS and packages have no goal, so
+        # MAKECMDGOALS is undefined, as in Make
+        level = int(env.get("MAKELEVEL", "0")) + 1
+        env = {k: v for k, v in env.items() if k != "MAKELEVEL"}
         for k, v in env.items():
-            s.vars[k] = ("r", v.replace("$", "$$"))   # environment variables
+            s.set_env(k, v.replace("$", "$$"))       # environment variables
         s.exports = set(env)
+        s.set_env("MAKELEVEL", str(level))
         for k, v in cmdvars.items():
             s.set_cmdline(k, v)                       # command-line variables
-        s.assign("CURDIR", ":=", directory, override=True)
-        s.assign("MAKEFILE_LIST", ":=", "", override=True)
-        s.assign("MAKE", ":=", "make", override=True)
+        s.set_simple("CURDIR", directory)
+        s.set_simple("MAKE", "make", "default")
         makeexpr.CWD = directory
         mk = makefile or os.path.join(directory, "Makefile")
-        s.assign("MAKEFILE_LIST", "+=", mk, override=True)
+        s.set_simple("MAKEFILE_LIST", mk)
         r.run(rules_of(mk, self.rules), os.path.relpath(mk, self.top.root))
         module = s.get("MODULE").strip()
         cc = s.get("CC").strip()
@@ -107,6 +112,7 @@ class SubMake:
         # children inherit this sub-make's exported variables (e.g. a
         # `CFLAGS += …` before `DIRS += …`), not only the top level's
         child_env = {n: s.get(n) for n in s.exports if n in s.vars}
+        child_env["MAKELEVEL"] = str(level)
         for d in s.words("DIRS"):
             self.run_dir(d if os.path.isabs(d) else os.path.join(directory, d),
                          None, dict(s.cmdline), child_env)
@@ -137,7 +143,7 @@ class SubMake:
 
         runner = Runner(self.top.root, self.rules, on_make, on_command)
         r = runner.state(pkg_dir, None, self.env, {})
-        ctx = Context(r, pkg_dir)
+        ctx = Context(r, pkg_dir, r.level)
         before = len(self.objects)
         goal["name"] = r.s.default_goal
         runner.build(ctx, r.s.default_goal)

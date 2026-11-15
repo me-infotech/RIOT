@@ -1,8 +1,9 @@
-USEMODULE += stdin
+# Generated from deps.yaml by dist/tools/riot_deps/riot_deps.py.
+# Do not edit: change the YAML and run `just generate-deps`.
 
+USEMODULE += stdin
 ifneq (,$(filter shell_cmds_default,$(USEMODULE)))
   USEMODULE += shell_cmd_sys
-
   ifneq (,$(filter netif,$(USEMODULE)))
     USEMODULE += l2util
   endif
@@ -64,10 +65,10 @@ ifneq (,$(filter shell_cmds_default,$(USEMODULE)))
     USEMODULE += shell_cmd_gnrc_netif_lorawan
   endif
   ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
-      USEMODULE += shell_cmd_gnrc_rpl
+    USEMODULE += shell_cmd_gnrc_rpl
   endif
   ifneq (,$(filter gnrc_sixlowpan_ctx,$(USEMODULE)))
-      USEMODULE += shell_cmd_gnrc_sixlowpan_ctx
+    USEMODULE += shell_cmd_gnrc_sixlowpan_ctx
   endif
   ifneq (,$(filter gnrc_sixlowpan_frag_stats,$(USEMODULE)))
     USEMODULE += shell_cmd_gnrc_sixlowpan_frag_stats
@@ -133,7 +134,6 @@ ifneq (,$(filter shell_cmds_default,$(USEMODULE)))
     USEMODULE += shell_cmd_vfs
   endif
 endif
-
 ifneq (,$(filter shell_cmd_app_metadata,$(USEMODULE)))
   USEMODULE += app_metadata
 endif
@@ -147,9 +147,7 @@ ifneq (,$(filter shell_cmd_ccn-lite-utils,$(USEMODULE)))
   USEMODULE += ccn-lite-utils
 endif
 ifneq (,$(filter shell_cmd_coap,$(USEMODULE)))
-  USEMODULE += unicoap
-  USEMODULE += unicoap_client
-  USEMODULE += unicoap_client_uri
+  USEMODULE += unicoap unicoap_client unicoap_client_uri
   ifneq (,$(filter sock_udp,$(USEMODULE)))
     USEMODULE += unicoap_driver_udp
   endif
@@ -161,26 +159,19 @@ ifneq (,$(filter shell_cmd_conn_can,$(USEMODULE)))
   USEMODULE += conn_can
 endif
 ifneq (,$(filter shell_cmd_cord_ep,$(USEMODULE)))
-  USEMODULE += cord_ep
-  USEMODULE += sock_util
-  USEMODULE += uri_parser
+  USEMODULE += cord_ep sock_util uri_parser
 endif
 ifneq (,$(filter shell_cmd_cryptoauthlib,$(USEPKG)))
   USEMODULE += cryptoauthlib
 endif
 ifneq (,$(filter shell_cmd_dfplayer,$(USEMODULE)))
-  USEMODULE += auto_init_multimedia
-  USEMODULE += dfplayer
-  USEMODULE += fmt
+  USEMODULE += auto_init_multimedia dfplayer fmt
 endif
 ifneq (,$(filter shell_cmd_fib,$(USEMODULE)))
-  USEMODULE += fib
-  USEMODULE += posix_inet
+  USEMODULE += fib posix_inet
 endif
 ifneq (,$(filter shell_cmd_gnrc_icmpv6_echo,$(USEMODULE)))
-  USEMODULE += gnrc_icmpv6_echo
-  USEMODULE += netutils
-  USEMODULE += ztimer_usec
+  USEMODULE += gnrc_icmpv6_echo netutils ztimer_usec
 endif
 ifneq (,$(filter shell_cmd_gnrc_ipv6_blacklist,$(USEMODULE)))
   USEMODULE += gnrc_ipv6_blacklist
@@ -195,30 +186,25 @@ ifneq (,$(filter shell_cmd_gnrc_ipv6_whitelist,$(USEMODULE)))
   USEMODULE += gnrc_ipv6_whitelist
 endif
 ifneq (,$(filter shell_cmd_gnrc_netif,$(USEMODULE)))
-  USEMODULE += gnrc_netif
-  USEMODULE += fmt
+  USEMODULE += gnrc_netif fmt
 endif
 ifneq (,$(filter shell_cmd_gnrc_netif_lorawan,$(USEMODULE)))
-  USEMODULE += gnrc_netif_lorawan
-  USEMODULE += shell_cmd_gnrc_netif_lora
-  USEMODULE += shell_cmd_gnrc_netif
+  USEMODULE += gnrc_netif_lorawan shell_cmd_gnrc_netif_lora shell_cmd_gnrc_netif
 endif
 ifneq (,$(filter shell_cmd_gnrc_pktbuf,$(USEMODULE)))
-    USEMODULE += gnrc_pktbuf
+  USEMODULE += gnrc_pktbuf
 endif
 ifneq (,$(filter shell_cmd_gnrc_rpl,$(USEMODULE)))
-    USEMODULE += gnrc_rpl
+  USEMODULE += gnrc_rpl
 endif
 ifneq (,$(filter shell_cmd_gnrc_sixlowpan_ctx,$(USEMODULE)))
-    USEMODULE += gnrc_sixlowpan_ctx
+  USEMODULE += gnrc_sixlowpan_ctx
 endif
 ifneq (,$(filter shell_cmd_gnrc_sixlowpan_frag_stats,$(USEMODULE)))
   USEMODULE += gnrc_sixlowpan_frag_stats
 endif
 ifneq (,$(filter shell_cmd_gnrc_udp,$(USEMODULE)))
-  USEMODULE += gnrc_udp
-  USEMODULE += gnrc_pktdump
-  USEMODULE += netutils
+  USEMODULE += gnrc_udp gnrc_pktdump netutils
 endif
 ifneq (,$(filter shell_cmd_i2c_scan,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
@@ -227,8 +213,7 @@ ifneq (,$(filter shell_cmd_iw,$(USEMODULE)))
   USEMODULE += ztimer_sec
 endif
 ifneq (,$(filter shell_cmd_lwip_netif,$(USEMODULE)))
-  USEMODULE += lwip_netif
-  USEMODULE += posix_inet
+  USEMODULE += lwip_netif posix_inet
   ifneq (,$(filter lwip_ipv4,$(USEMODULE)))
     USEMODULE += ipv4_addr
   endif
@@ -240,31 +225,22 @@ ifneq (,$(filter shell_cmd_md5sum,$(USEMODULE)))
   USEMODULE += shell_cmd_vfs
 endif
 ifneq (,$(filter shell_cmd_mtd,$(USEMODULE)))
-  USEMODULE += fmt
-  USEMODULE += mtd
-  USEMODULE += od
+  USEMODULE += fmt mtd od
 endif
 ifneq (,$(filter shell_cmd_nanocoap_vfs,$(USEMODULE)))
-  USEMODULE += nanocoap_vfs
-  USEMODULE += vfs_util
-  USEMODULE += nanocoap_link_format
+  USEMODULE += nanocoap_vfs vfs_util nanocoap_link_format
 endif
 ifneq (,$(filter shell_cmd_netstats_neighbor,$(USEMODULE)))
   USEMODULE += netstats_neighbor
 endif
 ifneq (,$(filter shell_cmd_nimble_netif,$(USEMODULE)))
-  USEMODULE += fmt
-  USEMODULE += nimble_netif
-  USEMODULE += nimble_scanlist
-  USEMODULE += nimble_scanner
+  USEMODULE += fmt nimble_netif nimble_scanlist nimble_scanner
 endif
 ifneq (,$(filter shell_cmd_nimble_statconn,$(USEMODULE)))
   USEMODULE += nimble_statconn
 endif
 ifneq (,$(filter shell_cmd_openwsn,$(USEMODULE)))
-  USEMODULE += ipv6_addr
-  USEMODULE += l2util
-  USEMODULE += netif
+  USEMODULE += ipv6_addr l2util netif
   USEPKG += openwsn
 endif
 ifneq (,$(filter shell_cmd_pm,$(USEMODULE)))
@@ -313,29 +289,20 @@ ifneq (,$(filter shell_cmd_suit,$(USEMODULE)))
   USEMODULE += suit_transport_worker
 endif
 ifneq (,$(filter shell_cmd_udp_server,$(USEMODULE)))
-  USEMODULE += od
-  USEMODULE += shell_cmd_udp
-  USEMODULE += sock_async_event
+  USEMODULE += od shell_cmd_udp sock_async_event
 endif
 ifneq (,$(filter shell_cmd_udp,$(USEMODULE)))
-  USEMODULE += fmt
-  USEMODULE += sock_udp
-  USEMODULE += sock_util
+  USEMODULE += fmt sock_udp sock_util
 endif
 ifneq (,$(filter shell_cmd_udptty,$(USEMODULE)))
-  USEMODULE += sock_async
-  USEMODULE += sock_udp
+  USEMODULE += sock_async sock_udp
 endif
 ifneq (,$(filter shell_cmd_vfs,$(USEMODULE)))
-  USEMODULE += vfs
-  USEMODULE += tiny_strerror
+  USEMODULE += vfs tiny_strerror
 endif
-
 ifneq (,$(filter shell_cmd_xipfs,$(USEMODULE)))
   USEMODULE += xipfs
 endif
-
 ifneq (,$(filter shell_democommands,$(USEMODULE)))
-  USEMODULE += rust_riotmodules
-  USEMODULE += shell
+  USEMODULE += rust_riotmodules shell
 endif

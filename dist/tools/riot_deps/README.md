@@ -22,7 +22,8 @@ none_except: [patterns]}}` / `{VAR: {equals|not_equals: value}}` /
 generated file). What cannot be expressed this way stays a Make expression
 under the key `make_expr` (or `include_make_expr`), so it is visible.
 
-Scope of the proof of concept: the 17 dependency files hello-world reads on
-`nrf52840dk`; all other `Makefile.dep` are unchanged. Edit the YAML, never
+Scope of the proof of concept: the 30 dependency files hello-world and
+gnrc_networking read on `nrf52840dk` (17 + 13); all other `Makefile.dep`
+are unchanged. Edit the YAML, never
 the generated `Makefile.dep`. Requires Python 3 and PyYAML; uses the
 translator of `build-poc/resolver` for the one-time export.

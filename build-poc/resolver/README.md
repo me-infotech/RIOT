@@ -8,7 +8,7 @@ of concept: hello-world and gnrc_networking.
 | File | Purpose |
 |---|---|
 | `translate_deps.py` | translates every `Makefile.dep`, `Makefile.features`, `*.dep`, `Makefile.default` and the plain-rule pipeline files (`makefiles/defaultmodules_*.inc.mk`, `features_modules.inc.mk`), plus every file they include, into an ordered rule list (JSON) and counts what it cannot translate |
-| `makeexpr.py` | evaluator for the Make functions used in RIOT's make files (text, file name, `foreach`, `call` with parameters, `eval`, `file`, `wildcard`, `shell` through hooks, substitution references, computed names); known gaps: see the test log §7 |
+| `makeexpr.py` | evaluator for the Make functions used in RIOT's make files (text, file name, `foreach`, `call` with parameters, `eval`, `file`, `wildcard`, `shell` through hooks, substitution references, computed names); known gaps: see the test log §7/§8 |
 | `resolver.py` | evaluates the rules for `riot-app.yaml` + board in Make's order (features, default modules, features check, fixpoint over `Makefile.dep`, finalisation); the features check (`makefiles/features_check.inc.mk`) is implemented in Python |
 
 Rule format (`riot-dep-rules/0`): per file a list of items, each one of

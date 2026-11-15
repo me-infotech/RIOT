@@ -1,0 +1,5 @@
+# Dependency rules of drivers/netdev (authoritative; Makefile.dep is generated from this file).
+schema_version: 1
+rules:
+- add:
+    USEMODULE: [eui_provider]

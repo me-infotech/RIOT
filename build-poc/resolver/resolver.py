@@ -43,10 +43,12 @@ class MakeError(Exception):
 
 class State:
     """Make variables: name -> (flavor, text); flavor 'r' (recursive, `=`)
-    or 's' (simple, `:=`)."""
+    or 's' (simple, `:=`); origin per variable ("file", "environment",
+    "command line", "override", "default"), like $(origin)."""
 
     def __init__(self):
         self.vars: dict[str, tuple[str, str]] = {}
+        self.origins: dict[str, str] = {}
         self.exports: set[str] = set()
         # command-line variables: only `override` may change them; passed
         # on to every sub-make (MAKEFLAGS)
@@ -59,8 +61,13 @@ class State:
         self.messages: list[tuple[str, str]] = []
 
     def raw(self, name):
+        """Lookup for the evaluator: the stored text with flavor and
+        origin (a simple variable's text is not expanded again)."""
         v = self.vars.get(name)
-        return None if v is None else v[1]
+        if v is None:
+            return None
+        return makeexpr.value(v[1], "simple" if v[0] == "s" else "recursive",
+                              self.origins.get(name, "file"))
 
     def get(self, name) -> str:
         v = self.vars.get(name)
@@ -77,12 +84,34 @@ class State:
     def set_cmdline(self, name, value):
         self.cmdline[name] = value
         self.vars[name] = ("r", value)
+        self.origins[name] = "command line"
+
+    def set_env(self, name, value):
+        """A variable from the environment (recursive, like Make)."""
+        self.vars[name] = ("r", value)
+        self.origins[name] = "environment"
+
+    def set_simple(self, name, value, origin="file"):
+        """Set a simple variable directly (variables Make defines itself:
+        CURDIR, MAKEFILE_LIST with origin "file", MAKE, MAKE_VERSION,
+        MAKECMDGOALS with origin "default")."""
+        self.vars[name] = ("s", value)
+        self.origins[name] = origin
 
     def assign(self, name, op, text, override=False):
-        if name in self.cmdline and not override:
-            return                        # command line wins (GNU Make)
+        if (name in self.cmdline or self.origins.get(name) == "override") \
+                and not override:
+            return          # command line / `override` win (GNU Make)
         cur = self.vars.get(name)
-        if op == ":=":
+        if op != "?=" or cur is None:
+            self.origins[name] = "override" if override else "file"
+        if op == "!=":
+            # shell assignment: run now, result is a recursive variable
+            if makeexpr.SHELL is None:
+                raise makeexpr.UnsupportedExpr(f"{name} != {text[:60]}")
+            self.vars[name] = ("r", makeexpr.SHELL(self.expand(text)))
+            return
+        if op in (":=", "::="):
             self.vars[name] = ("s", self.expand(text))
         elif op == "=":
             self.vars[name] = ("r", text)
@@ -155,13 +184,14 @@ class Resolver:
             elif ch == ":" and depth == 0:
                 break
         targets = s.expand(text[:k]).split()
-        rest = text[k + 1:].lstrip(":")
-        m = re.match(r"^\s*(?:(?:export|override)\s+)*([\w.-]+)\s*(\+=|:=|\?=|=)\s*(.*)$",
-                     rest, re.S)
+        double = text[k + 1:k + 2] == ":"          # `targets:: prereqs`
+        rest = text[k + 2:] if double else text[k + 1:]
+        m = re.match(r"^\s*(?:(?:export|override|private)\s+)*([\w.-]+)\s*"
+                     r"(\+=|::=|:=|\?=|=)\s*(.*)$", rest, re.S)
         if m:
             # target-specific variable: applied when the target is made
             var, op, value = m.groups()
-            if op == ":=":
+            if op in (":=", "::="):
                 value, op = s.expand(value), "s="
             for t in targets:
                 s.target_vars.setdefault(t, []).append((var, op, value))
@@ -171,10 +201,33 @@ class Resolver:
             rest, inline = rest.split(";", 1)
         else:
             inline = None
+        # static pattern rule `targets: target-pattern: prereq-patterns`
+        static = None
+        depth = 0
+        for j, ch in enumerate(rest):
+            if ch in "({":
+                depth += 1
+            elif ch in ")}":
+                depth -= 1
+            elif ch == ":" and depth == 0:
+                static = s.expand(rest[:j]).strip()
+                rest = rest[j + 1:]
+                break
+        if static is not None:
+            if double or len(static.split()) != 1 or static.count("%") < 1:
+                raise MakeError(f"static pattern rule {text[:80]}: target "
+                                "pattern must be one word with a %")
+            for t in targets:
+                if not _pattern_match(static, t):
+                    # GNU Make only warns; the target gets no prerequisites
+                    s.messages.append(("warning", f"target '{t}' doesn't "
+                                       "match the target pattern"))
         normal, _, order_only = rest.partition("|")
         prereqs = s.expand(normal).split()
+        # [targets, prerequisites, recipe lines, order-only prerequisites,
+        #  double-colon, static target pattern or None]
         s.rules.append([targets, prereqs, [inline] if inline else [],
-                        s.expand(order_only).split()])
+                        s.expand(order_only).split(), double, static])
         if s.default_goal is None:
             first = [t for t in targets if not t.startswith(".") and "%" not in t]
             if first:
@@ -188,7 +241,7 @@ class Resolver:
         for t, vs in s.target_vars.items():
             if t == target or ("%" in t and _pattern_match(t, target)):
                 entries += vs
-        saved = dict(s.vars)
+        saved, saved_origins = dict(s.vars), dict(s.origins)
         for var, op, value in entries:
             if op == "s=":
                 s.vars[var] = ("s", value)
@@ -196,7 +249,7 @@ class Resolver:
                 s.assign(var, op, value, override=True)
 
         def restore():
-            s.vars = saved
+            s.vars, s.origins = saved, saved_origins
         return restore
 
     def run(self, items: list, where: str):
@@ -206,12 +259,18 @@ class Resolver:
                          where)
             elif "assign" in it:
                 text = it["expr"] if "expr" in it else " ".join(it["words"])
-                self.s.assign(it["assign"], it["op"], text,
+                name = it["assign"]
+                if "$" in name:
+                    # computed name, e.g. `$(N)_X := v`: expanded when read
+                    name = self.s.expand(name).strip()
+                    if not name:
+                        raise MakeError(f"{where}:{it['line']}: empty variable name")
+                self.s.assign(name, it["op"], text,
                               override=it.get("override", False))
-                if it["assign"] == ".DEFAULT_GOAL" and not self.s.get(".DEFAULT_GOAL").strip():
+                if name == ".DEFAULT_GOAL" and not self.s.get(".DEFAULT_GOAL").strip():
                     self.s.default_goal = None   # next target becomes default
                 if it.get("export"):
-                    self.s.exports.add(it["assign"])
+                    self.s.exports.add(name)
             elif "export" in it:
                 self.s.exports.update(self.s.expand(" ".join(it["export"])).split())
             elif "unexport" in it:
@@ -228,7 +287,9 @@ class Resolver:
             elif "call" in it:
                 self.s.expand(it["call"])        # side effects: messages
             elif "undefine" in it:
-                self.s.vars.pop(it["undefine"].strip(), None)
+                name = self.s.expand(it["undefine"]).strip()
+                self.s.vars.pop(name, None)
+                self.s.origins.pop(name, None)
             elif "rule" in it:
                 self.record_rule(it["rule"])
             elif "recipe" in it:
@@ -266,6 +327,9 @@ class Resolver:
         return riot_deps.load_yaml(full)
 
     def include(self, path: str, optional: bool, where: str = "-"):
+        if not os.path.isabs(path):
+            # like Make: relative to the directory make runs in (CURDIR)
+            path = os.path.join(makeexpr.CWD, path)
         rel = os.path.relpath(os.path.normpath(path), self.root)
         items = self.yaml_rules(rel)
         if items is not None:
@@ -323,8 +387,47 @@ class Resolver:
             pick = [f for f in alts if f in used_so_far] + \
                 [f for f in alts if f in usable] + alts
             one_out_of.append(pick[0])
-        s.set_words("FEATURES_USED", sorted(set(required) | set(one_out_of) |
-                                            set(optional_used)))
+        used = sorted(set(required) | set(one_out_of) | set(optional_used))
+        s.set_words("FEATURES_USED", used)
+        s.set_words("FEATURES_MISSING", sorted(
+            set(f for f in required + one_out_of if f not in provided)))
+        conflicting = set()
+        for conflict in s.words("FEATURES_CONFLICT"):
+            group = conflict.split(":")
+            if len(group) == len([f for f in group if f in used]):
+                conflicting.update(group)
+        s.set_words("FEATURES_CONFLICTING", sorted(conflicting))
+        s.set_words("FEATURES_USED_BLACKLISTED",
+                    sorted(set(f for f in blacklist if f in used)))
+
+    def features_report(self):
+        """What Makefile.include does with the results of the features
+        check (unless the goals are clean/distclean/help/…): an info
+        message per problem, then `$(error …)` unless
+        CONTINUE_ON_EXPECTED_ERRORS=1 (then only "EXPECT ERRORS!")."""
+        s = self.s
+        problems = []
+        for var, text in (("FEATURES_MISSING",
+                           "There are unsatisfied feature requirements:"),
+                          ("FEATURES_USED_BLACKLISTED",
+                           "Some feature requirements are blacklisted:"),
+                          ("FEATURES_CONFLICTING",
+                           "The following features conflict:")):
+            words = s.words(var)
+            if words:
+                problems.append(f"{text} {' '.join(words)}")
+                s.messages.append(("info", problems[-1]))
+                if var == "FEATURES_CONFLICTING" and \
+                        s.get("FEATURES_CONFLICT_MSG").strip():
+                    s.messages.append(("info", "Rationale: " +
+                                       s.get("FEATURES_CONFLICT_MSG").strip()))
+        if not problems:
+            return
+        if s.get("CONTINUE_ON_EXPECTED_ERRORS").strip() != "1":
+            raise MakeError("; ".join(problems) + " (You can let the build "
+                            "continue on expected errors by setting "
+                            "CONTINUE_ON_EXPECTED_ERRORS=1 to the command line.)")
+        s.messages.append(("error", "EXPECT ERRORS!"))
 
     def state_key(self):
         s = self.s
@@ -337,6 +440,7 @@ class Resolver:
 
     def resolve(self, app: dict, board: str, max_passes: int = 50) -> dict:
         s, root = self.s, self.root
+        makeexpr.CWD = app["_appdir"]          # make runs in the app directory
         base = {"RIOTBASE": root, "RIOTMAKE": f"{root}/makefiles",
                 "RIOTCPU": f"{root}/cpu", "RIOTBOARD": f"{root}/boards",
                 "RIOTPKG": f"{root}/pkg", "BOARD": board,
@@ -408,11 +512,15 @@ class Resolver:
         self.include(f"{root}/makefiles/defaultmodules_deps.inc.mk", False,
                      "pipeline")
         self.sort_vars("USEMODULE", "DEFAULT_MODULE")
+        self.features_report()
         return {"board": board, "cpu": s.get("CPU").strip(),
                 "cpu_model": s.get("CPU_MODEL").strip(),
                 "modules": s.words("USEMODULE"), "packages": sorted(set(s.words("USEPKG"))),
                 "features_used": s.words("FEATURES_USED"),
                 "features_provided": sorted(set(s.words("FEATURES_PROVIDED"))),
+                "features_missing": s.words("FEATURES_MISSING"),
+                "features_conflicting": s.words("FEATURES_CONFLICTING"),
+                "features_used_blacklisted": s.words("FEATURES_USED_BLACKLISTED"),
                 "passes": passes,
                 "messages": [list(m) for m in s.messages]}
 

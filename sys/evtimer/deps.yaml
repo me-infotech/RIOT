@@ -1,0 +1,9 @@
+# Dependency rules of sys/evtimer (authoritative; Makefile.dep is generated from this file).
+schema_version: 1
+rules:
+- when:
+    USEMODULE:
+      any: [evtimer]
+  then:
+  - add:
+      USEMODULE: [ztimer_msec]

@@ -17,7 +17,9 @@ and line, and counted):
   ifdef VAR / ifndef VAR                -> {"def"/"undef": VAR}
   else, else if…, endif, nesting
   VAR += words / VAR := words / VAR ?= words / VAR = words
-        (words may contain plain $(VAR) references)
+        (words may contain plain $(VAR) references; `::=` is read as
+        `:=`, `!=` is kept as a shell assignment; the name may be computed,
+        e.g. `$(N)_X := v`)
   include / -include <path with $(VAR) and %-free words>
   $(error|warning|info …), $(call echowarn|echoinfo|echoerror,…)
                                         -> {"message": level, "text": …}
@@ -45,7 +47,6 @@ FILTER_RE2 = re.compile(
     r"^\(\s*\$\((filter|filter-out)\s+([^,]+?),\s*\$\((\w+)\)\s*\)\s*,\s*\)$")
 EQ_RE = re.compile(r"^\(\s*\$\((\w+)\)\s*,\s*([^$(),]*)\s*\)$")
 EQ_RE2 = re.compile(r"^\(\s*([^$(),]*)\s*,\s*\$\((\w+)\)\s*\)$")
-ASSIGN_RE = re.compile(r"^([\w.-]+)\s*(\+=|:=|\?=|=)\s*(.*)$")
 INCLUDE_RE = re.compile(r"^(-?include)\s+(.+)$")
 MSG_RE = re.compile(r"^\$\((?:(error|warning|info)\s|call\s+(echowarn|echoinfo|"
                     r"echoerror)\s*,)(.*)\)$")
@@ -90,15 +91,71 @@ def parse_cond(kind: str, arg: str) -> dict:
 
 
 DEFINE_RE = re.compile(
-    r"^(?:override\s+|export\s+)?define\s+([\w.-]+)\s*(=|:=|\+=|\?=)?\s*$")
+    r"^(?:override\s+|export\s+)?define\s+([\w.-]+)\s*(=|::=|:=|\+=|\?=|!=)?\s*$")
 PREFIX_RE = re.compile(r"^(export|unexport|override|undefine)\s+(.*)$")
 RULE_RE = re.compile(r"^[^=]*?[^:=\s]\s*:{1,2}(?![=])")
+
+
+ASSIGN_OPS = ("::=", ":=", "+=", "?=", "!=", "=")
+
+
+def _skip_ref(s: str, i: int) -> int:
+    """Index after the variable reference that starts with `$` at s[i]
+    (`$(…)`/`${…}` counted like Make, or `$x`)."""
+    if i + 1 >= len(s):
+        return len(s)
+    opening = s[i + 1]
+    if opening not in "({":
+        return i + 2
+    closing = ")" if opening == "(" else "}"
+    depth, j = 0, i + 1
+    while j < len(s):
+        if s[j] == opening:
+            depth += 1
+        elif s[j] == closing:
+            depth -= 1
+            if depth == 0:
+                return j + 1
+        j += 1
+    return len(s)
+
+
+def parse_assign(s: str):
+    """(name, op, value) if s is a variable assignment, else None. Like
+    Make's parse_variable_definition: the name may contain variable
+    references (`$(N)_X := v`, expanded when the line is run); the operator
+    is the first `=`, `:=`, `::=`, `+=`, `?=` or `!=` outside references;
+    after whitespace in the name only an operator may follow; a `:` that
+    is not part of an operator makes the line a rule."""
+    i, n = 0, len(s)
+    while i < n:
+        ch = s[i]
+        if ch == "$":
+            i = _skip_ref(s, i)
+            continue
+        if ch == "#":
+            return None
+        if ch.isspace():
+            rest = s[i:].lstrip()
+            op = next((o for o in ASSIGN_OPS if rest.startswith(o)), None)
+            if op is None:
+                return None
+            name = s[:i].strip()
+            return (name, op, rest[len(op):].lstrip()) if name else None
+        for op in ASSIGN_OPS:
+            if s.startswith(op, i):
+                name = s[:i].strip()
+                return (name, op, s[i + len(op):].lstrip()) if name else None
+        if ch == ":":
+            return None
+        i += 1
+    return None
 
 
 def is_rule(s: str) -> bool:
     """A rule line: a ':' outside of $(…) that is not part of ':=' (and
     the line is no assignment)."""
-    if ASSIGN_RE.match(s):
+    if parse_assign(s):
         return False
     depth = 0
     for k, ch in enumerate(s):
@@ -113,52 +170,113 @@ def is_rule(s: str) -> bool:
     return False
 
 
-def logical_lines(text: str):
-    """(line number, text, starts with tab, define body or None): comments
-    removed (`\\#` is escaped), continuation lines joined, `define … endef`
-    blocks returned whole."""
+def is_target_variable(s: str) -> bool:
+    """`targets: [export|override] VAR op value` (a target-specific
+    variable; unlike a rule, such a line does not start a recipe)."""
+    depth = 0
+    for k, ch in enumerate(s):
+        if ch in "({":
+            depth += 1
+        elif ch in ")}":
+            depth -= 1
+        elif ch == ":" and depth == 0:
+            rest = re.sub(r"^:?\s*(?:(?:export|override|private)\s+)*", "",
+                          s[k + 1:])
+            return parse_assign(rest) is not None
+    return False
+
+
+def strip_comment(line: str) -> str:
+    """Make's remove_comments: a `#` outside variable references starts a
+    comment; a run of backslashes before `#` is halved, an odd run quotes
+    the `#` (so `\\#` becomes `#`)."""
+    out, i, n = [], 0, len(line)
+    while i < n:
+        ch = line[i]
+        if ch == "$":
+            j = _skip_ref(line, i)
+            out.append(line[i:j])
+            i = j
+            continue
+        if ch == "\\":
+            j = i
+            while j < n and line[j] == "\\":
+                j += 1
+            if j < n and line[j] == "#":
+                k = j - i
+                out.append("\\" * (k // 2))
+                if k % 2 == 0:
+                    return "".join(out)
+                out.append("#")
+                i = j + 1
+                continue
+            out.append(line[i:j])
+            i = j
+            continue
+        if ch == "#":
+            return "".join(out)
+        out.append(ch)
+        i += 1
+    return "".join(out)
+
+
+def _continued(line: str) -> bool:
+    """Ends with an odd number of backslashes (backslash-newline)."""
+    return (len(line) - len(line.rstrip("\\"))) % 2 == 1
+
+
+def logical_lines(text: str, ctx: dict | None = None):
+    """(line number, text, kind, define body or None); kind is "comment"
+    (full-line comment, kept for the YAML format, D27), "recipe" (a line
+    that starts with a tab while ctx["in_rule"] is true, i.e. after a rule
+    line; the caller updates ctx while it reads, like Make), "define" or
+    "line". As in Make, continuation lines are joined first (outside
+    recipes backslash-newline and the whitespace around it become one
+    space), then the comment is removed (a `# … \\` line comments out the
+    next line too) and `\\#` becomes `#`. Recipe lines keep their text
+    (backslash-newline is passed on to the shell, `#` is the shell's)."""
+    ctx = {"in_rule": False} if ctx is None else ctx
     lines = text.splitlines()
-    buf, start, i = "", 0, 0
+    i = 0
     while i < len(lines):
         raw = lines[i]
         n = i + 1
         i += 1
-        if not buf:
-            start = n
-            if raw.lstrip().startswith("#") and not raw.startswith("\t"):
-                # full-line comment: kept for the YAML format (D27)
-                yield n, raw.strip(), False, None
-                continue
-            m = DEFINE_RE.match(raw.strip())
-            if m and not raw.startswith("\t"):
-                body = []
-                while i < len(lines) and lines[i].strip() != "endef":
-                    body.append(lines[i])
-                    i += 1
-                i += 1                          # skip endef
-                yield n, raw.strip(), False, "\n".join(body)
-                continue
-        line = raw
-        in_recipe = raw.startswith("\t") or (buf and lines[start - 1].startswith("\t"))
-        if not in_recipe:
-            m = re.search(r"(?<!\\)#", line)
-            if m:
-                line = line[:m.start()]
-        if line.endswith("\\"):
-            if lines[start - 1].startswith("\t"):
-                # recipe: Make passes backslash-newline on to the shell
-                # (a `#` inside a recipe is a shell comment for one line)
-                nxt = lines[i] if i < len(lines) else ""
-                buf += line + "\n"
-                if nxt.startswith("\t"):
-                    lines[i] = nxt[1:]
-                continue
-            buf += line[:-1] + " "
+        if raw.startswith("\t") and ctx["in_rule"]:
+            buf = raw
+            while _continued(buf) and i < len(lines):
+                nxt = lines[i]
+                i += 1
+                buf += "\n" + (nxt[1:] if nxt.startswith("\t") else nxt)
+            yield n, buf.rstrip(), "recipe", None
             continue
-        buf += line
-        if buf.strip():
-            yield start, buf.rstrip(), lines[start - 1].startswith("\t"), None
-        buf = ""
+        if raw.lstrip().startswith("#"):
+            yield n, raw.strip(), "comment", None
+            last = raw
+            while _continued(last) and i < len(lines):
+                # Make: the comment goes on on the next line
+                last = lines[i]
+                i += 1
+                t = last.strip()
+                yield i, (t if t.startswith("#") else ("# " + t).strip()), \
+                    "comment", None
+            continue
+        m = DEFINE_RE.match(raw.strip())
+        if m:
+            body = []
+            while i < len(lines) and lines[i].strip() != "endef":
+                body.append(lines[i])
+                i += 1
+            i += 1                          # skip endef
+            yield n, raw.strip(), "define", "\n".join(body)
+            continue
+        buf = raw
+        while _continued(buf) and i < len(lines):
+            buf = buf[:-1].rstrip() + " " + lines[i].lstrip()
+            i += 1
+        line = strip_comment(buf)
+        if line.strip():
+            yield n, line.rstrip(), "line", None
 
 
 def translate(text: str, path: str, unsupported: list) -> list:
@@ -174,23 +292,26 @@ def translate(text: str, path: str, unsupported: list) -> list:
             pending.clear()
         stack[-1]["body"].append(item)
 
-    in_rule = False
-    for n, line, tab, define in logical_lines(text):
+    # ctx["in_rule"]: after a rule line, a line starting with a tab is a
+    # recipe line (logical_lines reads it so); comments, blank lines and
+    # conditionals that do not start with a tab keep the rule open, any
+    # other statement ends it (GNU Make)
+    ctx = {"in_rule": False}
+    for n, line, kind, define in logical_lines(text, ctx):
         s = line.strip()
-        if s.startswith("#") and define is None and not tab:
+        if kind == "comment":
             pending.append(s[1:].strip() if s != "#" else "")
             continue
-        if define is not None:
+        if kind == "define":
             m = DEFINE_RE.match(s)
             op = m.group(2) or "="
-            emit({"assign": m.group(1), "op": op, "expr": define,
-                  "define": True, "line": n})
-            in_rule = False
+            emit({"assign": m.group(1), "op": ":=" if op == "::=" else op,
+                  "expr": define, "define": True, "line": n})
+            ctx["in_rule"] = False
             continue
-        # a tab-indented line after a rule is a recipe (no effect on
-        # variables); conditionals inside recipes are still parsed by Make
-        if tab and in_rule and not COND_RE.match(s) and \
-                not s.startswith(("else", "endif", "ifdef ", "ifndef ")):
+        # a recipe line (no effect on variables); a tab-indented `ifeq`,
+        # `else` or `endif` there is shell text, as in Make
+        if kind == "recipe":
             emit({"recipe": s, "line": n})
             continue
         try:
@@ -241,14 +362,16 @@ def translate(text: str, path: str, unsupported: list) -> list:
             m = PREFIX_RE.match(s)
             if m:
                 kind, rest = m.group(1), m.group(2).strip()
-                if kind in ("export", "override") and ASSIGN_RE.match(rest):
+                if kind in ("export", "override") and parse_assign(rest):
                     s = rest                  # an ordinary assignment below
                     exported = kind == "export"
                     overridden = kind == "override"
                 elif kind in ("export", "unexport"):
+                    ctx["in_rule"] = False
                     emit({kind: rest.split(), "line": n})
                     continue
                 elif kind == "undefine":
+                    ctx["in_rule"] = False
                     emit({"undefine": rest, "line": n})
                     continue
                 else:
@@ -256,7 +379,7 @@ def translate(text: str, path: str, unsupported: list) -> list:
             else:
                 exported = False
                 overridden = False
-            in_rule = False
+            ctx["in_rule"] = False
             m = MSG_RE.match(s)
             if m:
                 level = m.group(1) or m.group(2)
@@ -278,9 +401,11 @@ def translate(text: str, path: str, unsupported: list) -> list:
                 emit({"include_expr": m.group(2), "optional": optional,
                       "line": n})
                 continue
-            m = ASSIGN_RE.match(s)
+            m = parse_assign(s)
             if m:
-                var, op, value = m.groups()
+                var, op, value = m
+                if op == "::=":
+                    op = ":="              # POSIX spelling of `:=`
                 words = value.split()
                 if all(SIMPLE_WORD.match(w) for w in words):
                     emit({"assign": var, "op": op, "words": words, "line": n,
@@ -302,7 +427,8 @@ def translate(text: str, path: str, unsupported: list) -> list:
                       **({"override": True} if overridden else {})})
                 continue
             if is_rule(s):
-                in_rule = True
+                # a target-specific variable does not open a recipe
+                ctx["in_rule"] = not is_target_variable(s)
                 emit({"rule": s, "line": n})   # no effect on variables
                 continue
             if s.startswith("$("):
@@ -313,7 +439,7 @@ def translate(text: str, path: str, unsupported: list) -> list:
                 emit({"call": s, "line": n})
                 continue
             if RULE_RE.match(s):
-                in_rule = True
+                ctx["in_rule"] = not is_target_variable(s)
                 emit({"rule": s, "line": n})        # no effect on variables
                 continue
             raise Unsupported("unknown statement")

@@ -40,6 +40,56 @@ class UnsupportedExpr(Exception):
     pass
 
 
+class Value(str):
+    """A variable's value as a lookup returns it: the text plus Make's
+    flavor ("recursive": expanded when referenced; "simple": already
+    expanded, used as is) and origin ("file", "environment", "command
+    line", "override", "default", "automatic"). A plain str from a lookup
+    counts as a recursive variable from a file."""
+    flavor = "recursive"
+    origin = "file"
+
+
+def value(text: str, flavor: str = "recursive", origin: str = "file") -> Value:
+    v = Value(text)
+    v.flavor, v.origin = flavor, origin
+    return v
+
+
+AUTO_NAMES = set("@<^*?%+|")
+
+
+def _is_auto(name: str) -> bool:
+    """$@ … and the D/F variants ($(@D), $(<F), …)."""
+    return name[:1] in AUTO_NAMES and (len(name) == 1 or
+                                        (len(name) == 2 and name[1] in "DF"))
+
+
+def _var(name: str, lookup, args) -> str:
+    """Expanded value of the variable name: automatic variables, call
+    parameters, simple variables as stored, recursive ones expanded."""
+    if _is_auto(name):
+        if name[0] not in AUTOMATIC:
+            if CHECK_ONLY:
+                return ""
+            raise UnsupportedExpr(f"automatic variable ${name} outside a recipe")
+        v = AUTOMATIC[name[0]]
+        if len(name) == 2:
+            if name[1] == "D":
+                return " ".join(os.path.dirname(w) or "." for w in v.split())
+            return " ".join(os.path.basename(w) for w in v.split())
+        return v
+    if name.isdigit() and args is not None:
+        k = int(name)
+        return args[k - 1] if 0 < k <= len(args) else ""
+    v = lookup(name)
+    if not v:
+        return ""
+    if getattr(v, "flavor", "recursive") == "simple":
+        return str(v)
+    return evaluate(v, lookup, args)
+
+
 def _split_args(s: str) -> list[str]:
     """Split at top-level commas."""
     out, depth, cur = [], 0, ""
@@ -102,26 +152,12 @@ def evaluate(expr: str, lookup, args: list[str] | None = None) -> str:
                 out += _ref(expr[i + 2:j], lookup, args)
                 i = j + 1
                 continue
-            if nxt.isdigit() and args is not None:
-                k = int(nxt)
-                out += args[k - 1] if k <= len(args) else ""
+            if nxt.isalnum() or nxt == "_" or nxt in AUTO_NAMES:
+                # single-character variable ($_ in $(foreach _,…)), call
+                # parameter ($1) or automatic variable ($@)
+                out += _var(nxt, lookup, args)
                 i += 2
                 continue
-            if nxt.isalpha() or nxt == "_":
-                # single-character variable, e.g. $_ in $(foreach _,…)
-                value = lookup(nxt)
-                out += evaluate(value, lookup, args) if value else ""
-                i += 2
-                continue
-            if nxt in AUTOMATIC:
-                out += AUTOMATIC[nxt]
-                i += 2
-                continue
-            if nxt in "@<^*?%+|":
-                if CHECK_ONLY:
-                    i += 2
-                    continue
-                raise UnsupportedExpr(f"automatic variable ${nxt} outside a recipe")
         out += ch
         i += 1
     return out
@@ -159,18 +195,22 @@ def _ref(body: str, lookup, args) -> str:
             body = ",".join(raw[2:])
             res = []
             for item in items:
-                def look(name, _item=item, _var=var):
-                    return _item if name == _var else lookup(name)
+                def look(name, _item=value(item, "simple", "automatic"),
+                         _name=var):
+                    return _item if name == _name else lookup(name)
                 res.append(evaluate(body, look, args))
             # like Make: results joined by one space, not stripped (a
             # $(NEWLINE) at the end of each result must survive)
             return " ".join(res)
         if fn == "call":
             name = ev(raw[0]).strip()
-            value = lookup(name)
-            if value is None:
+            fvalue = lookup(name)
+            if fvalue is None:
                 raise UnsupportedExpr(f"call of unknown function {name}")
-            return evaluate(value, lookup, [ev(a) for a in raw[1:]])
+            params = [ev(a) for a in raw[1:]]
+            if getattr(fvalue, "flavor", "recursive") == "simple":
+                return str(fvalue)         # like $(name): not expanded again
+            return evaluate(fvalue, lookup, params)
         if fn == "file":
             # $(file >name,text) / $(file >>name,text) / $(file <name)
             spec = ev(raw[0]).strip()
@@ -195,9 +235,17 @@ def _ref(body: str, lookup, args) -> str:
             EVAL(text)
             return ""
         if fn == "value":
-            return lookup(ev(raw[0]).strip()) or ""
+            return str(lookup(ev(raw[0]).strip()) or "")
         if fn in ("origin", "flavor"):
-            return "file" if lookup(ev(raw[0]).strip()) is not None else "undefined"
+            name = ev(raw[0]).strip()
+            if (_is_auto(name) and name[0] in AUTOMATIC) or \
+                    (args is not None and name.isdigit() and
+                     0 < int(name) <= len(args)):
+                return "automatic" if fn == "origin" else "simple"
+            v = lookup(name)
+            if v is None:
+                return "undefined"
+            return getattr(v, fn, "recursive" if fn == "flavor" else "file")
         vals = [ev(a) for a in raw]
         if fn in ("info", "warning", "error"):
             text = ",".join(vals)
@@ -217,10 +265,10 @@ def _ref(body: str, lookup, args) -> str:
                 return ""
             out = []
             for pat in vals[0].split():
-                full = pat if os.path.isabs(pat) else os.path.join(CWD, pat)
-                hits = sorted(glob.glob(full))
-                out += [h if os.path.isabs(pat) else os.path.relpath(h, CWD)
-                        for h in hits]
+                # relative patterns are matched in CWD and returned in the
+                # pattern's own form (`./x` stays `./x`), sorted per pattern
+                out += sorted(glob.glob(pat, root_dir=None if os.path.isabs(pat)
+                                        else CWD))
             return " ".join(out)
         if fn == "addprefix":
             return " ".join(vals[0].strip() + w for w in vals[1].split())
@@ -236,15 +284,19 @@ def _ref(body: str, lookup, args) -> str:
                     continue
                 res.append(full)
             return " ".join(res)
+        # dir/notdir/basename/suffix as in Make's function.c: split at the
+        # last `/` and at the last `.` after it ($(dir /) is `/`,
+        # $(basename .bashrc) is empty, $(suffix .bashrc) is `.bashrc`)
         if fn == "dir":
-            return " ".join((os.path.dirname(w) or ".") + "/" for w in vals[0].split())
+            return " ".join(w[:w.rfind("/") + 1] or "./" for w in vals[0].split())
         if fn == "notdir":
-            return " ".join(os.path.basename(w) for w in vals[0].split())
+            return " ".join(w[w.rfind("/") + 1:] for w in vals[0].split())
         if fn == "basename":
-            return " ".join(os.path.splitext(w)[0] for w in vals[0].split())
+            return " ".join(w[:w.rfind(".")] if w.rfind(".") > w.rfind("/") else w
+                            for w in vals[0].split())
         if fn == "suffix":
-            return " ".join(os.path.splitext(w)[1] for w in vals[0].split()
-                            if os.path.splitext(w)[1])
+            return " ".join(w[w.rfind("."):] for w in vals[0].split()
+                            if w.rfind(".") > w.rfind("/"))
         if fn == "join":
             a, b = vals[0].split(), vals[1].split()
             return " ".join((a[k] if k < len(a) else "") + (b[k] if k < len(b) else "")
@@ -286,29 +338,27 @@ def _ref(body: str, lookup, args) -> str:
             return " ".join(vals[0].split())
     if m:
         raise UnsupportedExpr(f"function {m.group(1)}")
-    # substitution reference $(VAR:a=b)
-    if ":" in body and "=" in body.split(":", 1)[1]:
-        var, rule = body.split(":", 1)
-        a, b = rule.split("=", 1)
-        a, b = evaluate(a, lookup, args), evaluate(b, lookup, args)
-        value = evaluate(lookup(var.strip()) or "", lookup, args)
+    if "$" in body:
+        # like Make: references inside the name are expanded first, e.g.
+        # $(IOTLAB_ARCHI_$(BOARD)) or $(L$(X):.c=.o)
+        body = evaluate(body, lookup, args)
+    colon = body.find(":")
+    if colon >= 0 and "=" in body[colon + 1:]:
+        # substitution reference $(VAR:a=b), also $(@:ALL--%=%)
+        var = body[:colon].strip()
+        a, b = body[colon + 1:].split("=", 1)
+        text = _var(var, lookup, args)
         if "%" not in a:
             a, b = "%" + a, "%" + b
-        return " ".join(_patsubst(a, b, w) for w in value.split())
-    if body in ("@D", "@F", "<D", "<F", "*D", "*F") and body[0] in AUTOMATIC:
-        v = AUTOMATIC[body[0]]
-        return (os.path.dirname(v) or ".") if body[1] == "D" else os.path.basename(v)
-    if body in AUTOMATIC:
-        return AUTOMATIC[body]
-    if "$" in body and not re.match(r"^[\w.-]+\s", body):
-        # computed variable name, e.g. $(IOTLAB_ARCHI_$(BOARD))
-        body = evaluate(body, lookup, args).strip()
+        return " ".join(_patsubst(a, b, w) for w in text.split())
+    body = body.strip()
+    if _is_auto(body):
+        return _var(body, lookup, args)
     if not re.match(r"^[\w.-]+$", body):
         if CHECK_ONLY:
             return ""
         raise UnsupportedExpr(f"reference {body}")
-    value = lookup(body)
-    return evaluate(value, lookup, args) if value else ""
+    return _var(body, lookup, args)
 
 
 def check(expr: str) -> None:

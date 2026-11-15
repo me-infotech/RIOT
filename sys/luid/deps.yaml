@@ -1,0 +1,5 @@
+# Dependency rules of sys/luid (authoritative; Makefile.dep is generated from this file).
+schema_version: 1
+rules:
+- add:
+    FEATURES_OPTIONAL: [periph_cpuid]

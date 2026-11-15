@@ -55,15 +55,78 @@ def _run(m) -> str:
     return " ".join(out.split())
 
 
-def _arith(m) -> str:
-    """$((…)) arithmetic (sizes and addresses): integers, + - * /."""
-    expr = m.group("e")
-    if not re.fullmatch(r"[0-9a-fA-Fx+\-*/() ]+", expr):
+def sh_arith(expr: str) -> int:
+    """$((…)) like /bin/sh: integers (decimal, 0x hex, leading-zero
+    octal), unary + - ~ !, * / % (C: division truncates toward zero,
+    remainder takes the sign of the dividend), + -, << >>, & ^ |,
+    parentheses. Anything else (variables, comparisons, assignments)
+    raises UnsupportedExpr."""
+    tokens = re.findall(r"\s*(0[xX][0-9a-fA-F]+|\d+|<<|>>|[-+*/%()~!&^|]|\S)", expr)
+    if "".join(t.strip() for t in tokens) != "".join(expr.split()):
         raise makeexpr.UnsupportedExpr(f"arithmetic {expr}")
-    val = eval(re.sub(r"\b(0x[0-9a-fA-F]+|\d+)\b",
-                      lambda x: str(int(x.group(1), 0)), expr),
-               {"__builtins__": {}})
-    val = int(val)
+    tokens = [t.strip() for t in tokens]
+    pos = 0
+
+    def bad():
+        raise makeexpr.UnsupportedExpr(f"arithmetic {expr}")
+
+    def number(t):
+        if re.fullmatch(r"0[xX][0-9a-fA-F]+", t):
+            return int(t, 16)
+        if re.fullmatch(r"0[0-7]*", t):
+            return int(t, 8)
+        if re.fullmatch(r"[1-9]\d*", t):
+            return int(t)
+        bad()                                   # e.g. 08: error in sh
+
+    def peek():
+        return tokens[pos] if pos < len(tokens) else None
+
+    def take():
+        nonlocal pos
+        pos += 1
+        return tokens[pos - 1]
+
+    def unary():
+        t = take() if peek() is not None else bad()
+        if t == "(":
+            v = binary(0)
+            if take() != ")":
+                bad()
+            return v
+        if t in ("-", "+", "~", "!"):
+            v = unary()
+            return {"-": -v, "+": v, "~": ~v, "!": int(not v)}[t]
+        return number(t)
+
+    levels = [("|",), ("^",), ("&",), ("<<", ">>"), ("+", "-"), ("*", "/", "%")]
+
+    def binary(level):
+        if level == len(levels):
+            return unary()
+        v = binary(level + 1)
+        while peek() in levels[level]:
+            op = take()
+            w = binary(level + 1)
+            if op in ("/", "%"):
+                if w == 0:
+                    bad()                       # division by zero: sh error
+                q = abs(v) // abs(w) * (1 if (v < 0) == (w < 0) else -1)
+                v = q if op == "/" else v - w * q
+            else:
+                v = {"|": v | w, "^": v ^ w, "&": v & w, "<<": v << w,
+                     ">>": v >> w, "+": v + w, "-": v - w, "*": v * w}[op]
+        return v
+
+    val = binary(0)
+    if pos != len(tokens):
+        bad()
+    return val
+
+
+def _arith(m) -> str:
+    """echo $((…)) / printf "0x%x" $((…)) (sizes and addresses)."""
+    val = sh_arith(m.group("e"))
     return f"0x{val:x}" if m.group("fmt") else str(val)
 
 
@@ -135,6 +198,10 @@ def _git_toplevel(m) -> str:
     return out or makeexpr.CWD
 
 
+# program names and flag words in the patterns: no shell metacharacters
+PROG = r"[\w.+/-]+"
+FLAG = r"(?:-[\w=,.+/-]+|noexecstack)"
+
 # (name, regular expression over the whole command, block); every $(shell)
 # of the build for hello-world/nrf52840dk is listed here (test log)
 SHELL_BLOCKS: list = [
@@ -142,16 +209,19 @@ SHELL_BLOCKS: list = [
      lambda m: str(struct.calcsize("P") * 8)),
     ("uname", r"uname -m -s",
      lambda m: f"{os.uname().sysname} {os.uname().machine}"),
-    ("arithmetic", r"(?P<fmt>printf \"0x%x\" )?(?:echo )?\$\(\((?P<e>[^)]*)\)\)",
+    ("arithmetic", r"(?P<fmt>printf \"0x%x\" )?(?:echo )?\$\(\((?P<e>[0-9a-fA-FxX+\-*/%()~!&^|<> ]*)\)\)",
      _arith),
-    ("which", r"command -v \S+( 2>/dev/null)?( \|\| command -v \S+)*",
+    ("which", rf"command -v {PROG}( 2>/dev/null)?( \|\| command -v {PROG})*",
      _which),
-    ("tool-version", r"command -v (?P<p>\S+) > /dev/null && (?P=p) -dumpversion",
+    # the blocks below run the matched command on the host (tool versions,
+    # toolchain probes); their patterns admit only the command shapes of
+    # RIOT's make files with program names and flag words, no other shell
+    ("tool-version", rf"command -v (?P<p>{PROG}) > /dev/null && (?P=p) -dumpversion",
      _run),
     ("git-toplevel", r"git rev-parse --show-toplevel 2>/dev/null \|\| pwd",
      _git_toplevel),
     # time stamp (pyterm log name in TERMFLAGS)
-    ("date", r"date \+(?P<f>\S+)",
+    ("date", r"date \+(?P<f>[%\w.:-]+)",
      lambda m: __import__("time").strftime(m.group("f"))),
     # version string (RIOT_VERSION): git describe / branch name
     ("git-describe", r'git --git-dir="(?P<d>[^"]+)" describe --always --abbrev=4 2> /dev/null',
@@ -161,12 +231,16 @@ SHELL_BLOCKS: list = [
     # toolchain probes: the toolchain make files ask the compiler, linker
     # or debugger whether a flag works; the block runs the same probe
     # command of the host tool (stdout only, like $(shell))
-    ("compiler-flag-probe", r"\S+ .*-E - 2>/dev/null >/dev/null </dev/null ; echo \$\?",
-     _run),
-    ("gdb-probe", r"\S+gdb -v > /dev/null 2>&1; echo \$\?", _run),
-    ("linker-flag-probe", r"LC_ALL=C \S+ \S+minimal_linkable\.c -o /dev/null .*",
-     _run),
-    ("compiler-include-dirs", r"\S+ -v -x c -E /dev/null 2>&1 \| sed .*", _run),
+    ("compiler-flag-probe",
+     rf"{PROG}(?: {FLAG})+ -E - 2>/dev/null >/dev/null </dev/null ; echo \$\?", _run),
+    ("gdb-probe", rf"{PROG}gdb -v > /dev/null 2>&1; echo \$\?", _run),
+    ("linker-flag-probe",
+     rf"LC_ALL=C {PROG} {PROG}/minimal_linkable\.c -o /dev/null(?: {FLAG})+"
+     r"(?: 2> /dev/null && echo 1 \|\| echo 0"
+     r'| 2>&1 \| grep -q "[\w\s.,-]+" ; echo \$\?)', _run),
+    ("compiler-include-dirs",
+     rf"{PROG} -v -x c -E /dev/null 2>&1 \| sed -e '1,/\\#include <\.\.\.> "
+     r"search starts here:/d' -e '/End of search list\./,\$d' -e 's/\^ \*//'", _run),
 ]
 BLOCK_USE: dict = {}
 
@@ -179,10 +253,17 @@ def evaluate(root: str, rules: dict, app_path: str, board: str) -> Resolver:
     makeexpr.CWD = appdir
     makeexpr.SHELL = shell_block
     s = r.s
-    for k, v in {"CURDIR": appdir, "MAKE": "make", "MAKE_VERSION": "4.3",
-                 "MAKECMDGOALS": "", "BOARD": board,
-                 "APPLICATION": app.get("application", ""),
-                 "SHELL": "/bin/sh", "MAKEFILE_LIST": ""}.items():
+    # variables Make defines itself (origin "default"/"file"), MAKELEVEL
+    # from the environment (0 at the top level)
+    for k, v in {"MAKE": "make", "MAKE_VERSION": "4.3",
+                 "MAKECMDGOALS": ""}.items():
+        s.set_simple(k, v, "default")
+    for k, v in {"CURDIR": appdir, "SHELL": "/bin/sh",
+                 "MAKEFILE_LIST": ""}.items():
+        s.set_simple(k, v)
+    s.set_env("MAKELEVEL", "0")
+    for k, v in {"BOARD": board,
+                 "APPLICATION": app.get("application", "")}.items():
         s.assign(k, ":=", v)
     keymap = {"usemodule": "USEMODULE", "usepkg": "USEPKG",
               "disable_module": "DISABLE_MODULE",

@@ -1,0 +1,45 @@
+# Dependency rules of sys/random (authoritative; Makefile.dep is generated from this file).
+schema_version: 1
+rules:
+- add:
+    DEFAULT_MODULE: [auto_init_random]
+- add:
+    USEMODULE: [prng]
+- when:
+    USEMODULE:
+      any: [prng_fortuna]
+  then:
+  - add:
+      USEMODULE: [fortuna, hashes, crypto]
+  - when:
+      USEMODULE:
+        any: [fortuna_reseed]
+    then:
+    - add:
+        USEMODULE: [atomic_utils, ztimer, ztimer_msec]
+- when:
+    USEMODULE:
+      any: [prng_tinymt32]
+  then:
+  - add:
+      USEMODULE: [tinymt32]
+- when:
+    USEMODULE:
+      any: [prng_sha%prng]
+  then:
+  - add:
+      USEMODULE: [prng_shaxprng, hashes]
+- when:
+    USEMODULE:
+      any: [prng_hwrng]
+  then:
+  - add:
+      FEATURES_REQUIRED: [periph_hwrng]
+- when:
+    USEMODULE:
+      none: [puf_sram]
+  then:
+  - add:
+      FEATURES_OPTIONAL: [periph_hwrng]
+- add:
+    USEMODULE: [luid]

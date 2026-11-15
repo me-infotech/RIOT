@@ -1,0 +1,54 @@
+# Dependency rules of sys/xtimer (authoritative; Makefile.dep is generated from this file).
+schema_version: 1
+rules:
+- add:
+    DEFAULT_MODULE: [auto_init_xtimer]
+- comment: 'In whatever combination of backends periph_timer will be required
+
+    - xtimer (only) -> periph_timer
+
+    - xtimer_on_ztimer -> ztimer_usec -> ztimer_periph_timer -> periph_timer
+
+    - ztimer_xtimer_compat -> ztimer_usec -> ztimer_periph_timer -> periph_timer
+
+    But requesting it here avoid an ifeq dependency that would be subject to
+
+    dependency inclusion order issues'
+  add:
+    FEATURES_REQUIRED: [periph_timer]
+- when:
+    USEMODULE:
+      none: [xtimer_no_ztimer_default]
+  then:
+  - when:
+      USEMODULE:
+        none: [xtimer_on_ztimer]
+    then:
+    - add:
+        USEMODULE: [ztimer_xtimer_compat]
+  else:
+  - when:
+      USEMODULE:
+        any: [ztimer]
+    then:
+    - when:
+        USEMODULE:
+          none: [xtimer_on_ztimer]
+      then:
+      - add:
+          USEMODULE: [ztimer_xtimer_compat]
+- when:
+    USEMODULE:
+      any: [ztimer_xtimer_compat]
+  then:
+  - add:
+      DISABLE_MODULE: [auto_init_xtimer]
+  - add:
+      USEMODULE: [div]
+- comment: make xtimer use ztimer_usec as low level timer
+  when:
+    USEMODULE:
+      any: [xtimer_on_ztimer]
+  then:
+  - add:
+      USEMODULE: [ztimer_usec]

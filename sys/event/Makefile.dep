@@ -1,14 +1,13 @@
-USEMODULE += core_thread_flags
+# Generated from deps.yaml by dist/tools/riot_deps/riot_deps.py.
+# Do not edit: change the YAML and run `just generate-deps`.
 
+USEMODULE += core_thread_flags
 ifneq (,$(filter event_thread_%,$(USEMODULE)))
   USEMODULE += event_thread
 endif
-
 ifneq (,$(filter event_timeout_ztimer,$(USEMODULE)))
   USEMODULE += ztimer
 endif
-
 ifneq (,$(filter event_timeout,$(USEMODULE)))
-  USEMODULE += event_timeout_ztimer
-  USEMODULE += ztimer_usec
+  USEMODULE += event_timeout_ztimer ztimer_usec
 endif
