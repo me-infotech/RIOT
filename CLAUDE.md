@@ -1,14 +1,15 @@
-# CLAUDE.md — RIOT_Test (Masterthesis: Migrationskonzept von GNU Make)
+# CLAUDE.md — RIOT_Forked (Masterthesis: Migrationskonzept von GNU Make)
 
 @AGENTS.md
 
 ## Worum es hier geht
 
-`RIOT_Test` ist die **Experimentier-Arbeitskopie** von RIOT für die Masterarbeit
+`RIOT_Forked` (Klon des Forks github.com/me-infotech/RIOT; `origin` = Fork,
+`upstream` = RIOT-OS) ist die **Experimentier-Arbeitskopie** von RIOT für die Masterarbeit
 in `/home/mohammadjavad/Documents/riot-build-config-thesis`. Ziel der Arbeit ist
 ein **Migrationskonzept** für RIOTs Make-basiertes Build- und
 Konfigurationssystem (Meeting 2026-11-06): beschreiben, *wie* man vorgeht —
-Umsetzung in `RIOT_Test` ist ein Proof of Concept, das das Konzept belegt, nicht
+Umsetzung in `RIOT_Forked` ist ein Proof of Concept, das das Konzept belegt, nicht
 das Ziel selbst.
 
 Leitfrage (Stand 2026-10-23):
@@ -51,8 +52,15 @@ Drei Schichten des Konzepts — nie vermischen:
    des Images nur nach Freigabe). `native64` bleibt nur als
    Vergleich/Referenz für bereits erledigte Arbeit (P3/P4). Jede Begrenzung
    wird begründet; die Übertragbarkeit auf andere Boards wird beschrieben.
-8. Gearbeitet wird im Working Tree von `RIOT_Test` auf `master`; dort dürfen
-   nur eigene, uncommittete Änderungen dieses Projekts stehen. Der Pilot-Branch
+8. Gearbeitet wird im Working Tree von `RIOT_Forked` auf dem Branch
+   `migration/just-group1-extraction` (Basis RIOT `0be9299ca9`, lokal
+   `riot-test-base`); `master` ist der Stand des Forks und bleibt unberührt.
+   Commits nur nach Freigabe des Nutzers; gepusht wird nur nach `origin`
+   (Fork), nie nach `upstream` (RIOT-OS), und nur nach Freigabe. Jeder
+   Schritt wird kurz angekündigt (Nutzerregel 2026-11-15).
+   `/home/mohammadjavad/Documents/RIOT_Test` ist das Archiv der früheren
+   Arbeitskopie (nur lesen); Historie: `riot-build-config-thesis/docs/00-project/repository-history.md`.
+   Der Pilot-Branch
    `migration/category-1-static-introspection` (just → `_helper`-Bridges für
    2A/2C) ist ein **verworfener Ansatz** und nur Gegenbeispiel.
 9. **Ziel der Migration: Verantwortung aus Make herauslösen, nicht just als

@@ -31,7 +31,7 @@ Load the `tool-evaluation` skill and follow its protocol exactly.
    multivocal-review guidelines but must be marked as such.
 5. Recompute weighted sums with a script, never by hand; run the sensitivity
    analysis (weights ±20 %, rank reversals) and report it.
-6. Hands-on checks run in a scratch directory or in `RIOT_Test`, never in the
+6. Hands-on checks run in a scratch directory or in `RIOT_Forked`, never in the
    clean `RIOT` checkout. Do not install software system-wide without asking.
 7. Do not commit. Answer in German.
 

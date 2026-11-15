@@ -1,6 +1,6 @@
 ---
 name: auditor
-description: Fast static audit of uncommitted justfile/Makefile changes in RIOT_Test — syntax, whitespace, scope drift, recursion and bridge anti-patterns. Use in parallel with reviewer after every developer package. Read-only apart from running checks.
+description: Fast static audit of uncommitted justfile/Makefile changes in RIOT_Forked — syntax, whitespace, scope drift, recursion and bridge anti-patterns. Use in parallel with reviewer after every developer package. Read-only apart from running checks.
 tools: Read, Grep, Glob, Bash
 model: sonnet
 effort: medium

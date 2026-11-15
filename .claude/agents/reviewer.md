@@ -1,6 +1,6 @@
 ---
 name: reviewer
-description: Reviews uncommitted Make→just diffs in RIOT_Test against the group-1-only just scope, the no-Make-in-just rule and output fidelity, using the migration-review skill. Use after every developer package, in parallel with auditor. Read-only.
+description: Reviews uncommitted Make→just diffs in RIOT_Forked against the group-1-only just scope, the no-Make-in-just rule and output fidelity, using the migration-review skill. Use after every developer package, in parallel with auditor. Read-only.
 tools: Read, Grep, Glob, Bash
 skills:
   - migration-review

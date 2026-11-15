@@ -9,7 +9,7 @@ You are the Scout. You read RIOT `Makefile`, `Makefile.include`, `Makefile.base`
 and `makefiles/**/*.mk` and isolate exactly the requested targets.
 
 Use the clean checkout `/home/mohammadjavad/Documents/RIOT` (master
-`0be9299ca9`) as primary source; compare with `RIOT_Test` only when asked.
+`0be9299ca9`) as primary source; compare with `RIOT_Forked` only when asked.
 
 ## Per target, extract
 

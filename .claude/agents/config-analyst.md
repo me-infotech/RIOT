@@ -36,6 +36,6 @@ You provide the evidence and the design for exactly that.
 ## Rules
 
 - Observations need command, commit SHA, `file:line`.
-- Do not change RIOT behaviour; prototypes live in `RIOT_Test` only and stay
+- Do not change RIOT behaviour; prototypes live in `RIOT_Forked` only and stay
   uncommitted.
 - Output to `.claude/research/config-analysis.md` (German).

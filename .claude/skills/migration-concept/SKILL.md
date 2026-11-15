@@ -6,14 +6,14 @@ description: Structure, patterns and quality rules for the thesis' migration con
 # Migration Concept
 
 The thesis delivers a **concept** ("wie man vorgeht"), validated by selected
-proofs of concept in `RIOT_Test`. Place concept text in
+proofs of concept in `RIOT_Forked`. Place concept text in
 `riot-build-config-thesis/docs/05-migration-concept/`.
 
 ## Core model
 
 | Layer | Owns | Today | Target (concept) |
 |---|---|---|---|
-| Task | **group 1 only**: commands without Make context, artifacts, runtime, lifecycle or build (`info-boards`, `doc`, `welcome`, `generate-*`, `list-ttys`, …; list: `RIOT_Test/.claude/research/just-scope.md`) | Make targets | command runner (`just`) owns the full logic, never calls Make; the target is removed from Make and callers use just (D20) |
+| Task | **group 1 only**: commands without Make context, artifacts, runtime, lifecycle or build (`info-boards`, `doc`, `welcome`, `generate-*`, `list-ttys`, …; list: `RIOT_Forked/.claude/research/just-scope.md`) | Make targets | command runner (`just`) owns the full logic, never calls Make; the target is removed from Make and callers use just (D20) |
 | Configuration | inputs (`BOARD`, `USEMODULE`, `DEVELHELP`, …) and resolved state (`CPU`, features, modules, `BINDIR`) | spread over app Makefile, env, `Makefile.local`, board/CPU `Makefile*`, `Makefile.dep`, Kconfig | one tool-independent input file + one resolved-state export; Make stays single resolver until the build layer moves |
 | Build | groups 2A/2B/2C/3: context-dependent introspection (`info-modules`, `help`), artifact/runtime (`term`, `debug`, `info-buildsize`), artifact lifecycle (`clean`), build | GNU Make (`Makefile.include`, `Makefile.base`) | stays Make-native until the build tool takes over; target CMake + Ninja, compared hands-on with Meson + Ninja (PoC: one module + `hello-world`) |
 

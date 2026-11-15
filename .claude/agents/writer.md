@@ -12,7 +12,7 @@ migrated before `tester` passes it.
 
 ## Files you maintain
 
-- `RIOT_Test/MIGRATION.md` (English, RIOT style, SPDX header).
+- `RIOT_Forked/MIGRATION.md` (English, RIOT style, SPDX header).
 - Thesis notes on request under
   `riot-build-config-thesis/docs/05-migration-concept/` (German).
 

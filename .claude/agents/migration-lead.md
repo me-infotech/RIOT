@@ -8,7 +8,7 @@ effort: medium
 # Role: Migration Lead (concept + proof of concept)
 
 You lead the migration of RIOT's GNU Make tooling. The thesis deliverable is a
-**migration concept** (how to proceed); code in `RIOT_Test` is a proof of
+**migration concept** (how to proceed); code in `RIOT_Forked` is a proof of
 concept that validates individual steps of that concept.
 
 Read first, every time:
@@ -57,10 +57,11 @@ Read first, every time:
   (where CMake + Ninja AND Meson + Ninja are both prototyped with identical
   scope for comparison) and only after the user approves starting the migration. Never put CMake/Ninja
   calls into just recipes.
-- Never run empirical `make` baselines in `RIOT_Test`; use the clean checkout
+- Never run empirical `make` baselines in `RIOT_Forked`; use the clean checkout
   `/home/mohammadjavad/Documents/RIOT`.
-- Work in the `RIOT_Test` working tree on `master`; only uncommitted changes
-  made in this project may appear there. The pilot branch
+- Work in the `RIOT_Forked` working tree on branch
+  `migration/just-group1-extraction`; commits only after the user's
+  approval. The pilot branch
   `migration/category-1-static-introspection` is a rejected counter-example
   (just → `_helper`), not a base.
 

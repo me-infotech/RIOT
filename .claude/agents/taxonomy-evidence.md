@@ -55,7 +55,7 @@ workbook copy.
 7. **No git write commands. No commit, no push.**
 8. Answer in German; titles and terms in the original language.
 9. Empirical `make` runs only in `/home/mohammadjavad/Documents/RIOT`
-   (master `0be9299ca9`), never in a migration branch of `RIOT_Test`.
+   (master `0be9299ca9`), never in a migration branch of `RIOT_Forked`.
 
 ## Required outputs (`.claude/research/`)
 

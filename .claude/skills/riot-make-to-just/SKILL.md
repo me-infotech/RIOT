@@ -1,6 +1,6 @@
 ---
 name: riot-make-to-just
-description: Move RIOT OS group-1 make targets (stateless — no Make context, no artifact, no runtime, no artifact lifecycle, no build) completely into the root justfile, with no call back into make. Scope list in .claude/research/just-scope.md (36 targets). Use when implementing, reviewing or testing a task-layer migration step in RIOT_Test.
+description: Move RIOT OS group-1 make targets (stateless — no Make context, no artifact, no runtime, no artifact lifecycle, no build) completely into the root justfile, with no call back into make. Scope list in .claude/research/just-scope.md (36 targets). Use when implementing, reviewing or testing a task-layer migration step in RIOT_Forked.
 ---
 
 # RIOT Make to just migration (task layer, group 1 only)
@@ -39,8 +39,8 @@ that is rejected (user rule 2026-11-12, decision log D17).
    `just/generate.just`, `just/doc.just`) with `import`, so recipe names stay
    unprefixed.
 5. Nothing is committed. The user reviews every change. Work in the
-   `RIOT_Test` working tree on `master`; only your own uncommitted changes may
-   appear there.
+   `RIOT_Forked` working tree on branch `migration/just-group1-extraction`;
+   only your own uncommitted changes may appear there.
 6. Proof-of-concept boards: `native64` and `native` only (D16; for new work superseded by D22: target board nRF52840) — relevant only
    for app-context invocations such as `make -C examples/basic/hello-world
    BOARD=native64 info-boards`.
@@ -50,14 +50,15 @@ that is rejected (user rule 2026-11-12, decision log D17).
 - `just 1.59.0` in `~/.local/bin`; the justfile is tested with this version
   only and uses `[group]`, `[doc]`, `[working-directory]`,
   `[no-exit-message]`.
-- **Implemented (P3, uncommitted, `RIOT_Test` master):** all 36 targets of
+- **Implemented (P3, done in `RIOT_Test` master, committed as `f6e2445482`
+  on `migration/just-group1-extraction`, now in `RIOT_Forked`):** all 36 targets of
   `just-scope.md` A+B are in `just/*.just` and removed from every Makefile;
   callers and docs use just. Evidence:
   `.claude/research/test-logs/2026-11-12-p3-group1-just.md`.
   The older untracked justfile (just → `_info-*` calls) was replaced; its
   content is preserved in branch `migration/category-1-static-introspection`.
-- Branch `migration/category-1-static-introspection` (worktree
-  `RIOT_Test-pilot`) is the **rejected** pilot (just → `_helper` bridges for
+- Branch `migration/category-1-static-introspection` (formerly worktree
+  `RIOT_Test-pilot`, now on the fork) is the **rejected** pilot (just → `_helper` bridges for
   2A/2C). Read it only as a counter-example; reusable from it: the group-1
   recipes `info-boards`, `info-emulated-boards`, `info-applications`
   (byte-order sort fix D14).

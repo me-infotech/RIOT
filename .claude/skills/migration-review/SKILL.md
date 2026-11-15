@@ -1,6 +1,6 @@
 ---
 name: migration-review
-description: Review checklist for RIOT Make→just migration diffs (group-1-only scope, no Make in just, output fidelity, Make goal semantics) plus general correctness. Use when reviewing uncommitted changes to justfile, Makefile*, *.mk or MIGRATION.md in RIOT_Test.
+description: Review checklist for RIOT Make→just migration diffs (group-1-only scope, no Make in just, output fidelity, Make goal semantics) plus general correctness. Use when reviewing uncommitted changes to justfile, Makefile*, *.mk or MIGRATION.md in RIOT_Forked.
 ---
 
 # Migration Review

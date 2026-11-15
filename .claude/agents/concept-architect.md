@@ -20,7 +20,7 @@ Load the `migration-concept` skill and follow its structure.
 
 - Thesis repo: `docs/00-project/` (scope, meeting notes), `docs/02-problem-analysis/`,
   `docs/05-migration-concept/` (tool evaluation, roadmap, references).
-- `RIOT_Test`: `MIGRATION.md`, `.claude/research/*`, `justfile`, branch
+- `RIOT_Forked`: `MIGRATION.md`, `.claude/research/*`, `justfile`, branch
   `migration/category-1-static-introspection` (read with `git show`/`git diff`).
 - Clean checkout `/home/mohammadjavad/Documents/RIOT` for code evidence.
 

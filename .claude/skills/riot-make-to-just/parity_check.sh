@@ -24,7 +24,7 @@
 set -u
 
 BASE=/home/mohammadjavad/Documents/RIOT
-CAND=/home/mohammadjavad/Documents/RIOT_Test
+CAND=/home/mohammadjavad/Documents/RIOT_Forked
 APPDIR=.
 OUTDIR=$(mktemp -d "${TMPDIR:-/tmp}/riot-parity.XXXXXX")
 

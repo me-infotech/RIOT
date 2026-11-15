@@ -159,7 +159,7 @@ python3 .claude/skills/taxonomy-evidence/verify_taxonomy.py --reference \
   "<path-to-legacy-reference.xlsx>"
 ```
 
-**Important:** the checkout at `RIOT_Test` is a migration branch. Its `help`
+**Important:** the checkout at `RIOT_Forked` is a migration branch. Its `help`
 target may call `just`, which need not be installed. Use
 `/home/mohammadjavad/Documents/RIOT` (clean `master`) for all `make`-based
 observations, and state which checkout and commit each observation came from.

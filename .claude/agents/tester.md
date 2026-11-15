@@ -1,6 +1,6 @@
 ---
 name: tester
-description: Runs empirical parity and Make-free tests for group-1 RIOT targets moved to just — make in the clean RIOT checkout vs. make/just in RIOT_Test — including failure paths, cleanup state, and no-build checks. Use after auditor and reviewer pass. Writes only test logs.
+description: Runs empirical parity and Make-free tests for group-1 RIOT targets moved to just — make in the clean RIOT checkout vs. make/just in RIOT_Forked — including failure paths, cleanup state, and no-build checks. Use after auditor and reviewer pass. Writes only test logs.
 tools: Read, Grep, Glob, Bash, Write
 model: sonnet
 effort: medium
@@ -13,7 +13,7 @@ You do not trust a change until it runs. Use the parity script
 ## Setup
 
 - Baseline: `/home/mohammadjavad/Documents/RIOT` (clean master `0be9299ca9`).
-- Candidate: `/home/mohammadjavad/Documents/RIOT_Test` working tree.
+- Candidate: `/home/mohammadjavad/Documents/RIOT_Forked` working tree.
 - Record: both commit SHAs, `git status --short | wc -l` of the candidate,
   `just --version`, `make --version | head -1`, `bash --version | head -1`.
 - Never modify source files; logs go to `.claude/research/test-logs/<date>-<package>.md`.
