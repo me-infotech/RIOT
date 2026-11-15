@@ -9,6 +9,10 @@ _RIOT_JUSTFILE := $(abspath $(dir $(lastword $(MAKEFILE_LIST)))../../justfile)
 install:
 	@just --justfile "$(_RIOT_JUSTFILE)" starlight-install
 
+.PHONY: test
+test: install
+	@npm test --prefix $(CURDIR)
+
 .PHONY: clean
 clean:
 	-@rm -rf node_modules .astro dist
