@@ -242,43 +242,43 @@ info-files:
 	) | sort | uniq | sed 's#$(RIOTBASE)/##'
 
 info-modules:
-	@just --working-directory "$(CURDIR)" info-modules
+	@env $(JUST_CONTEXT_UNEXPORT) just --working-directory "$(CURDIR)" info-modules
 
 _info-modules:
 	@for i in $(sort $(USEMODULE)); do echo $$i; done
 
 info-packages:
-	@just --working-directory "$(CURDIR)" info-packages
+	@env $(JUST_CONTEXT_UNEXPORT) just --working-directory "$(CURDIR)" info-packages
 
 _info-packages:
 	@for i in $(sort $(USEPKG)); do echo $$i; done
 
 info-cpu:
-	@just --working-directory "$(CURDIR)" info-cpu
+	@env $(JUST_CONTEXT_UNEXPORT) just --working-directory "$(CURDIR)" info-cpu
 
 _info-cpu:
 	@echo $(CPU)
 
 info-features-provided:
-	@just --working-directory "$(CURDIR)" info-features-provided
+	@env $(JUST_CONTEXT_UNEXPORT) just --working-directory "$(CURDIR)" info-features-provided
 
 _info-features-provided:
 	@for i in $(sort $(FEATURES_PROVIDED)); do echo $$i; done
 
 info-features-required:
-	@just --working-directory "$(CURDIR)" info-features-required
+	@env $(JUST_CONTEXT_UNEXPORT) just --working-directory "$(CURDIR)" info-features-required
 
 _info-features-required:
 	@for i in $(sort $(FEATURES_REQUIRED)); do echo $$i; done
 
 info-features-missing:
-	@just --working-directory "$(CURDIR)" info-features-missing
+	@env $(JUST_CONTEXT_UNEXPORT) just --working-directory "$(CURDIR)" info-features-missing
 
 _info-features-missing:
 	@for i in $(FEATURES_MISSING); do echo $$i; done
 
 info-features-used:
-	@just --working-directory "$(CURDIR)" info-features-used
+	@env $(JUST_CONTEXT_UNEXPORT) just --working-directory "$(CURDIR)" info-features-used
 
 _info-features-used:
 	@for i in $(FEATURES_USED); do echo $$i; done
@@ -286,7 +286,7 @@ _info-features-used:
 # This target prints all variables set via KConfig sorted alphabetically for
 # debugging.
 info-kconfig-variables:
-	@just --working-directory "$(CURDIR)" info-kconfig-variables
+	@env $(JUST_CONTEXT_UNEXPORT) just --working-directory "$(CURDIR)" info-kconfig-variables
 
 _info-kconfig-variables:
 	@for i in $(sort $(filter CONFIG_%,$(.VARIABLES))); do echo $$i; done
@@ -295,25 +295,25 @@ info-debug-variable-%:
 	@echo $($*)
 
 info-toolchains-supported:
-	@just --working-directory "$(CURDIR)" info-toolchains-supported
+	@env $(JUST_CONTEXT_UNEXPORT) just --working-directory "$(CURDIR)" info-toolchains-supported
 
 _info-toolchains-supported:
 	@echo $(filter-out $(TOOLCHAINS_BLACKLIST),$(TOOLCHAINS_SUPPORTED))
 
 check-toolchain-supported:
-	@just --working-directory "$(CURDIR)" check-toolchain-supported
+	@env $(JUST_CONTEXT_UNEXPORT) just --working-directory "$(CURDIR)" check-toolchain-supported
 
 _check-toolchain-supported:
 	@exit $(if $(filter $(TOOLCHAIN),$(filter-out $(TOOLCHAINS_BLACKLIST),$(TOOLCHAINS_SUPPORTED))),0,1)
 
 info-programmers-supported:
-	@just --working-directory "$(CURDIR)" info-programmers-supported
+	@env $(JUST_CONTEXT_UNEXPORT) just --working-directory "$(CURDIR)" info-programmers-supported
 
 _info-programmers-supported:
 	@echo $(sort $(PROGRAMMERS_SUPPORTED))
 
 info-rust:
-	@just --working-directory "$(CURDIR)" info-rust
+	@env $(JUST_CONTEXT_UNEXPORT) just --working-directory "$(CURDIR)" info-rust
 
 _info-rust:
 	cargo version

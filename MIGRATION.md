@@ -130,6 +130,21 @@ Root-level checks passed:
   defined artifact contract covering board identity, `BINDIR` layout, ELF
   paths, per-module object directories, and missing-artifact behavior.
 
+### Re-validation 2026-11-12 (uncommitted fixes)
+
+Measured against the pilot base `b6d532269a`, boards `native64` and `native`:
+
+- **Fixed:** contextual bridges leaked exported Make state into the child
+  Make (`make BOARD=samr21-xpro info-features-required` added `newlib`). All
+  22 contextual bridges now use `env $(JUST_CONTEXT_UNEXPORT)`.
+- **Fixed:** `just info-boards` / `info-emulated-boards` sorted by locale and
+  printed a trailing space; they now match Make's `echo $(sort ...)`.
+- **Known deviation:** with `BOARD=native`, the alias notice
+  (`makefiles/board_alias.inc.mk:30`) is printed twice on stderr because the
+  child Make resolves the alias again. stdout and exit status are identical.
+- Earlier parity claims covered only `native64`; the original evidence did not
+  include `native` or hardware boards.
+
 ## Onboarding
 
 From the repository root:

@@ -139,27 +139,27 @@ $(SUPPORT_FILES):
 	@$(MAKE) BOARD=$* INFO_OVERRIDE=1 info-boards-collect --no-print-directory
 
 info-boards-supported:
-	@just --working-directory "$(CURDIR)" info-boards-supported
+	@env $(JUST_CONTEXT_UNEXPORT) just --working-directory "$(CURDIR)" info-boards-supported
 
 _info-boards-supported: $(BINDIRBASE)/.INFO_BOARDS_SUPPORTED $(BOARD_CANDIDATES)
 	@cat $(BINDIRBASE)/.INFO_BOARDS_SUPPORTED | sort | xargs echo
 
 info-boards-features-missing:
-	@just --working-directory "$(CURDIR)" info-boards-features-missing
+	@env $(JUST_CONTEXT_UNEXPORT) just --working-directory "$(CURDIR)" info-boards-features-missing
 
 _info-boards-features-missing: $(BINDIRBASE)/.INFO_BOARDS_FEATURES_MISSING \
                               $(BOARD_CANDIDATES)
 	@cat $(BINDIRBASE)/.INFO_BOARDS_FEATURES_MISSING | sort | column -t
 
 info-boards-features-blacklisted:
-	@just --working-directory "$(CURDIR)" info-boards-features-blacklisted
+	@env $(JUST_CONTEXT_UNEXPORT) just --working-directory "$(CURDIR)" info-boards-features-blacklisted
 
 _info-boards-features-blacklisted: $(BINDIRBASE)/.INFO_BOARDS_FEATURES_BLACKLISTED \
                                    $(BOARD_CANDIDATES)
 	@cat $(BINDIRBASE)/.INFO_BOARDS_FEATURES_BLACKLISTED | sort | column -t
 
 info-boards-features-conflicting:
-	@just --working-directory "$(CURDIR)" info-boards-features-conflicting
+	@env $(JUST_CONTEXT_UNEXPORT) just --working-directory "$(CURDIR)" info-boards-features-conflicting
 
 _info-boards-features-conflicting: $(BINDIRBASE)/.INFO_BOARDS_FEATURES_CONFLICTING \
                                    $(BOARD_CANDIDATES)

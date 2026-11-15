@@ -1,33 +1,39 @@
 set shell := ["bash", "-ec"]
 
 # List all boards, excluding the common board directory.
+# Output mirrors Make's `echo $(BOARDS)`: byte-order sort (LC_ALL=C, like
+# `$(sort)`), single spaces, no trailing space.
 info-boards:
     #!/usr/bin/env bash
-    set -e
+    set -ef
     if [ "${BOARDS+x}" = x ]; then
-        printf '%s\n' "$BOARDS"
+        echo $BOARDS
         exit 0
     fi
     riotbase="${RIOTBASE:-$PWD}"
     boarddirs="${BOARDSDIRS:-${EXTERNAL_BOARD_DIRS:-} ${RIOTBOARD:-$riotbase/boards}}"
-    for dir in $boarddirs; do
+    set +f
+    boards=$(for dir in $boarddirs; do
         for board in "$dir"/*/; do
             [ -d "$board" ] || continue
             board=${board%/}
             board=${board##*/}
             [ "$board" = common ] || printf '%s\n' "$board"
         done
-    done | sort -u | tr '\n' ' '
-    echo
+    done | LC_ALL=C sort -u)
+    set -f
+    echo $boards
 
-# List emulated boards.
+# List emulated boards (byte-order sort, like Make's `$(sort)`).
 info-emulated-boards:
     #!/usr/bin/env bash
     set -e
+    set -f
     if [ "${EMULATED_BOARDS+x}" = x ]; then
-        printf '%s\n' "$EMULATED_BOARDS"
+        echo $(printf '%s\n' $EMULATED_BOARDS | LC_ALL=C sort -u)
         exit 0
     fi
+    set +f
     riotbase="${RIOTBASE:-$PWD}"
     boarddirs="${BOARDSDIRS:-${EXTERNAL_BOARD_DIRS:-} ${RIOTBOARD:-$riotbase/boards}}"
     boards="microbit gba_cartridge"
@@ -38,8 +44,8 @@ info-emulated-boards:
             boards="$boards ${board##*/}"
         done
     done
-    printf '%s\n' $boards | sort -u | tr '\n' ' '
-    echo
+    set -f
+    echo $(printf '%s\n' $boards | LC_ALL=C sort -u)
 
 # List application directories.
 info-applications:
