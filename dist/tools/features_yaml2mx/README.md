@@ -8,5 +8,5 @@ as a markdown file for consumption by Doxygen to document the features.
 The YAML file containing the features is `features.yaml` in the root of the
 repo. Its syntax is documented in a comment on top of said file.
 
-This script should be invoked by running `make generate-features` in the root
+This script should be invoked by running `just generate-features` in the root
 of the repository.

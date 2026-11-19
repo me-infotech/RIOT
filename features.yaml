@@ -4,7 +4,7 @@
 # exist in RIOT. The file `makefiles/features_existing.inc.mk` is generated
 # from this list, and so is the documentation in
 # `doc/doxygen/src/feature_list.md`. To regenerate them, run
-# `make generate-features` in the root of the repo.
+# `just generate-features` in the root of the repo.
 #
 # The syntax is relatively simple: A group is a mapping that may contain a
 # string-valued "title" and "help", may contain a list of groups under the
