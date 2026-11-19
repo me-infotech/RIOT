@@ -1,6 +1,6 @@
 .all:
 
-.PHONY: all doc doc-man doc-latex docclean doc-starlight print-versions welcome
+.PHONY: all doc doc-man doc-latex docclean doc-starlight welcome
 
 all: welcome
 	@echo ""
@@ -22,14 +22,6 @@ docclean:
 pkg-clean:
 	@echo "Cleaning all package sources"
 	rm -rf build/pkg
-
-print-versions:
-	@./dist/tools/ci/print_toolchain_versions.sh
-
-generate-features:
-	@./dist/tools/features_yaml2mx/features_yaml2mx.py \
-		features.yaml \
-		--output-makefile makefiles/features_existing.inc.mk
 
 include makefiles/boards.inc.mk
 include makefiles/app_dirs.inc.mk
@@ -67,11 +59,13 @@ define welcome_message
 	@echo "    https://forum.riot-os.org"
 	@echo ""
 	@echo "Available targets for the RIOT base directory include:"
-	@echo " generate-{board,driver,example,module,pkg,test,features}"
+	@echo " generate-{board,driver,example,module,pkg,test}"
 	@echo " info-{applications,boards,emulated-boards} info-applications-supported-boards"
-	@echo " print-versions"
 	@echo " clean distclean docclean pkg-clean"
 	@echo " doc doc-{starlight,man,latex}"
+	@echo ""
+	@echo "Repository commands that moved to just (run 'just --list'):"
+	@echo " generate-features print-versions"
 	@echo ""
 	@echo "==> tl;dr Try running:"
 	@echo "    cd examples/basic/default"

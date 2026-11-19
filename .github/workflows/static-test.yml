@@ -50,6 +50,10 @@ jobs:
           git config diff.renameLimit 16384
         fi
         git config apply.whitespace nowarn
+    - name: Install just
+      uses: taiki-e/install-action@v2
+      with:
+        tool: just@1.59.0
     - name: Fetch riot/static-test-tools Docker image
       run: docker pull riot/static-test-tools:latest
     - name: Run static-tests on `riot/static-test-tools`
@@ -57,9 +61,11 @@ jobs:
         # Start docker container and run tests...
 
         # Note: ${CI_BASE_BRANCH} is empty when not in a PR
+        # The image has no just yet: mount the static binary from the runner.
         docker run --rm                             \
           -e CI_BASE_BRANCH                         \
           -e GITHUB_RUN_ID=${GITHUB_RUN_ID}         \
           -v $(pwd):/data/riotbuild                 \
+          -v "$(command -v just)":/usr/local/bin/just:ro \
           riot/static-test-tools:latest             \
           make static-test
