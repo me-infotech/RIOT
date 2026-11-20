@@ -1,6 +1,6 @@
 # WARNING: This has been auto-generated from features.yaml.
 #          Do not edit this by hand, but update features.yaml instead.
-#          Finally, run `make generate-features` in the root of the RIOT repo.
+#          Finally, run `just generate-features` in the root of the RIOT repo.
 FEATURES_EXISTING := \
     arch_16bit \
     arch_32bit \

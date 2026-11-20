@@ -1,0 +1,45 @@
+# SPDX-FileCopyrightText: 2026 RIOT contributors
+# SPDX-License-Identifier: LGPL-2.1-only
+#
+# Register of the migration steps away from GNU Make.
+#
+# Single source for: which targets a step migrated, which group they belong
+# to, which unit tests check them and what CI must install to run them.
+# The workflow .github/workflows/migration-tests.yml builds one CI job per
+# step from this file; dist/tools/migration/run_tests.py runs the same tests
+# locally. Add a step here, never a test directory to a workflow.
+#
+# Keys of a step:
+#   id        unique, `<roadmap phase>-<topic>`; the CI job is named after it
+#   title     one line
+#   group     1 | 2A | 2B | 2C | 3 (taxonomy of the migration concept)
+#   targets   the migrated targets; each target is in exactly one step
+#     name      former Make target
+#     now       how it is run after the migration
+#     hardware  true if it needs a board; then `board_test` says how it is
+#               tested on the board (manually, not in CI)
+#   tests     directories with unittest modules (test_*.py), relative to the
+#             repository root; each is run as its own unittest discovery
+#   requires  what CI installs before running the tests
+#     pip       Python packages
+#     tools     tools installed with taiki-e/install-action (name@version)
+#   docs      README that documents the step
+
+steps:
+  - id: p3-task-layer-group1
+    title: Stateless repository commands from the root Makefile to just
+    group: "1"
+    targets:
+      - name: print-versions
+        now: just print-versions
+        hardware: false
+      - name: generate-features
+        now: just generate-features
+        hardware: false
+    tests:
+      - dist/tools/task_layer/tests
+      - dist/tools/features_yaml2mx/tests
+    requires:
+      pip: [pyyaml]
+      tools: [just@1.59.0]
+    docs: dist/tools/task_layer/README.md

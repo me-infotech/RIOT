@@ -50,7 +50,7 @@ def write_makefile(outfile, yaml_path, parsed):
     outfile.write(f"""\
 # WARNING: This has been auto-generated from {yaml_path}.
 #          Do not edit this by hand, but update {yaml_path} instead.
-#          Finally, run `make generate-features` in the root of the RIOT repo.
+#          Finally, run `just generate-features` in the root of the RIOT repo.
 """)
     outfile.write("FEATURES_EXISTING := \\\n")
     for feature in sorted(collect_features(parsed)):
@@ -114,7 +114,7 @@ def write_mdfile(outfile, yaml_path, parsed):
 <!--
 WARNING: This has been auto-generated from {yaml_path}.
          Do not edit this by hand, but update {yaml_path} instead.
-         Finally, run `make generate-features` in the root of the RIOT repo.
+         Finally, run `just generate-features` in the root of the RIOT repo.
 -->
 
 [TOC]

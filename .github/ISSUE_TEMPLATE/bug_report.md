@@ -40,7 +40,7 @@ Please paste or specifically describe the actual output.
 <!--
 Operating system: macOS, Linux, Windows/WSL, Docker/Podman
 Build environment: GCC, CLang versions (you can run the following command from
-the RIOT base directory: make print-versions).
+the RIOT base directory: just print-versions).
 -->
 
 ### Declaration of AI-Tools / LLMs usage:
