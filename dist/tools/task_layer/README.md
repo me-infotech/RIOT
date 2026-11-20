@@ -35,7 +35,8 @@ python3 -m unittest discover -s dist/tools/features_yaml2mx/tests -v
 
 Requirements: Python 3, PyYAML, just 1.59.0 (tests that need just are skipped
 without it). The tests build nothing and change no repository file. CI runs
-them in the `tools-test` workflow.
+them in the `migration-tests` workflow (step `p3-task-layer-group1` in
+`dist/tools/migration/steps.yaml`).
 
 | Rule | Test class (`tests/test_justfile.py`)                        | How                                                     |
 |------|--------------------------------------------------------------|---------------------------------------------------------|
