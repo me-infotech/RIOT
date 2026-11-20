@@ -245,5 +245,29 @@ class PrintVersionsParityTest(unittest.TestCase):
         self.assertEqual(recipe.stdout, script.stdout)
 
 
+@unittest.skipIf(JUST is None, "just is not installed")
+class ReachabilityTest(unittest.TestCase):
+    """R6 (decision 2026-11-20): the recipes may be called from any directory
+    of the repository, because their result does not depend on the directory.
+    Make offered them only at the root; just finds the root justfile from
+    every subdirectory. Checked: same command, run in the repository root."""
+
+    DIRECTORIES = ("examples/basic/hello-world", "tests/sys/shell", "boards", "sys")
+
+    def test_same_command_from_every_directory(self):
+        for target, command in MIGRATED.items():
+            for directory in self.DIRECTORIES:
+                with self.subTest(target=target, directory=directory):
+                    result = run([JUST, "--dry-run", target], cwd=os.path.join(RIOTBASE, directory))
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    self.assertEqual(result.stderr.strip(), command)
+
+    def test_recipes_run_in_the_repository_root(self):
+        parsed = dump(JUSTFILE)
+        for target in MIGRATED:
+            with self.subTest(target=target):
+                self.assertNotIn("no-cd", parsed["recipes"][target]["attributes"])
+
+
 if __name__ == "__main__":
     unittest.main()
