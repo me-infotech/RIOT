@@ -820,9 +820,6 @@ cleanterm: $(TERMDEPS)
 	$(call check_cmd,$(TERMPROG),Terminal program)
 	$(TERMPROG) $(TERMFLAGS) $(TERMTEE)
 
-list-ttys:
-	$(Q)$(RIOTTOOLS)/usb-serial/ttys.py
-
 doc-man doc-latex:
 	$(MAKE) -C $(RIOTBASE) $@
 

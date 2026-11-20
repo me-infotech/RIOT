@@ -9,17 +9,51 @@ built with `make` in their directory.
 |---|---|---|---|
 | `p3-task-layer-group1` | `migration/g1-01-print-versions-generate-features` | `print-versions`, `generate-features` | `tests/`, `../features_yaml2mx/tests/` |
 | `p3-task-layer-group1-doc` | `migration/g1-02-doc` | `doc` | `../doccheck/tests/` |
+| `p3-task-layer-group1-list-ttys` | `migration/g1-03-list-ttys` | `list-ttys` | `../usb-serial/tests/` |
+
+just searches the root `justfile` upwards from the current directory, so
+every recipe can also be called from an application directory (rule R6).
 
 Migrated targets
 ----------------
 
-| Target              | Before                     | Now                        | Runs                                              |
-|---------------------|----------------------------|----------------------------|---------------------------------------------------|
-| `print-versions`    | `make print-versions`      | `just print-versions`      | `dist/tools/ci/print_toolchain_versions.sh`       |
-| `generate-features` | `make generate-features`   | `just generate-features`   | `dist/tools/features_yaml2mx/features_yaml2mx.py` |
+| Target              | Before                                   | Now                      | Runs                                              | Step (`steps.yaml`) / branch |
+|---------------------|------------------------------------------|--------------------------|---------------------------------------------------|------------------------------|
+| `print-versions`    | `make print-versions` (root)             | `just print-versions`    | `dist/tools/ci/print_toolchain_versions.sh`       | `p3-task-layer-group1` / `migration/g1-01-print-versions-generate-features` |
+| `generate-features` | `make generate-features` (root)          | `just generate-features` | `dist/tools/features_yaml2mx/features_yaml2mx.py` | `p3-task-layer-group1` / `migration/g1-01-print-versions-generate-features` |
+| `doc`               | `make doc` (root, applications)          | `just doc`               | `doc/doxygen` (Doxygen, see below)                | `p3-task-layer-group1-doc` / `migration/g1-02-doc` |
+| `list-ttys`         | `make list-ttys` (application directory) | `just list-ttys`         | `dist/tools/usb-serial/ttys.py`                   | `p3-task-layer-group1-list-ttys` / `migration/g1-03-list-ttys` |
 
-The first two were stateless group-1 targets: they read only repository files and do
-not depend on `BOARD`, the application or build artifacts.
+All are stateless group-1 targets: they do not depend on `BOARD`, the
+application or build artifacts.
+
+### `list-ttys`
+
+`make list-ttys` was defined in `Makefile.include`, so it was run from an
+application directory. It ran `$(RIOTTOOLS)/usb-serial/ttys.py` without
+arguments and without any Make variable. The recipe keeps this exactly:
+
+- same command: the absolute path `<repository>/dist/tools/usb-serial/ttys.py`
+  (`justfile_directory()`), no arguments;
+- same working directory: `[no-cd]`, so it runs where it is called, as Make
+  ran it in the application directory;
+- no extra arguments: Make offered no way to pass arguments to `ttys.py`,
+  so the recipe has no parameters and `just list-ttys --serial x` fails.
+  For filters, call `dist/tools/usb-serial/ttys.py --help` directly.
+
+It is not a hardware target: it only lists the serial devices the host
+already knows (udev, via `pyudev`); it does not talk to a board, flash or
+reset anything, and it works (with an empty table) when nothing is connected.
+
+Not migrated: the PORT selection in `makefiles/tools/serial.inc.mk`
+(`MOST_RECENT_PORT`, `TTY_SELECT_CMD`) also runs `ttys.py`, but as part of
+the board configuration of a build. It stays in Make unchanged.
+
+Effects: `make help` in an application lists the targets of the Make
+database, so `list-ttys` no longer appears there; `just --list` shows it.
+The welcome text of the root Makefile lists only root targets and is
+unchanged. The zsh completion no longer offers `list-ttys` as a Make target.
+`release-notes.txt` keeps `make list-ttys` as history.
 
 Rules
 -----
@@ -28,7 +62,8 @@ Rules
 - R2 A recipe never calls `make`.
 - R3 A migrated target is removed from the Makefile (`make <target>` fails).
 - R4 Every caller (CI, docs, generated headers) uses `just`.
-- R5 The CI check of the generated file keeps its behaviour.
+- R5 Checks keep their behaviour (CI check of the generated file;
+  for `list-ttys`: the PORT selection in `serial.inc.mk`).
 - R6 A recipe may be reachable from every directory only if its result does not
   depend on the directory (checked per target, see
   `riot-build-config-thesis/docs/05-migration-concept/reachability/`).
@@ -39,12 +74,17 @@ Unit tests
 ```sh
 python3 -m unittest discover -s dist/tools/task_layer/tests -v
 python3 -m unittest discover -s dist/tools/features_yaml2mx/tests -v
+python3 -m unittest discover -s dist/tools/usb-serial/tests -v   # list-ttys
 ```
 
 Requirements: Python 3, PyYAML, just 1.59.0 (tests that need just are skipped
-without it). The tests build nothing and change no repository file. CI runs
-them in the `migration-tests` workflow (step `p3-task-layer-group1` in
-`dist/tools/migration/steps.yaml`).
+without it); for `list-ttys` also GNU Make and `pyudev`. The tests build
+nothing and change no repository file. CI runs them in the
+`migration-tests` workflow, one job per step of
+`dist/tools/migration/steps.yaml` (`p3-task-layer-group1`,
+`p3-task-layer-group1-list-ttys`).
+
+### `print-versions`, `generate-features` (step `p3-task-layer-group1`)
 
 | Rule | Test class (`tests/test_justfile.py`)                        | How                                                     |
 |------|--------------------------------------------------------------|---------------------------------------------------------|
@@ -141,3 +181,31 @@ Doxygen, a recipe calling `make`, `doc` back in `Makefile.include`, the root
 rule for `doc` removed, a guide naming `make doc`, `doc-ci` calling
 `make doc` again, the GraphViz check duplicated in Make, the minimum version
 defined twice, `check.sh` calling `make doc`, its exclude list ignored.
+
+### `list-ttys` (step `p3-task-layer-group1-list-ttys`)
+
+| Rule | Test class (`dist/tools/usb-serial/tests/test_list_ttys.py`) | How |
+|------|---------------------------------------------------|-----|
+| R1   | `JustfileContractTest`                            | `just --dump`: public, no parameters, `[no-cd]`; `just --dry-run list-ttys` prints the command Make ran (golden), from the root, from an application directory (upward search) and with `--justfile`/`--working-directory` |
+| R1   | `CallingDirectoryAndArgumentsTest`                | copied justfile with a stub `ttys.py`: runs in the calling directory, with no arguments, exit code passed on; extra arguments are rejected |
+| R1   | `OutputParityTest`                                | stdout, stderr and exit code of `just list-ttys` equal those of `ttys.py`, both run in `examples/basic/hello-world` (no device needed) |
+| R2   | `JustfileContractTest`                            | make-call detector of `tests/test_justfile.py`, with a positive and a negative sample of this recipe's shape |
+| R3   | `MakefileTest`, `UnknownTargetDetectorTest`       | no rule/`.PHONY` entry in any Makefile; `make -n list-ttys` in an application: `No rule to make target`; in the root: `unrecognized target`; not in `make help`; detector checked on positive and negative samples |
+| R4   | `CallerTest`                                      | `git grep` for `make list-ttys` (excluding `release-notes.txt`, this directory and the tests); docs use `just list-ttys`; zsh completion; detector samples |
+| R5   | `SerialPortSelectionTest`                         | `TTY_SELECT_CMD` for `nrf52840dk` with `MOST_RECENT_PORT=1` equals the value recorded before the migration; without it no command and `PORT=/dev/ttyACM0` |
+| –    | `RegisterTest`                                    | the step is in `steps.yaml` with this test directory |
+
+Mutation probe (2026-11-20; each file copied before the change and restored
+from the copy):
+
+| Rule | Defect | Failing tests |
+|------|--------|---------------|
+| R1   | recipe passes `--most-recent` | 4 |
+| R1   | `[no-cd]` removed (runs in the repository root) | 2 |
+| R1   | recipe accepts and passes extra arguments | 2 |
+| R2   | recipe calls `make -C … list-ttys` | 6 |
+| R3   | rule `list-ttys:` added to `Makefile.include` again | 3 |
+| R4   | `rpl.mdx` back to `make list-ttys` | 2 |
+| R4   | zsh completion offers `list-ttys` again | 1 |
+| R5   | `serial.inc.mk` drops the `serial` output format | 1 |
+| –    | step removed from `steps.yaml` | 1 (+1 register test O2) |

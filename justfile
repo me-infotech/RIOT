@@ -1,12 +1,14 @@
 # SPDX-FileCopyrightText: 2026 RIOT contributors
 # SPDX-License-Identifier: LGPL-2.1-only
 #
-# RIOT task layer: repository commands that need no build system, moved from
-# the root Makefile to just (see dist/tools/task_layer/README.md).
+# RIOT task layer: commands that need no build system, moved from GNU Make
+# to just (see dist/tools/task_layer/README.md). just finds this file from any
+# directory of the repository; whether a recipe may run everywhere is checked
+# per target (rule R6).
 #
 # Rules: a recipe never calls make; inputs are repository files and host
-# tools only; the commands are no longer Make targets. Applications are still built with
-# make in their directory. Tested with just 1.59.0.
+# tools only; the commands are no longer Make targets. Applications are still
+# built with make in their directory. Tested with just 1.59.0.
 
 # Recipe lines run with /bin/sh, as GNU Make ran them.
 set shell := ["/bin/sh", "-c"]
@@ -88,3 +90,10 @@ _doc-doxygen-version:
             "the documentation with the required Doxygen version, which will be downloaded" \
             "and (if required) compiled locally.${reset}"
     fi
+
+# Moved from Makefile.include (application level). Runs in the calling
+# directory, without arguments and with the absolute path, as Make did.
+# List the serial TTYs connected to this host.
+[no-cd]
+list-ttys:
+    @{{ justfile_directory() }}/dist/tools/usb-serial/ttys.py
