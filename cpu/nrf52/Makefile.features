@@ -1,9 +1,13 @@
+# Generated from provides.yaml by dist/tools/config_data/config_data.py.
+# Do not edit: change provides.yaml and run `just generate-config-data`.
+
 ifneq (,$(filter nrf52832xxaa nrf52833xxaa nrf52840xxaa,$(CPU_MODEL)))
-CPU_CORE = cortex-m4f
+  CPU_CORE = cortex-m4f
 else
-CPU_CORE = cortex-m4
+  CPU_CORE = cortex-m4
 endif
-CPU_FAM  = nrf52
+
+CPU_FAM = nrf52
 
 # The 802.15.4 radio is not available on all SoCs
 ifneq (,$(filter nrf52811xxaa nrf52820xxaa nrf52833xxaa nrf52840xxaa,$(CPU_MODEL)))
@@ -30,6 +34,7 @@ endif
 # All nRF52 CPUs use UARTE (UART + EasyDMA) for UART, so that can be used
 # in non-blocking mode
 FEATURES_PROVIDED += periph_uart_nonblocking
+
 # The ADC does not depend on any board configuration, so always available
 FEATURES_PROVIDED += periph_adc
 
@@ -39,13 +44,13 @@ FEATURES_PROVIDED += ble_nimble_netif
 
 # all nrf52 have an MPU
 FEATURES_PROVIDED += cortexm_mpu
-
 FEATURES_PROVIDED += periph_i2c_reconfigure
 FEATURES_PROVIDED += periph_spi_gpio_mode
 
 # On top of the default 1Mbit PHY mode, all nrf52 support the 2MBit PHY mode,
 # and the 52840 does further support the coded PHYs
 FEATURES_PROVIDED += ble_phy_2mbit
+
 ifneq (,$(filter nrf52811% nrf52820% nrf52833% nrf52840%,$(CPU_MODEL)))
   FEATURES_PROVIDED += ble_phy_coded
 endif
@@ -55,5 +60,4 @@ ifneq (,$(filter nrf52840%,$(CPU_MODEL)))
 endif
 
 FEATURES_PROVIDED += ble_adv_ext
-
 include $(RIOTCPU)/nrf5x_common/Makefile.features

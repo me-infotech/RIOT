@@ -29,10 +29,15 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 RIOTBASE = os.path.normpath(os.path.join(HERE, "..", "..", ".."))
 STEPS_FILE = os.path.join(HERE, "steps.yaml")
 
-GROUPS = ("1", "2A", "2B", "2C", "3")
+# G0: foundation (configuration as data, resolver); it migrates no Make
+# target but provides data and commands the groups build on
+GROUPS = ("G0", "1", "2A", "2B", "2C", "3")
+FOUNDATION = "G0"
 STEP_KEYS = {"id", "title", "group", "targets", "tests", "requires", "docs"}
+OPTIONAL_STEP_KEYS = {"provides"}
 TARGET_KEYS = {"name", "now", "hardware", "board_test"}
-ID_PATTERN = re.compile(r"^p[0-9]+-[a-z0-9]+(-[a-z0-9]+)*$")
+# `p3-topic` (roadmap phase) or `g0-01-topic` (group and number, like the branch)
+ID_PATTERN = re.compile(r"^(p[0-9]+|g(0|1|2a|2b|2c|3)-[0-9]{2})-[a-z0-9]+(-[a-z0-9]+)*$")
 
 
 def load(path=STEPS_FILE):
@@ -47,18 +52,27 @@ def validate(steps, root=RIOTBASE):
     for step in steps:
         sid = step.get("id", "<no id>")
         where = f"step {sid}"
-        problems += [f"{where}: unknown key {k!r}" for k in sorted(set(step) - STEP_KEYS)]
+        problems += [f"{where}: unknown key {k!r}"
+                     for k in sorted(set(step) - STEP_KEYS - OPTIONAL_STEP_KEYS)]
         problems += [f"{where}: missing key {k!r}" for k in sorted(STEP_KEYS - set(step))]
         if not ID_PATTERN.match(str(sid)):
-            problems.append(f"{where}: id must look like p3-topic-words")
+            problems.append(f"{where}: id must look like p3-topic-words or g0-01-topic-words")
         if sid in seen_ids:
             problems.append(f"{where}: duplicate id")
         seen_ids.add(sid)
         if str(step.get("group")) not in GROUPS:
             problems.append(f"{where}: group must be one of {', '.join(GROUPS)}")
-        if not step.get("targets"):
+        if str(step.get("group")) == FOUNDATION:
+            if step.get("targets"):
+                problems.append(f"{where}: a {FOUNDATION} step migrates no target "
+                                "(targets: [])")
+            if not step.get("provides"):
+                problems.append(f"{where}: a {FOUNDATION} step needs 'provides'")
+        elif not step.get("targets"):
             problems.append(f"{where}: no targets")
-        for target in step.get("targets") or []:
+        elif "provides" in step:
+            problems.append(f"{where}: 'provides' only in a {FOUNDATION} step")
+        for target in (step.get("targets") or []) + (step.get("provides") or []):
             name = target.get("name", "<no name>")
             problems += [f"{where}: target {name}: unknown key {k!r}"
                          for k in sorted(set(target) - TARGET_KEYS)]
@@ -83,6 +97,11 @@ def validate(steps, root=RIOTBASE):
     return problems
 
 
+def entries(step):
+    """Migrated targets and (G0) provided commands of a step."""
+    return (step.get("targets") or []) + (step.get("provides") or [])
+
+
 def select(steps, step=None, group=None, target=None):
     chosen = steps
     if step:
@@ -90,7 +109,7 @@ def select(steps, step=None, group=None, target=None):
     if group:
         chosen = [s for s in chosen if str(s["group"]) == group]
     if target:
-        chosen = [s for s in chosen if any(t["name"] == target for t in s["targets"])]
+        chosen = [s for s in chosen if any(t["name"] == target for t in entries(s))]
     return chosen
 
 
@@ -139,7 +158,7 @@ def main(argv=None):
         return 0
     if args.list:
         for s in chosen:
-            names = ", ".join(t["name"] for t in s["targets"])
+            names = ", ".join(t["name"] for t in entries(s))
             print(f"{s['id']:<32} group {s['group']:<3} {names}")
         return 0
 

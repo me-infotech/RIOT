@@ -1,0 +1,9 @@
+# Dependency rules of boards/common/nrf52xxxdk. This file is the source: Makefile.dep
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - if: {has: {var: USEMODULE, match: [saul_default]}}
+    then:
+      - add: {USEMODULE: [saul_gpio, saul_pwm]}
+  - include: {path: '${RIOTBOARD}/common/nrf52/Makefile.dep'}

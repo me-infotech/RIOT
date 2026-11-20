@@ -1,0 +1,33 @@
+# Provided features and CPU data of boards. This file is the source: Makefile.features
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - comment: SORT THIS ALPHABETICALLY BY COMMON BOARD NAME!
+    if: {has: {var: USEMODULE, match: [boards_common_esp32]}}
+    then:
+      - include: {path: '${RIOTBOARD}/common/esp32/Makefile.features'}
+  - if: {has: {var: USEMODULE, match: [boards_common_esp32c3]}}
+    then:
+      - include: {path: '${RIOTBOARD}/common/esp32c3/Makefile.features'}
+  - if: {has: {var: USEMODULE, match: [boards_common_esp32c6]}}
+    then:
+      - include: {path: '${RIOTBOARD}/common/esp32c6/Makefile.features'}
+  - if: {has: {var: USEMODULE, match: [boards_common_esp32h2]}}
+    then:
+      - include: {path: '${RIOTBOARD}/common/esp32h2/Makefile.features'}
+  - if: {has: {var: USEMODULE, match: [boards_common_esp32s2]}}
+    then:
+      - include: {path: '${RIOTBOARD}/common/esp32s2/Makefile.features'}
+  - if: {has: {var: USEMODULE, match: [boards_common_esp32s3]}}
+    then:
+      - include: {path: '${RIOTBOARD}/common/esp32s3/Makefile.features'}
+  - if: {has: {var: USEMODULE, match: [boards_common_esp32x]}}
+    then:
+      - include: {path: '${RIOTBOARD}/common/esp32x/Makefile.features'}
+  - if: {has: {var: USEMODULE, match: [boards_common_rpi_pico_2]}}
+    then:
+      - include: {path: '${RIOTBOARD}/common/rpi-pico-2/Makefile.features'}
+  - if: {has: {var: USEMODULE, match: [boards_common_seeedstudio-xiao-nrf52840]}}
+    then:
+      - include: {path: '${RIOTBOARD}/common/seeedstudio-xiao-nrf52840/Makefile.features'}

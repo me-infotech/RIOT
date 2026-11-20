@@ -1,0 +1,8 @@
+# Dependency rules of sys/evtimer. This file is the source: Makefile.dep
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - if: {has: {var: USEMODULE, match: [evtimer]}}
+    then:
+      - add: {USEMODULE: [ztimer_msec]}

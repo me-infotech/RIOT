@@ -1,0 +1,11 @@
+# Dependency rules of drivers/netdev_ieee802154_submac. This file is the source: Makefile.dep
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - add: {USEMODULE: [netdev_ieee802154, netdev_new_api, ieee802154, ieee802154_submac, iolist, ztimer_usec]}
+  - if: {has: {var: USEMODULE, match: [netdev_ieee802154_submac_soft_ack]}}
+    then:
+      - add: {USEMODULE: [ieee802154_submac_soft_ack]}
+      - warning: SubMAC Soft ACK has been renamed to ieee802154_submac_soft_ack. Will be removed after
+          release 2027.04

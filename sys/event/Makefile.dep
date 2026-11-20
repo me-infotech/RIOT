@@ -1,3 +1,6 @@
+# Generated from deps.yaml by dist/tools/config_data/config_data.py.
+# Do not edit: change deps.yaml and run `just generate-config-data`.
+
 USEMODULE += core_thread_flags
 
 ifneq (,$(filter event_thread_%,$(USEMODULE)))

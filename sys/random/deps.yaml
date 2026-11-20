@@ -1,0 +1,26 @@
+# Dependency rules of sys/random. This file is the source: Makefile.dep
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - add: {DEFAULT_MODULE: [auto_init_random]}
+  - add: {USEMODULE: [prng]}
+  - if: {has: {var: USEMODULE, match: [prng_fortuna]}}
+    then:
+      - add: {USEMODULE: [fortuna, hashes, crypto]}
+      - if: {has: {var: USEMODULE, match: [fortuna_reseed]}}
+        then:
+          - add: {USEMODULE: [atomic_utils, ztimer, ztimer_msec]}
+  - if: {has: {var: USEMODULE, match: [prng_tinymt32]}}
+    then:
+      - add: {USEMODULE: [tinymt32]}
+  - if: {has: {var: USEMODULE, match: [prng_sha%prng]}}
+    then:
+      - add: {USEMODULE: [prng_shaxprng, hashes]}
+  - if: {has: {var: USEMODULE, match: [prng_hwrng]}}
+    then:
+      - add: {FEATURES_REQUIRED: [periph_hwrng]}
+  - if: {not: {has: {var: USEMODULE, match: [puf_sram]}}}
+    then:
+      - add: {FEATURES_OPTIONAL: [periph_hwrng]}
+  - add: {USEMODULE: [luid]}

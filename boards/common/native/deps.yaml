@@ -1,0 +1,33 @@
+# Dependency rules of boards/common/native. This file is the source: Makefile.dep
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - if: {has: {var: USEMODULE, match: [netdev_default]}}
+    then:
+      - if: {not: {has: {var: USEMODULE, match: [socket_zep]}}}
+        then:
+          - add: {USEMODULE: [netdev_tap]}
+  - if: {has: {var: USEMODULE, match: [mtd]}}
+    then:
+      - add: {USEMODULE: [mtd_native]}
+  - if: {has: {var: FEATURES_USED, match: [periph_can]}}
+    then:
+      - add: {USEPKG: [libsocketcan]}
+  - comment: default to host fs pass-through if no other fs was selected
+    if: {has: {var: USEMODULE, match: [vfs_default]}}
+    then:
+      - if: {not: {has: {var: USEMODULE, match: [lwext%_vfs, spiffs, littlefs%, fatfs_vfs]}}}
+        then:
+          - add: {USEMODULE: [fs_native]}
+      - add: {USEMODULE: [mtd]}
+  - if: {has: {var: USEPKG, match: [lvgl]}}
+    then:
+      - add: {USEPKG: [lv_drivers]}
+      - add: {USEMODULE: [lv_drivers_sdl]}
+  - add: {USEMODULE: [native_drivers]}
+  - if: {has: {var: USEMODULE, match: [saul_default]}}
+    then:
+      - if: {has: {var: USEMODULE, match: [periph_gpio_mock]}}
+        then:
+          - add: {USEMODULE: [saul_gpio]}

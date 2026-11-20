@@ -1,0 +1,11 @@
+# Provided features and CPU data of boards/nrf52840dk. This file is the source: Makefile.features
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - set: {var: CPU_MODEL, value: nrf52840xxaa}
+  - include: {path: '${RIOTBOARD}/common/nrf52xxxdk/Makefile.features'}
+  - comment: Various other features (if any)
+    add: {FEATURES_PROVIDED: [arduino_analog]}
+  - add: {FEATURES_PROVIDED: [arduino_i2c, arduino_pins, arduino_shield_isp, arduino_shield_mega, arduino_shield_uno,
+        arduino_spi, arduino_uart, periph_pwm, periph_usbdev, tinyusb_device, vdd_lc_filter_reg0]}

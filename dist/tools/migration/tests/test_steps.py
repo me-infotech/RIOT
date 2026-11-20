@@ -116,6 +116,60 @@ class ValidatorTest(unittest.TestCase):
         del step["requires"]
         self.assert_problem("missing key 'requires'", step)
 
+    def test_group_id_accepted_and_bad_ones_rejected(self):
+        self.assertEqual(self.problems(self.changed(id="g2a-01-info-x")), [])
+        for bad in ("g0-1-config", "g9-01-x", "G0-01-x", "g0-01"):
+            with self.subTest(id=bad):
+                self.assert_problem("id must look like", self.changed(id=bad))
+
+
+class FoundationStepTest(unittest.TestCase):
+    """O1 for group G0: no migrated target, but what it provides."""
+
+    setUp = ValidatorTest.setUp
+    problems = ValidatorTest.problems
+    changed = ValidatorTest.changed
+    assert_problem = ValidatorTest.assert_problem
+
+    FOUNDATION_STEP = {**VALID_STEP, "id": "g0-01-example", "group": "G0", "targets": [],
+                       "provides": [{"name": "gen-x", "now": "just gen-x",
+                                     "hardware": False}]}
+
+    def foundation(self, **changes):
+        step = copy.deepcopy(self.FOUNDATION_STEP)
+        step.update(changes)
+        return step
+
+    def test_valid_foundation_step(self):
+        self.assertEqual(self.problems(self.foundation()), [])
+
+    def test_foundation_step_migrates_no_target(self):
+        self.assert_problem("migrates no target", self.foundation(targets=VALID_STEP["targets"]))
+
+    def test_foundation_step_needs_provides(self):
+        step = self.foundation()
+        del step["provides"]
+        self.assert_problem("needs 'provides'", step)
+
+    def test_provides_only_in_foundation_step(self):
+        self.assert_problem("'provides' only", self.changed(provides=[]))
+
+    def test_empty_targets_outside_foundation(self):
+        self.assert_problem("no targets", self.changed(targets=[]))
+
+    def test_provided_entries_are_checked_like_targets(self):
+        entry = {"name": "gen-x", "now": "just gen-x", "hardware": False, "x": 1}
+        self.assert_problem("unknown key 'x'", self.foundation(provides=[entry]))
+        self.assert_problem("already in step",
+                            self.foundation(provides=[{**VALID_STEP["targets"][0]}]),
+                            VALID_STEP)
+
+    def test_selection_by_provided_name(self):
+        steps = [VALID_STEP, self.foundation()]
+        self.assertEqual([s["id"] for s in rt.select(steps, target="gen-x")],
+                         ["g0-01-example"])
+        self.assertEqual([s["id"] for s in rt.select(steps, group="G0")], ["g0-01-example"])
+
 
 class SelectionTest(unittest.TestCase):
     def setUp(self):
@@ -154,7 +208,7 @@ class EveryJustTargetIsRegisteredTest(unittest.TestCase):
                                 capture_output=True, text=True, check=True)
         recipes = json.loads(result.stdout)["recipes"]
         cls.recipes = {n for n, r in recipes.items() if not r["private"]}
-        cls.registered = {t["now"].split()[1] for s in rt.load() for t in s["targets"]
+        cls.registered = {t["now"].split()[1] for s in rt.load() for t in rt.entries(s)
                           if t["now"].startswith("just ")}
 
     def test_every_recipe_is_registered_with_tests(self):

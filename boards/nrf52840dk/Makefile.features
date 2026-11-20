@@ -1,5 +1,7 @@
-CPU_MODEL = nrf52840xxaa
+# Generated from provides.yaml by dist/tools/config_data/config_data.py.
+# Do not edit: change provides.yaml and run `just generate-config-data`.
 
+CPU_MODEL = nrf52840xxaa
 include $(RIOTBOARD)/common/nrf52xxxdk/Makefile.features
 
 # Various other features (if any)

@@ -1,3 +1,6 @@
+# Generated from deps.yaml by dist/tools/config_data/config_data.py.
+# Do not edit: change deps.yaml and run `just generate-config-data`.
+
 ifeq ($(OS),Linux)
   ifneq (,$(filter periph_gpio,$(USEMODULE)))
     ifeq (,$(filter periph_gpio_mock,$(USEMODULE)))
@@ -62,5 +65,4 @@ USEMODULE += periph
 
 # UART is needed by startup.c
 USEMODULE += periph_uart
-
 USEMODULE += fdcan

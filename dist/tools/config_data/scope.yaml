@@ -1,0 +1,60 @@
+# Scope of migration step G0-1: the dependency and feature files GNU Make
+# reads for these applications and boards. They were determined on the base
+# commit with
+#   make -C <application> BOARD=<board> info-debug-variable-MAKEFILE_LIST
+# (union over all pairs; every file named Makefile*.dep or Makefile*.features)
+# and are converted to YAML. `config_data.py scope --check` repeats this.
+# Later scopes add applications and boards here and convert with the same tool.
+base: 827338cf72616f884bfab485d4097d42030a1ad5
+applications:
+  hello-world: examples/basic/hello-world
+  gnrc_networking: examples/networking/gnrc/networking
+  bindist: examples/advanced/bindist
+boards:
+- nrf52840dk
+- native64
+files:
+- Makefile.dep
+- Makefile.features
+- boards/Makefile.dep
+- boards/Makefile.features
+- boards/common/native/Makefile.dep
+- boards/common/native/Makefile.features
+- boards/common/nrf52/Makefile.dep
+- boards/common/nrf52/Makefile.features
+- boards/common/nrf52xxxdk/Makefile.dep
+- boards/common/nrf52xxxdk/Makefile.features
+- boards/native64/Makefile.dep
+- boards/native64/Makefile.features
+- boards/nrf52840dk/Makefile.dep
+- boards/nrf52840dk/Makefile.features
+- cpu/Makefile.dep
+- cpu/cortexm_common/Makefile.dep
+- cpu/cortexm_common/Makefile.features
+- cpu/native/Makefile.dep
+- cpu/native/Makefile.features
+- cpu/nrf52/Makefile.dep
+- cpu/nrf52/Makefile.features
+- cpu/nrf52/Makefile.nrf802154.dep
+- cpu/nrf52/periph/Makefile.dep
+- cpu/nrf5x_common/Makefile.dep
+- cpu/nrf5x_common/Makefile.features
+- drivers/Makefile.dep
+- drivers/netdev/Makefile.dep
+- drivers/netdev_ieee802154_submac/Makefile.dep
+- drivers/periph_common/Makefile.dep
+- pkg/cmsis/Makefile.dep
+- pkg/mpaland-printf/Makefile.dep
+- sys/Makefile.dep
+- sys/event/Makefile.dep
+- sys/evtimer/Makefile.dep
+- sys/isrpipe/Makefile.dep
+- sys/luid/Makefile.dep
+- sys/net/gnrc/Makefile.dep
+- sys/od/Makefile.dep
+- sys/random/Makefile.dep
+- sys/shell/Makefile.dep
+- sys/test_utils/Makefile.dep
+- sys/trickle/Makefile.dep
+- sys/xtimer/Makefile.dep
+- sys/ztimer/Makefile.dep

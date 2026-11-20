@@ -1,0 +1,382 @@
+# Dependency rules of sys/net/gnrc. This file is the source: Makefile.dep
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - if: {has: {var: USEMODULE, match: [bhp]}}
+    then:
+      - add: {USEMODULE: [bhp_event]}
+  - if: {has: {var: USEMODULE, match: [gcoap]}}
+    then:
+      - add: {USEMODULE: [gnrc_sock_async]}
+  - if: {has: {var: USEMODULE, match: [sock_async]}}
+    then:
+      - add: {USEMODULE: [gnrc_sock_async]}
+  - if: {has: {var: USEMODULE, match: [gnrc_lorawan]}}
+    then:
+      - add: {USEMODULE: [ztimer_msec, random, hashes, iolist, crypto_aes_128]}
+  - if: {has: {var: USEMODULE, match: [gnrc_lorawan_1_1]}}
+    then:
+      - add: {USEMODULE: [gnrc_lorawan]}
+      - add: {FEATURES_REQUIRED: [periph_flashpage]}
+  - if: {has: {var: USEMODULE, match: [netdev_default]}}
+    then:
+      - add: {USEMODULE: [netdev, gnrc_netif]}
+  - if: {has: {var: USEMODULE, match: [gnrc_dhcpv6_%]}}
+    then:
+      - add: {USEMODULE: [gnrc_dhcpv6]}
+  - if: {has: {var: USEMODULE, match: [gnrc_dhcpv6_client]}}
+    then:
+      - add: {USEMODULE: [dhcpv6_client, gnrc_ipv6_nib, gnrc_netif, gnrc_sock_udp]}
+  - if: {has: {var: USEMODULE, match: [gnrc_dhcpv6_client_6lbr]}}
+    then:
+      - add: {USEMODULE: [gnrc_dhcpv6_client_simple_pd]}
+  - if: {has: {var: USEMODULE, match: [gnrc_dhcpv6_client_simple_pd]}}
+    then:
+      - add: {USEMODULE: [gnrc_dhcpv6_client, dhcpv6_client_ia_pd]}
+  - if: {has: {var: USEMODULE, match: [gnrc_uhcpc]}}
+    then:
+      - add: {DEFAULT_MODULE: [auto_init_gnrc_uhcpc]}
+      - add: {USEMODULE: [uhcpc, gnrc_sock_udp, fmt]}
+  - if: {has: {var: USEMODULE, match: [gnrc_%], except: [gnrc_lorawan, gnrc_lorawan_1_1, gnrc_netapi,
+          gnrc_netapi_notify, gnrc_netreg, gnrc_netif%, gnrc_pkt%]}}
+    then:
+      - add: {USEMODULE: [gnrc]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sock_%]}}
+    then:
+      - add: {USEMODULE: [iolist, gnrc_sock]}
+      - if: {has: {var: USEMODULE, match: [sock_aux_timestamp]}}
+        then:
+          - add: {USEMODULE: [gnrc_netif_timestamp]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sock_async]}}
+    then:
+      - add: {USEMODULE: [gnrc_netapi_callbacks]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sock_udp]}}
+    then:
+      - add: {USEMODULE: [gnrc_udp]}
+      - comment: to generate random ports
+        add: {USEMODULE: [random]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sock_tcp]}}
+    then:
+      - add: {USEMODULE: [gnrc_tcp]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sock]}}
+    then:
+      - add: {USEMODULE: [gnrc_netapi_mbox, sock]}
+  - if: {has: {var: USEMODULE, match: [gnrc_netapi_mbox]}}
+    then:
+      - add: {USEMODULE: [core_mbox]}
+  - if: {has: {var: USEMODULE, match: [gnrc_rpl_p2p]}}
+    then:
+      - add: {USEMODULE: [gnrc_rpl]}
+  - if: {has: {var: USEMODULE, match: [gnrc_rpl]}}
+    then:
+      - add: {USEMODULE: [gnrc_ipv6, gnrc_icmpv6, gnrc_ipv6_nib, trickle]}
+      - if: {not: {has: {var: USEMODULE, match: [ztimer_msec]}}}
+        then:
+          - add: {USEMODULE: [xtimer]}
+      - add: {USEMODULE: [evtimer]}
+  - if: {has: {var: USEMODULE, match: [gnrc_ipv6_auto_subnets_eui]}}
+    then:
+      - add: {USEMODULE: [gnrc_ipv6_auto_subnets_simple]}
+  - if: {has: {var: USEMODULE, match: [gnrc_ipv6_auto_subnets_simple]}}
+    then:
+      - add: {USEMODULE: [gnrc_ipv6_auto_subnets]}
+  - if: {has: {var: USEMODULE, match: [gnrc_ipv6_auto_subnets]}}
+    then:
+      - add: {USEMODULE: [gnrc_ipv6_nib_rtr_adv_pio_cb, xtimer]}
+      - if: {not: {has: {var: USEMODULE, match: [gnrc_ipv6_auto_subnets_simple]}}}
+        then:
+          - add: {DEFAULT_MODULE: [gnrc_ipv6_auto_subnets_auto_init]}
+          - add: {USEMODULE: [gnrc_udp]}
+  - if: {has: {var: USEMODULE, match: [gnrc_netif]}}
+    then:
+      - add: {USEMODULE: [netif, l2util, fmt, ztimer_msec]}
+      - if: {has: {var: USEMODULE, match: [netdev_ieee802154_submac]}}
+        then:
+          - add: {USEMODULE: [gnrc_netif_pktq]}
+      - if: {has: {var: USEMODULE, match: [netdev_ieee802154]}}
+        then:
+          - add: {USEMODULE: [gnrc_netif_ieee802154]}
+      - if: {has: {var: USEMODULE, match: [netdev_eth]}}
+        then:
+          - add: {USEMODULE: [gnrc_netif_ethernet]}
+      - if: {has: {var: USEMODULE, match: [gnrc_lorawan]}}
+        then:
+          - add: {USEMODULE: [gnrc_netif_lorawan]}
+  - if: {has: {var: USEMODULE, match: [gnrc_netif_bus]}}
+    then:
+      - add: {USEMODULE: [core_msg_bus]}
+  - if: {has: {var: USEMODULE, match: [netdev_eth, slipdev]}}
+    then:
+      - if: {not: {has: {var: USEMODULE, match: [gnrc_sixloenc]}}}
+        then:
+          - if: {has: {var: USEMODULE, match: [gnrc_ipv6]}}
+            then:
+              - add: {USEMODULE: [gnrc_ipv6_classic]}
+  - if: {has: {var: USEMODULE, match: [ieee802154, nrfmin, esp_now, cc110x, gnrc_sixloenc]}}
+    then:
+      - if: {has: {var: USEMODULE, match: [gnrc_ipv6]}}
+        then:
+          - add: {USEMODULE: [gnrc_sixlowpan]}
+      - if: {has: {var: USEMODULE, match: [gnrc_ipv6_default]}}
+        then:
+          - add: {USEMODULE: [gnrc_sixlowpan_default]}
+      - if: {has: {var: USEMODULE, match: [gnrc_ipv6_router_default]}}
+        then:
+          - add: {USEMODULE: [gnrc_sixlowpan_router_default]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan_default]}}
+    then:
+      - add: {USEMODULE: [gnrc_ipv6_nib_6ln, gnrc_sixlowpan]}
+      - if: {not: {has: {var: USEMODULE, match: [gnrc_sixlowpan_frag_sfr]}}}
+        then:
+          - add: {USEMODULE: [gnrc_sixlowpan_frag]}
+      - add: {USEMODULE: [gnrc_sixlowpan_iphc]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan_router_default]}}
+    then:
+      - add: {USEMODULE: [gnrc_ipv6_nib_6lr]}
+      - if: {not: {has: {var: USEMODULE, match: [gnrc_sixlowpan_frag_sfr]}}}
+        then:
+          - add: {USEMODULE: [gnrc_sixlowpan_frag]}
+      - add: {USEMODULE: [gnrc_sixlowpan_iphc]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan_border_router_default]}}
+    then:
+      - add: {USEMODULE: [gnrc_ipv6_nib_6lbr, gnrc_ipv6_router_default]}
+      - if: {not: {has: {var: USEMODULE, match: [gnrc_sixlowpan_frag_sfr]}}}
+        then:
+          - add: {USEMODULE: [gnrc_sixlowpan_frag]}
+      - add: {USEMODULE: [gnrc_sixlowpan_iphc]}
+  - if: {has: {var: USEMODULE, match: [netdev_new_api]}}
+    then:
+      - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan_frag%]}}
+        then:
+          - add: {USEMODULE: [gnrc_netif_pktq]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan_frag]}}
+    then:
+      - add: {USEMODULE: [gnrc_sixlowpan, gnrc_sixlowpan_frag_fb, gnrc_sixlowpan_frag_rb]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan_frag_fb]}}
+    then:
+      - add: {USEMODULE: [core_msg]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan_frag_minfwd]}}
+    then:
+      - add: {USEMODULE: [gnrc_netif_pktq, gnrc_sixlowpan_frag, gnrc_sixlowpan_frag_hint, gnrc_sixlowpan_frag_vrb]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan_frag_rb]}}
+    then:
+      - add: {USEMODULE: [xtimer]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan_frag_sfr]}}
+    then:
+      - add: {USEMODULE: [gnrc_sixlowpan, gnrc_sixlowpan_frag_fb, gnrc_sixlowpan_frag_vrb, gnrc_sixlowpan_frag_rb,
+            evtimer, xtimer]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan_frag_sfr_congure_%]}}
+    then:
+      - add: {USEMODULE: [gnrc_sixlowpan_frag_sfr_congure]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan_frag_sfr_congure_abe]}}
+    then:
+      - add: {USEMODULE: [gnrc_sixlowpan_frag_sfr_congure_reno, congure_abe]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan_frag_sfr_congure_quic]}}
+    then:
+      - add: {USEMODULE: [congure_quic]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan_frag_sfr_congure_reno]}}
+    then:
+      - add: {USEMODULE: [congure_reno]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan_frag_sfr_congure]}}
+    then:
+      - add: {USEMODULE: [gnrc_sixlowpan_frag_sfr]}
+      - if: {not: {has: {var: USEMODULE, match: [gnrc_sixlowpan_frag_sfr_congure_%, congure_mock]}}}
+        then:
+          - comment: pick Appendix C as default congestion control
+            add: {USEMODULE: [gnrc_sixlowpan_frag_sfr_congure_sfr]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan_frag_sfr_ecn_%]}}
+    then:
+      - add: {USEMODULE: [gnrc_sixlowpan_frag_sfr_ecn]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan_frag_sfr_ecn_if_out]}}
+    then:
+      - add: {USEMODULE: [gnrc_netif_pktq]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan_frag_sfr_ecn]}}
+    then:
+      - add: {USEMODULE: [gnrc_sixlowpan_frag_sfr]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan_frag_sfr_stats]}}
+    then:
+      - add: {USEMODULE: [gnrc_sixlowpan_frag_sfr]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan_frag_vrb]}}
+    then:
+      - add: {USEMODULE: [xtimer, gnrc_sixlowpan_frag_fb]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan_iphc]}}
+    then:
+      - add: {USEMODULE: [gnrc_ipv6, gnrc_sixlowpan, gnrc_sixlowpan_ctx, gnrc_sixlowpan_iphc_nhc]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan]}}
+    then:
+      - add: {DEFAULT_MODULE: [auto_init_gnrc_sixlowpan]}
+      - add: {USEMODULE: [gnrc_nettype_sixlowpan, sixlowpan]}
+      - if: {has: {var: USEMODULE, match: [gnrc_netif]}}
+        then:
+          - add: {USEMODULE: [gnrc_netif_6lo]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan_ctx]}}
+    then:
+      - add: {USEMODULE: [ipv6_addr]}
+      - if: {not: {has: {var: USEMODULE, match: [ztimer_msec]}}}
+        then:
+          - add: {USEMODULE: [xtimer]}
+  - if: {has: {var: USEMODULE, match: [gnrc_ipv6_default]}}
+    then:
+      - add: {USEMODULE: [gnrc_ipv6, gnrc_icmpv6]}
+  - if: {has: {var: USEMODULE, match: [gnrc_ipv6_router_default]}}
+    then:
+      - add: {USEMODULE: [gnrc_ipv6_nib_rio, gnrc_ipv6_router, gnrc_icmpv6]}
+  - if: {has: {var: USEMODULE, match: [gnrc_ndp]}}
+    then:
+      - add: {USEMODULE: [gnrc_icmpv6, gnrc_ipv6_hdr, gnrc_netif]}
+  - if: {has: {var: USEMODULE, match: [gnrc_icmpv6_echo]}}
+    then:
+      - add: {USEMODULE: [gnrc_icmpv6, gnrc_ipv6_hdr, gnrc_netif_hdr]}
+  - if: {has: {var: USEMODULE, match: [gnrc_icmpv6_error]}}
+    then:
+      - add: {USEMODULE: [gnrc_icmpv6, gnrc_ipv6_hdr, gnrc_netif_hdr]}
+  - if: {has: {var: USEMODULE, match: [gnrc_icmpv6]}}
+    then:
+      - add: {USEMODULE: [inet_csum, ipv6_hdr, gnrc_nettype_icmpv6, gnrc_nettype_ipv6, icmpv6]}
+  - if: {has: {var: USEMODULE, match: [gnrc_rpl_srh]}}
+    then:
+      - add: {USEMODULE: [gnrc_ipv6_ext_rh]}
+  - if: {has: {var: USEMODULE, match: [gnrc_ipv6%]}}
+    then:
+      - add: {USEMODULE: [ipv6]}
+  - if: {has: {var: USEMODULE, match: [gnrc_ipv6_ext_frag]}}
+    then:
+      - add: {USEMODULE: [gnrc_ipv6_ext, xtimer]}
+  - if: {has: {var: USEMODULE, match: [gnrc_ipv6_ext_opt]}}
+    then:
+      - add: {USEMODULE: [gnrc_ipv6_ext]}
+  - if: {has: {var: USEMODULE, match: [gnrc_ipv6_ext_rh]}}
+    then:
+      - add: {USEMODULE: [gnrc_ipv6_ext]}
+  - if: {has: {var: USEMODULE, match: [gnrc_ipv6_ext]}}
+    then:
+      - add: {USEMODULE: [gnrc_nettype_ipv6, gnrc_nettype_ipv6_ext]}
+  - if: {has: {var: USEMODULE, match: [gnrc_ipv6_whitelist]}}
+    then:
+      - add: {USEMODULE: [ipv6_addr]}
+  - if: {has: {var: USEMODULE, match: [gnrc_ipv6_blacklist]}}
+    then:
+      - add: {USEMODULE: [ipv6_addr]}
+  - if: {has: {var: USEMODULE, match: [gnrc_ipv6_router]}}
+    then:
+      - add: {USEMODULE: [gnrc_ipv6, gnrc_ipv6_nib_router]}
+  - if: {has: {var: USEMODULE, match: [gnrc_ipv6]}}
+    then:
+      - add: {DEFAULT_MODULE: [auto_init_gnrc_ipv6]}
+      - add: {USEMODULE: [inet_csum, ipv6_addr, gnrc_ipv6_hdr, gnrc_ipv6_nib, gnrc_netif, gnrc_netif_ipv6,
+            gnrc_nettype_ipv6]}
+  - if: {has: {var: USEMODULE, match: [gnrc_ipv6_hdr]}}
+    then:
+      - add: {USEMODULE: [ipv6_hdr, gnrc_pktbuf]}
+  - if: {has: {var: USEMODULE, match: [gnrc_ipv6_nib_6lbr]}}
+    then:
+      - add: {USEMODULE: [gnrc_ipv6_nib_6lr]}
+  - if: {has: {var: USEMODULE, match: [gnrc_ipv6_nib_6lr]}}
+    then:
+      - add: {USEMODULE: [gnrc_ipv6_nib_6ln, gnrc_ipv6_nib_router]}
+  - if: {has: {var: USEMODULE, match: [gnrc_ipv6_nib_6ln]}}
+    then:
+      - add: {USEMODULE: [gnrc_ipv6_nib, gnrc_sixlowpan_nd]}
+  - if: {has: {var: USEMODULE, match: [gnrc_ipv6_nib_dns]}}
+    then:
+      - add: {USEMODULE: [gnrc_ipv6_nib]}
+  - if: {has: {var: USEMODULE, match: [gnrc_ipv6_nib_router]}}
+    then:
+      - add: {USEMODULE: [gnrc_ipv6_nib]}
+  - if: {has: {var: USEMODULE, match: [gnrc_ipv6_nib]}}
+    then:
+      - add: {DEFAULT_MODULE: [auto_init_gnrc_ipv6_nib]}
+      - add: {USEMODULE: [evtimer, gnrc_ndp, gnrc_netif, gnrc_netif_ipv6, ipv6_addr, random]}
+  - if: {has: {var: USEMODULE, match: [gnrc_udp]}}
+    then:
+      - add: {DEFAULT_MODULE: [auto_init_gnrc_udp]}
+      - add: {USEMODULE: [gnrc_nettype_udp, gnrc_nettype_ipv6, inet_csum, udp]}
+  - if: {has: {var: USEMODULE, match: [gnrc_tcp]}}
+    then:
+      - add: {DEFAULT_MODULE: [auto_init_gnrc_tcp]}
+      - add: {USEMODULE: [gnrc_nettype_tcp, inet_csum, random, tcp, evtimer_mbox]}
+  - if: {has: {var: USEMODULE, match: [gnrc_pktdump]}}
+    then:
+      - add: {DEFAULT_MODULE: [auto_init_gnrc_pktdump]}
+      - add: {USEMODULE: [gnrc_pktbuf, od]}
+  - if: {has: {var: USEMODULE, match: [gnrc_pktshark_%]}}
+    then:
+      - add: {USEMODULE: [gnrc_pktshark]}
+  - if: {has: {var: USEMODULE, match: [gnrc_pktshark_all]}}
+    then:
+      - add: {USEMODULE: [gnrc_pktshark_4in6, gnrc_pktshark_coap, gnrc_pktshark_icmpv6]}
+  - if: {has: {var: USEMODULE, match: [gnrc_pktshark_default]}}
+    then:
+      - if: {has: {var: USEMODULE, match: [ipv4_addr]}}
+        then:
+          - add: {USEMODULE: [gnrc_pktshark_4in6]}
+      - if: {has: {var: USEMODULE, match: [nanocoap]}}
+        then:
+          - add: {USEMODULE: [gnrc_pktshark_coap]}
+      - if: {has: {var: USEMODULE, match: [gnrc_icmpv6]}}
+        then:
+          - add: {USEMODULE: [gnrc_pktshark_icmpv6]}
+  - if: {has: {var: USEMODULE, match: [shell_cmds_default]}}
+    then:
+      - add: {USEMODULE: [shell_cmd_gnrc_pktshark]}
+  - if: {has: {var: USEMODULE, match: [auto_init_gnrc_pktshark]}}
+    then:
+      - add: {USEMODULE: [gnrc_pktshark]}
+  - if: {has: {var: USEMODULE, match: [gnrc_pktshark]}}
+    then:
+      - add: {USEMODULE: [fmt, gnrc_pktbuf, od]}
+  - if: {has: {var: USEMODULE, match: [gnrc_pktshark_4in6]}}
+    then:
+      - add: {USEMODULE: [ipv4_addr]}
+  - if: {has: {var: USEMODULE, match: [gnrc_pktshark_coap]}}
+    then:
+      - add: {USEMODULE: [nanocoap, sock_udp]}
+  - if: {has: {var: USEMODULE, match: [gnrc]}}
+    then:
+      - add: {USEMODULE: [gnrc_netapi, gnrc_netreg, gnrc_netif, gnrc_netif_hdr, gnrc_pktbuf]}
+      - if: {has: {var: USEMODULE, match: [gnrc_ipv6]}}
+        then:
+          - if: {has: {var: USEMODULE, match: [nimble_netif]}}
+            then:
+              - add: {USEMODULE: [gnrc_netapi_notify]}
+      - if: {has: {var: USEMODULE, match: [sock_async]}}
+        then:
+          - add: {USEMODULE: [gnrc_sock_async]}
+      - if: {has: {var: USEMODULE, match: [sock_ip]}}
+        then:
+          - add: {USEMODULE: [gnrc_sock_ip]}
+      - if: {has: {var: USEMODULE, match: [sock_udp]}}
+        then:
+          - add: {USEMODULE: [gnrc_sock_udp]}
+      - if: {has: {var: USEMODULE, match: [sock_tcp]}}
+        then:
+          - add: {USEMODULE: [gnrc_sock_tcp]}
+  - if: {has: {var: USEMODULE, match: [gnrc_netapi_notify]}}
+    then:
+      - add: {USEMODULE: [sema_inv]}
+  - if: {has: {var: USEMODULE, match: [gnrc_pktbuf]}}
+    then:
+      - if: {not: {has: {var: USEMODULE, match: [gnrc_pktbuf_%]}}}
+        then:
+          - add: {USEMODULE: [gnrc_pktbuf_static]}
+      - if: {selection_equals: {var: USEMODULE, match: [gnrc_pktbuf_%], words: [shell_cmd_gnrc_pktbuf]}}
+        then:
+          - add: {USEMODULE: [gnrc_pktbuf_static]}
+      - add: {DEFAULT_MODULE: [auto_init_gnrc_pktbuf]}
+      - add: {USEMODULE: [gnrc_pkt]}
+  - if: {has: {var: USEMODULE, match: [gnrc_pktbuf_%]}}
+    then:
+      - comment: make MODULE_GNRC_PKTBUF macro available for all implementations
+        add: {USEMODULE: [gnrc_pktbuf]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_gnrc_pktbuf]}}
+    then:
+      - if: {has: {var: USEMODULE, match: [gnrc_pktbuf_static]}}
+        then:
+          - add: {USEMODULE: [od]}
+  - if: {has: {var: USEMODULE, match: [gnrc_netif_%], except: [gnrc_netif_pktq]}}
+    then:
+      - add: {USEMODULE: [gnrc_netif, core_thread_flags, event]}
+  - if: {has: {var: USEMODULE, match: [gnrc_netif_pktq]}}
+    then:
+      - add: {USEMODULE: [xtimer]}

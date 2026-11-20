@@ -1,0 +1,15 @@
+# Dependency rules of boards/common/nrf52. This file is the source: Makefile.dep
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - if: {has: {var: USEMODULE, match: [saul_default]}}
+    then:
+      - add: {USEMODULE: [saul_nrf_temperature]}
+  - if: {has: {var: USEMODULE, match: [boards_common_adafruit-nrf52-bootloader]}}
+    then:
+      - comment: |-
+          If this only gets included in the 2nd round of dependency resolution
+          we will already have included stdio_uart by default.
+          Include this here to select stdio_cdc_acm early.
+        include: {path: '${RIOTBOARD}/common/adafruit-nrf52-bootloader/Makefile.dep'}

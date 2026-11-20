@@ -1,0 +1,56 @@
+# Dependency rules of cpu/native. This file is the source: Makefile.dep
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - if: {equals: {OS: Linux}}
+    then:
+      - if: {has: {var: USEMODULE, match: [periph_gpio]}}
+        then:
+          - if: {not: {has: {var: USEMODULE, match: [periph_gpio_mock]}}}
+            then:
+              - add: {USEMODULE: [periph_gpio_linux]}
+      - if: {has: {var: USEMODULE, match: [periph_i2c]}}
+        then:
+          - add: {USEMODULE: [periph_i2c_mock]}
+      - if: {has: {var: USEMODULE, match: [periph_spi]}}
+        then:
+          - add: {USEMODULE: [periph_spidev_linux]}
+    else:
+      - if: {has: {var: USEMODULE, match: [periph_gpio]}}
+        then:
+          - add: {USEMODULE: [periph_gpio_mock]}
+      - if: {has: {var: USEMODULE, match: [periph_i2c]}}
+        then:
+          - add: {USEMODULE: [periph_i2c_mock]}
+  - if: {has: {var: USEMODULE, match: [stdio_default]}}
+    then:
+      - add: {USEMODULE: [stdio_native]}
+  - if: {has: {var: USEMODULE, match: [periph_rtc]}}
+    then:
+      - add: {USEMODULE: [ztimer, ztimer_msec]}
+  - if: {has: {var: USEMODULE, match: [eui_provider]}}
+    then:
+      - add: {USEMODULE: [native_cli_eui_provider]}
+  - if: {has: {var: USEMODULE, match: [native_cli_eui_provider]}}
+    then:
+      - add: {USEMODULE: [l2util]}
+  - if: {has: {var: USEMODULE, match: [socket_zep]}}
+    then:
+      - add: {USEMODULE: [iolist, checksum, random, ieee802154]}
+      - if: {has: {var: USEMODULE, match: [netdev]}}
+        then:
+          - add: {USEMODULE: [netdev_ieee802154_submac]}
+      - if: {has: {var: USEMODULE, match: [ieee802154_submac]}}
+        then:
+          - add: {USEMODULE: [ieee802154_submac_soft_ack, ieee802154_submac_soft_frame_retrans]}
+  - if: {has: {var: USEMODULE, match: [netdev_tap]}}
+    then:
+      - add: {USEMODULE: [netdev_new_api]}
+  - if: {has: {var: USEMODULE, match: [libc_gettimeofday]}}
+    then:
+      - add: {USEMODULE: [ztimer64_usec]}
+  - add: {USEMODULE: [periph]}
+  - comment: UART is needed by startup.c
+    add: {USEMODULE: [periph_uart]}
+  - add: {USEMODULE: [fdcan]}

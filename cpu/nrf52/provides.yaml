@@ -1,0 +1,48 @@
+# Provided features and CPU data of cpu/nrf52. This file is the source: Makefile.features
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - if: {has: {var: CPU_MODEL, match: [nrf52832xxaa, nrf52833xxaa, nrf52840xxaa]}}
+    then:
+      - set: {var: CPU_CORE, value: cortex-m4f}
+    else:
+      - set: {var: CPU_CORE, value: cortex-m4}
+  - set: {var: CPU_FAM, value: nrf52}
+  - comment: The 802.15.4 radio is not available on all SoCs
+    if: {has: {var: CPU_MODEL, match: [nrf52811xxaa, nrf52820xxaa, nrf52833xxaa, nrf52840xxaa]}}
+    then:
+      - add: {FEATURES_PROVIDED: [radio_nrf802154]}
+      - comment: the nrf802154 driver is supported by OpenWSN
+        add: {FEATURES_PROVIDED: [netif_openwsn]}
+  - comment: crypto features
+    if: {has: {var: CPU_MODEL, match: [nrf52840xxaa]}}
+    then:
+      - add: {FEATURES_PROVIDED: [periph_hash_sha_1, periph_hash_sha_224, periph_hash_sha_256, periph_hash_sha_512,
+            periph_hmac_sha_256, periph_cipher_aes_128_cbc, periph_cipher_chacha20, periph_aead_aes_128_ccm,
+            periph_ecc_p192r1, periph_ecc_p256r1, periph_ecc_ed25519]}
+  - comment: |-
+      All nRF52 CPUs use UARTE (UART + EasyDMA) for UART, so that can be used
+      in non-blocking mode
+    add: {FEATURES_PROVIDED: [periph_uart_nonblocking]}
+  - comment: The ADC does not depend on any board configuration, so always available
+    add: {FEATURES_PROVIDED: [periph_adc]}
+  - comment: |-
+      So far, NimBLE netif does not support nrf51 platforms, so we use a dedicated
+      feature to mark this
+    add: {FEATURES_PROVIDED: [ble_nimble_netif]}
+  - comment: all nrf52 have an MPU
+    add: {FEATURES_PROVIDED: [cortexm_mpu]}
+  - add: {FEATURES_PROVIDED: [periph_i2c_reconfigure, periph_spi_gpio_mode]}
+  - comment: |-
+      On top of the default 1Mbit PHY mode, all nrf52 support the 2MBit PHY mode,
+      and the 52840 does further support the coded PHYs
+    add: {FEATURES_PROVIDED: [ble_phy_2mbit]}
+  - if: {has: {var: CPU_MODEL, match: [nrf52811%, nrf52820%, nrf52833%, nrf52840%]}}
+    then:
+      - add: {FEATURES_PROVIDED: [ble_phy_coded]}
+  - if: {has: {var: CPU_MODEL, match: [nrf52840%]}}
+    then:
+      - add: {FEATURES_PROVIDED: [periph_cryptocell_310]}
+  - add: {FEATURES_PROVIDED: [ble_adv_ext]}
+  - include: {path: '${RIOTCPU}/nrf5x_common/Makefile.features'}

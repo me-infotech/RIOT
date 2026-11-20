@@ -1,0 +1,15 @@
+# Dependency rules of boards/nrf52840dk. This file is the source: Makefile.dep
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - add: {USEMODULE: [boards_common_nrf52xxxdk]}
+  - if: {has: {var: USEMODULE, match: [mtd]}}
+    then:
+      - add: {USEMODULE: [mtd_spi_nor]}
+  - comment: default to using littlefs2 on the external flash
+    if: {has: {var: USEMODULE, match: [vfs_default]}}
+    then:
+      - add: {USEPKG: [littlefs2]}
+      - add: {USEMODULE: [mtd]}
+  - include: {path: '${RIOTBOARD}/common/nrf52xxxdk/Makefile.dep'}

@@ -1,3 +1,6 @@
+# Generated from deps.yaml by dist/tools/config_data/config_data.py.
+# Do not edit: change deps.yaml and run `just generate-config-data`.
+
 # mpaland's printf does not implement non-standard format specifiers. For
 # AVR MCUs we do need the ability to print from PROGMEM, though. Hence, this
 # is not compatible with AVR MCUs.

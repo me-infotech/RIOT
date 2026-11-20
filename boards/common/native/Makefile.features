@@ -1,3 +1,6 @@
+# Generated from provides.yaml by dist/tools/config_data/config_data.py.
+# Do not edit: change provides.yaml and run `just generate-config-data`.
+
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_rtc
 FEATURES_PROVIDED += periph_rtc_ms

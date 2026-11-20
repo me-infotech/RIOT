@@ -1,3 +1,6 @@
+# Generated from deps.yaml by dist/tools/config_data/config_data.py.
+# Do not edit: change deps.yaml and run `just generate-config-data`.
+
 # cannot be moved to GNRC's Makefile.dep, as module name neither starts or ends with gnrc
 ifneq (,$(filter auto_init_gnrc_netif,$(USEMODULE)))
   USEMODULE += gnrc_netif_init_devs
@@ -6,7 +9,6 @@ endif
 ifneq (,$(filter auto_init_wdt_thread,$(USEMODULE)))
   USEMODULE += periph_wdt_auto_start
   USEMODULE += ztimer_msec
-
   # we can only have either auto_init_wdt_event or auto_init_wdt_thread
   ifneq (,$(filter auto_init_wdt_event,$(USEMODULE)))
     $(error auto_init_wdt_event and auto_init_wdt_thread are mutually exclusive)
@@ -103,7 +105,8 @@ ifneq (,$(filter dhcpv6_client,$(USEMODULE)))
   USEMODULE += event_timeout
   ifneq (,$(filter ztimer,$(USEMODULE)))
     USEMODULE += event_timeout_ztimer
-    USEMODULE += ztimer_msec ztimer_sec
+    USEMODULE += ztimer_msec
+    USEMODULE += ztimer_sec
   endif
   USEMODULE += random
   ifneq (,$(filter sock_dns,$(USEMODULE)))
@@ -168,7 +171,7 @@ ifneq (,$(filter eui_provider,$(USEMODULE)))
 endif
 
 ifneq (,$(filter ieee802154 nrfmin esp_now cc110x,$(USEMODULE)))
-  ifneq (,$(filter lwip%, $(USEMODULE)))
+  ifneq (,$(filter lwip%,$(USEMODULE)))
     USEMODULE += lwip_sixlowpan
   endif
 endif
@@ -318,11 +321,11 @@ ifneq (,$(filter log_%,$(USEMODULE)))
   USEMODULE += log
 endif
 
-ifneq (,$(filter netstats_%, $(USEMODULE)))
+ifneq (,$(filter netstats_%,$(USEMODULE)))
   USEMODULE += netstats
 endif
 
-ifneq (,$(filter netstats_neighbor_%, $(USEMODULE)))
+ifneq (,$(filter netstats_neighbor_%,$(USEMODULE)))
   USEMODULE += netstats_neighbor
   USEMODULE += xtimer
 endif
@@ -642,7 +645,7 @@ ifneq (,$(filter usbus%,$(USEMODULE)))
   include $(RIOTBASE)/sys/usb/usbus/Makefile.dep
 endif
 
-ifneq (,$(filter riotboot_%, $(USEMODULE)))
+ifneq (,$(filter riotboot_%,$(USEMODULE)))
   USEMODULE += riotboot
 endif
 
@@ -650,12 +653,12 @@ ifneq (,$(filter irq_handler,$(USEMODULE)))
   USEMODULE += event
 endif
 
-ifneq (,$(filter sock_dtls, $(USEMODULE)))
-    USEMODULE += credman
-    USEMODULE += sock_udp
+ifneq (,$(filter sock_dtls,$(USEMODULE)))
+  USEMODULE += credman
+  USEMODULE += sock_udp
 endif
 
-ifneq (,$(filter credman_load, $(USEMODULE)))
+ifneq (,$(filter credman_load,$(USEMODULE)))
   USEPKG += tiny-asn1
 endif
 

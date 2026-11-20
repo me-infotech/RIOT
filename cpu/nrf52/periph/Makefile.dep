@@ -1,3 +1,6 @@
+# Generated from deps.yaml by dist/tools/config_data/config_data.py.
+# Do not edit: change deps.yaml and run `just generate-config-data`.
+
 ifneq (,$(filter periph_ecc_p192r1,$(USEMODULE)))
   USEPKG += driver_cryptocell_310
   USEMODULE += psa_cryptocell_310_ecc_p192
