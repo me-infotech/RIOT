@@ -24,6 +24,9 @@ Rules
 - R3 A migrated target is removed from the Makefile (`make <target>` fails).
 - R4 Every caller (CI, docs, generated headers) uses `just`.
 - R5 The CI check of the generated file keeps its behaviour.
+- R6 A recipe may be reachable from every directory only if its result does not
+  depend on the directory (checked per target, see
+  `riot-build-config-thesis/docs/05-migration-concept/reachability/`).
 
 Unit tests
 ----------
@@ -44,6 +47,7 @@ them in the `migration-tests` workflow (step `p3-task-layer-group1` in
 | R2   | `JustfileContractTest`, `MakeCallDetectorTest`               | parsed recipe bodies; detector checked on positive and negative samples |
 | R3   | `MakefileTest`                                               | no rule/`.PHONY` entry; `make -n <target>` reports an unknown target |
 | R4   | `CallerTest`                                                 | `git grep` for `make <target>`; workflow installs just |
+| R6   | `ReachabilityTest`                                           | same `--dry-run` command from four subdirectories; recipes have no `[no-cd]` |
 | R5   | `CiCheckScriptTest`                                          | script copy in a temporary tree with a stub `just`: up to date, stale, failing |
 
 `features_yaml2mx/tests/test_features_yaml2mx.py` tests the generator itself:
