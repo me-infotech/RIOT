@@ -43,3 +43,17 @@ steps:
       pip: [pyyaml]
       tools: [just@1.59.0]
     docs: dist/tools/task_layer/README.md
+
+  - id: p3-task-layer-group1-doc
+    title: HTML API documentation (doc) from the root Makefile to just
+    group: "1"
+    targets:
+      - name: doc
+        now: just doc
+        hardware: false
+    tests:
+      - dist/tools/doccheck/tests
+    requires:
+      pip: [pyyaml]
+      tools: [just@1.59.0]
+    docs: dist/tools/task_layer/README.md

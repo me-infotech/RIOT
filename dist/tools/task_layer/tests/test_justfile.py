@@ -78,9 +78,12 @@ class JustfileContractTest(unittest.TestCase):
     def setUpClass(cls):
         cls.parsed = dump(JUSTFILE)
 
-    def test_public_recipes_are_exactly_the_migrated_targets(self):
-        public = sorted(n for n, r in self.parsed["recipes"].items() if not r["private"])
-        self.assertEqual(public, sorted(MIGRATED))
+    def test_migrated_targets_are_public_recipes(self):
+        # Later steps add recipes (e.g. `doc`, dist/tools/doccheck/tests); that
+        # every public recipe is registered with tests is checked by
+        # dist/tools/migration/tests (O2).
+        public = {n for n, r in self.parsed["recipes"].items() if not r["private"]}
+        self.assertLessEqual(set(MIGRATED), public)
 
     def test_recipes_run_with_posix_sh_like_make(self):
         self.assertEqual(self.parsed["settings"]["shell"],
@@ -149,10 +152,12 @@ class MakefileTest(unittest.TestCase):
                 self.assertNotIn(MIGRATED[target].split()[0], result.stdout)
 
     def test_welcome_text_points_to_just(self):
-        self.assertIn("moved to just (run 'just --list')", self.text)
-        self.assertIn('@echo " generate-features print-versions"', self.text)
-        self.assertNotIn("print-versions\"\n", self.text.replace(
-            '@echo " generate-features print-versions"', ""))
+        before, after = self.text.split("moved to just (run 'just --list')", 1)
+        moved = after.splitlines()[1].split('"')[1].split()
+        for target in MIGRATED:
+            with self.subTest(target=target):
+                self.assertIn(target, moved)
+                self.assertNotIn(target, before)
 
 
 class CallerTest(unittest.TestCase):

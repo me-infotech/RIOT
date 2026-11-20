@@ -13,34 +13,29 @@ export STRIP_FROM_INC_PATH_LIST=$(shell \
 # It can also be installed in ubuntu with the `node-less` package
 LESSC ?= lessc
 
+# The HTML documentation (`doc`) is built by the root justfile (`just doc`).
+# This Makefile keeps `doc-man`, `doc-latex` and `doc-ci`; the steps they share
+# with `just doc` are run with just, so each exists only once.
+JUST ?= just
+JUSTFILE := $(RIOTBASE)/justfile
+
 # Extract the documentation type that is to be generated and export it for
 # the doxygen Makefile
-ifneq (,$(filter doc,$(MAKECMDGOALS)))
-  DOCUMENTATION_FORMAT := html
-else ifneq (,$(filter doc-%,$(MAKECMDGOALS)))
+ifneq (,$(filter doc-%,$(MAKECMDGOALS)))
   DOCUMENTATION_FORMAT := $(patsubst doc-%,%,$(filter doc-%, $(MAKECMDGOALS)))
 endif
 
-# Check that the doxygen version is not too old to avoid
-# certain bugs that were fixed in later revisions. Especially
-# Debian-based distributions tend to have very old versions.
-# When updating the version, make sure to update the SHA512 checksum
-# of the doxygen-x.xx.x.linux.bin.tar.gz archive accordingly to avoid cache
-# misses.
-DOXYGEN_MIN_VERSION = 1.15.0
+# Minimum Doxygen version, defined once as `doxygen_min_version` in the root
+# justfile (`just doc` warns if Doxygen is older). Especially Debian-based
+# distributions tend to have very old versions. When updating the version,
+# make sure to update the SHA512 checksum of the
+# doxygen-x.xx.x.linux.bin.tar.gz archive accordingly to avoid cache misses.
+DOXYGEN_MIN_VERSION := $(shell sed -n 's/^doxygen_min_version := "\(.*\)"$$/\1/p' $(JUSTFILE))
 DOXYGEN_TGZ_SHA512 = 0e99fb9a65f9fada2fe90ea0d1f940b8e58d62801f880614b440b9f3a9f82a5c1a8dd1d0719ee6a46f9612ea7447655d5c8494f63463fe7f1222987bdb1485a9
 
 # Set the Doxygen binary if not already set
 DOXYGEN ?= doxygen
 
-# The tag file is the index of the HTML documentation. It is deployed together
-# with the HTML output and is used by the guides (doc/starlight) to link to the
-# API documentation.
-TAGFILE ?= html/riot.tag
-
-# Strip the commit hash that is sometimes present after the
-# version number.
-DOXYGEN_CUR_VERSION = $(shell $(DOXYGEN) --version | cut -d ' ' -f1)
 
 # for the `doc-ci` target, we can choose which Doxygen version should be built.
 # If nothing has been chosen, select the minimum version.
@@ -59,42 +54,25 @@ include $(RIOTMAKE)/color.inc.mk
 
 .NOTPARALLEL:
 
-.PHONY: doc doc-man doc-latex
-doc doc-man doc-latex: graphviz-check $(DOCUMENTATION_FORMAT) doxygen-version
+.PHONY: doc-man doc-latex
+doc-man doc-latex: graphviz-check $(DOCUMENTATION_FORMAT) doxygen-version
 
 # Check the Doxygen version and print a warning
 .PHONY: doxygen-version
 doxygen-version:
-	@if [ "`{ echo "$(DOXYGEN_MIN_VERSION)"; echo "$(DOXYGEN_CUR_VERSION)"; } | \
-	  sort -V | head -n1`" != "$(DOXYGEN_MIN_VERSION)" ]; then \
-	  $(COLOR_ECHO) "$(COLOR_RED)Warning: Doxygen version $(DOXYGEN_CUR_VERSION) is too old." \
-	  "It is recommended to use at least version $(DOXYGEN_MIN_VERSION)" \
-	  "to avoid incorrectly formatted output.\nYou can use 'make doc-ci' to build" \
-	  "the documentation with the required Doxygen version, which will be downloaded" \
-	  "and (if required) compiled locally.$(COLOR_RESET)"; \
-	fi
+	@"$(JUST)" --justfile "$(JUSTFILE)" DOXYGEN="$(DOXYGEN)" _doc-doxygen-version
 
 # GraphViz is a mandatory dependency to generate the Doxygen documentation for RIOT
 .PHONY: graphviz-check
 graphviz-check:
-	@command -v dot >/dev/null 2>&1 || { \
-	  $(COLOR_ECHO) "$(COLOR_RED)Error: GraphViz (dot) is not installed." \
-	  "GraphViz is mandatory to generate the RIOT documentation.$(COLOR_RESET)"; \
-	  exit 1; \
-	}
+	@"$(JUST)" --justfile "$(JUSTFILE)" _doc-graphviz-check
 
+# Build the HTML documentation (`just doc`) with the Doxygen version required
+# by DOXYGEN_VERSION, downloaded and (if needed) compiled locally.
 .PHONY: doc-ci
 doc-ci: $(RIOTTOOLS)/doxygen/Makefile
 	@PKG_VERSION=$(DOXYGEN_VERSION) PKG_SHA512=$(DOXYGEN_TGZ_SHA512) $(MAKE) -C $(RIOTTOOLS)/doxygen all --no-print-directory
-	@$(MAKE) -BC $(CURDIR) DOXYGEN=$(RIOTTOOLS)/doxygen/doxygen doc
-
-# by marking html as phony we force make to re-run Doxygen even if the directory exists.
-.PHONY: html
-html: src/changelog.md
-	( cat riot.doxyfile ; echo "GENERATE_HTML = yes" ; \
-	  echo "GENERATE_TAGFILE = $(TAGFILE)" ) | $(DOXYGEN) -
-	@echo ""
-	@echo "RIOT documentation successfully generated at file://$(RIOTBASE)/doc/doxygen/html/index.html"
+	@"$(JUST)" --justfile "$(JUSTFILE)" DOXYGEN="$(RIOTTOOLS)/doxygen/doxygen" doc
 
 .PHONY: check
 check: src/changelog.md
@@ -114,7 +92,7 @@ src/css/variables.less: src/config.json
 	  -e 's/",\?$$/;/g' -e 's/\\"/"/g' > $@
 
 src/changelog.md: src/changelog.md.tmp ../../release-notes.txt
-	@./generate-changelog.py $+ $@
+	@"$(JUST)" --justfile "$(JUSTFILE)" _doc-changelog
 
 .PHONY:
 latex: src/changelog.md

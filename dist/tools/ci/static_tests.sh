@@ -18,7 +18,7 @@
 declare -A DEPS
 
 DEPS["./dist/tools/licenses/check.sh"]="head"
-DEPS["./dist/tools/doccheck/check.sh"]="doxygen tput"
+DEPS["./dist/tools/doccheck/check.sh"]="doxygen just tput"
 DEPS["./dist/tools/cppcheck/check.sh"]="cppcheck"
 DEPS["./dist/tools/vera++/check.sh"]="vera++"
 DEPS["./dist/tools/coccinelle/check.sh"]="spatch"

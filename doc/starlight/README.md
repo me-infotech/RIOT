@@ -12,7 +12,7 @@ The build uses a Doxygen tag file to link the board and CPU pages to the
 It takes the first of these:
 
 1. The path or URL in `RIOT_DOXYGEN_TAGFILE`.
-2. `doc/doxygen/html/riot.tag` from a local `make doc`.
+2. `doc/doxygen/html/riot.tag` from a local `just doc`.
 3. A download of `https://api.riot-os.org/riot.tag`.
 
 Case 3 needs network access, and the links follow the published API
