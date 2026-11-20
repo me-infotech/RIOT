@@ -158,9 +158,19 @@ class MakefileTest(unittest.TestCase):
 class CallerTest(unittest.TestCase):
     """R4: no caller still runs the removed Make targets."""
 
+    # These files name the old Make commands on purpose: the README documents
+    # the migration ("before"), the tests assert their absence elsewhere.
+    DOCUMENTS_THE_MIGRATION = (
+        "dist/tools/task_layer",
+        "dist/tools/features_yaml2mx/tests",
+    )
+
     def test_no_reference_to_removed_make_targets(self):
-        result = run(["git", "grep", "-n", "-E",
-                      r"make +(print-versions|generate-features)\b"], cwd=RIOTBASE)
+        # --untracked: a local run sees the same files as CI after the commit.
+        excludes = [f":(exclude){path}" for path in self.DOCUMENTS_THE_MIGRATION]
+        result = run(["git", "grep", "--untracked", "-n", "-E",
+                      r"make +(print-versions|generate-features)\b", "--", "."]
+                     + excludes, cwd=RIOTBASE)
         if result.returncode == 128:
             self.skipTest("not a git checkout: " + result.stderr.strip())
         self.assertEqual(result.stdout, "", "still calls make for a moved target")
