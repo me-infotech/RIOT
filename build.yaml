@@ -1,0 +1,136 @@
+# Build data of Makefile.include (step G3-1): what the build of an
+# application reads from the build system's main Make file, in Make's order
+# (Makefile.include:209-1047). Read only by the build without Make
+# (dist/tools/cmake_gen); Make keeps reading Makefile.include, which also
+# holds the parts not migrated yet (flashing, terminal, debugging, Docker,
+# Kconfig). The resolution (modules, packages, features) is done before by
+# the resolver of step G0-2.
+# Format: dist/tools/config_data/README.md (schema 3).
+schema: 3
+rules:
+  - comment: Makefile.include:210
+    set: {var: RIOTBUILD_CONFIG_HEADER_C, value: '${BINDIR}/riotbuild/riotbuild.h'}
+  - comment: Makefile.include:226-227 (QUIET is set by the application)
+    set: {var: QUIET, value: '1', flavor: conditional}
+  - set: {var: VERBOSE_ASSERT, value: '0', flavor: conditional}
+  - if: {equals: {VERBOSE_ASSERT: '1'}}
+    then:
+      - add: {CFLAGS: [-DDEBUG_ASSERT_VERBOSE]}
+      - set: {var: DEVELHELP, value: '1', flavor: simple}
+  - set: {var: DEVELHELP, value: '0', flavor: conditional}
+  - if: {equals: {DEVELHELP: '1'}}
+    then:
+      - add: {CFLAGS: [-DDEVELHELP]}
+  - set: {var: THREAD_NAMES, value: '0', flavor: conditional}
+  - if: {equals: {THREAD_NAMES: '1'}}
+    then:
+      - add: {CFLAGS: [-DCONFIG_THREAD_NAMES]}
+  - comment: 'Makefile.include:252-258 (`ifdef LOG_LEVEL`: a non-empty LOG_LEVEL)'
+    if: {nonempty: [LOG_LEVEL]}
+    then:
+      - if: {not: {has: {var: CFLAGS, match: [-DLOG_LEVEL=%]}}}
+        then:
+          - add: {CFLAGS: ['-DLOG_LEVEL=${LOG_LEVEL}']}
+  - set: {var: WERROR, value: '1', flavor: conditional}
+  - if: {equals: {WERROR: '1'}}
+    then:
+      - add: {CFLAGS: [-Werror]}
+  - set: {var: WPEDANTIC, value: '0', flavor: conditional}
+  - if: {equals: {WPEDANTIC: '1'}}
+    then:
+      - add: {CFLAGS: [-Wpedantic]}
+  - comment: Makefile.include:296-297
+    set: {var: LAZYSPONGE, value: '${RIOTTOOLS}/lazysponge/lazysponge.py', flavor: conditional}
+  - if: {equals: {QUIET: '1'}}
+    then:
+      - set: {var: LAZYSPONGE_FLAGS, value: '', flavor: conditional}
+    else:
+      - set: {var: LAZYSPONGE_FLAGS, value: --verbose, flavor: conditional}
+  - comment: 'Makefile.include:307: `$(if $(TARGET_ARCH),$(TARGET_ARCH)-)`'
+    set: {var: PREFIX, value: {select: {var: TARGET_ARCH, pattern: {from: '%', to: '%-'}}}, flavor: conditional}
+  - comment: Makefile.include:325-330
+    add: {INCLUDES: ['-I${APPDIR}']}
+  - set: {var: BUILD_APP_INCLUDE_DIR, value: {files: {match: ['${APPDIR}/include']}}}
+  - add: {INCLUDES: [{select: {var: BUILD_APP_INCLUDE_DIR, pattern: {from: '%', to: '-I%'}}}]}
+  - add: {INCLUDES: ['-I${RIOTBASE}/core/lib/include', '-I${RIOTBASE}/core/include', '-I${RIOTBASE}/drivers/include', '-I${RIOTBASE}/sys/include']}
+  - comment: Makefile.include:366-374 (board and CPU)
+    set: {var: BUILD_BOARD_INCLUDE_DIR, value: {files: {match: ['${BOARDDIR}/include']}}}
+  - add: {INCLUDES: [{select: {var: BUILD_BOARD_INCLUDE_DIR, pattern: {from: '%', to: '-I%'}}}]}
+  - add: {INCLUDES: ['-I${RIOTCPU}/${CPU}/include']}
+  - include: {path: '${BOARDDIR}/Makefile.include'}
+  - include: {path: '${RIOTBASE}/boards/Makefile.include'}
+  - include: {path: '${RIOTCPU}/Makefile.include'}
+  - include: {path: '${RIOTCPU}/${CPU}/Makefile.include'}
+  - comment: Makefile.include:405-409 (toolchain)
+    set: {var: TOOLCHAINS_SUPPORTED, value: gnu, flavor: conditional}
+  - include: {path: '${RIOTMAKE}/toolchain/${TOOLCHAIN}.inc.mk'}
+  - comment: Makefile.include:413-418
+    if: {not: {has: {var: BOARD, match: [native, native32, native64]}}}
+    then:
+      - set: {var: LINKER_SUPPORTS_NOWARNRWX, value: '${PROBE_LINK_NOWARNRWX}', flavor: conditional}
+      - if: {equals: {LINKER_SUPPORTS_NOWARNRWX: '1'}}
+        then:
+          - add: {LINKFLAGS: ['-Wl,--no-warn-rwx-segments']}
+  - add: {LINKFLAGS: ['-L${RIOTBASE}/core/ldscripts']}
+  - comment: Makefile.include:438-445 (CI builds)
+    if: {equals: {RIOT_CI_BUILD: '1'}}
+    then:
+      - set: {var: RIOT_VERSION, value: buildtest, flavor: conditional}
+  - comment: Makefile.include:469-474
+    set: {var: BOARDDEF, value: {select: {var: BOARD, macro: true}}}
+  - set: {var: CPUDEF, value: {select: {var: CPU, macro: true}}}
+  - add: {CFLAGS: ['-DRIOT_APPLICATION=\"${APPLICATION}\"']}
+  - add: {CFLAGS: ['-DBOARD_${BOARDDEF}=\"${BOARD}\"', '-DRIOT_BOARD=BOARD_${BOARDDEF}']}
+  - add: {CFLAGS: ['-DCPU_${CPUDEF}=\"${CPU}\"', '-DRIOT_CPU=CPU_${CPUDEF}']}
+  - include: {path: '${RIOTMAKE}/cflags.inc.mk'}
+  - comment: Makefile.include:480-481 (release files; not converted, outside the data if present)
+    include: {path: '${RIOTBASE}/VERSION', optional: true}
+  - include: {path: '${RIOTBASE}/EXTRAVERSION', optional: true}
+  - include: {path: '${RIOTMAKE}/git_version.inc.mk'}
+  - set: {var: RIOT_VERSION, value: '${RIOT_VERSION_GIT}', flavor: conditional}
+  - set: {var: RIOT_DUMMY_VERSION, value: 2042.5.23, flavor: conditional}
+  - set: {var: RIOT_EXTRAVERSION, value: '0', flavor: conditional}
+  - comment: |-
+      Makefile.include:490-492; BUILD_RIOT_VERSION_TUPLE is `version_tuple`
+      of RIOT_VERSION, else of RIOT_DUMMY_VERSION (build algorithm)
+    set: {var: RIOT_VERSION_CODE, value: 'RIOT_VERSION_NUM\(${BUILD_RIOT_VERSION_TUPLE},${RIOT_EXTRAVERSION}\)', flavor: conditional}
+  - comment: Makefile.include:504-528 (include paths of modules and packages)
+    set: {var: USEMODULE_INCLUDES, value: ''}
+  - include: {path: '${RIOTBASE}/sys/Makefile.include'}
+  - include: {for_each: USEMODULE, path: '${RIOTBASE}/drivers/%/Makefile.include', optional: true}
+  - include: {for_each: PKG_PATHS, path: '%Makefile.include', optional: true}
+  - include: {for_each: EXTERNAL_MODULE_PATHS, path: '%Makefile.include', optional: true}
+  - add: {INCLUDES: [{select: {var: USEMODULE_INCLUDES, unique: true, pattern: {from: '%', to: '-I%'}}}]}
+  - include: {path: '${RIOTMAKE}/bindist.inc.mk'}
+  - comment: Makefile.include:566-571 (files of the build)
+    set: {var: ELFFILE, value: '${BINDIR}/${APPLICATION}.elf', flavor: conditional}
+  - set: {var: HEXFILE, value: {select: {var: ELFFILE, pattern: {from: '%.elf', to: '%.hex'}}}, flavor: conditional}
+  - set: {var: BINFILE, value: {select: {var: ELFFILE, pattern: {from: '%.elf', to: '%.bin'}}}, flavor: conditional}
+  - set: {var: HASHFILE, value: '${BINFILE}', flavor: conditional}
+  - set: {var: MAPFILE, value: {select: {var: ELFFILE, pattern: {from: '%.elf', to: '%.map'}}}, flavor: conditional}
+  - comment: |-
+      The programmer's Make file (makefiles/tools/openocd.inc.mk,
+      jlink.inc.mk) sets FLASHFILE ?= $(ELFFILE) for the boards in scope;
+      flashing is migrated in step G3-2.
+    set: {var: FLASHFILE, value: '${ELFFILE}', flavor: conditional}
+  - comment: Makefile.include:606
+    add: {BUILD_FILES: ['${ELFFILE}', '${BINFILE}', '${FLASHFILE}', '${HASHFILE}']}
+  - if: {has: {var: USEMODULE, match: [cpp]}}
+    then:
+      - set: {var: CPPMIX, value: '1', flavor: conditional}
+  - set: {var: LINKFLAGPREFIX, value: '-Wl,', flavor: conditional}
+  - add: {DIRS: ['${EXTERNAL_MODULE_PATHS}']}
+  - comment: |-
+      Makefile.include:1036-1047 (riotbuild.h); BUILD_EXTDEFINES are the
+      MODULE_* defines of makefiles/modules.inc.mk (build algorithm)
+    add: {CFLAGS_WITH_MACROS: ['${CFLAGS}']}
+  - add: {CFLAGS_WITH_MACROS: ['-DRIOT_VERSION=\"${RIOT_VERSION}\"']}
+  - add: {CFLAGS_WITH_MACROS: ['-DRIOT_VERSION_CODE=${RIOT_VERSION_CODE}']}
+  - add: {CFLAGS_WITH_MACROS: [-DRIOT_OS=1]}
+  - if: {nonempty: [RIOT_VERSION_EXTRA]}
+    then:
+      - add: {CFLAGS_WITH_MACROS: ['-DCONFIG_RIOT_VERSION_EXTRA=\""${RIOT_VERSION_EXTRA}"\"']}
+  - add: {CFLAGS_WITH_MACROS: ['${BUILD_EXTDEFINES}']}
+  - add: {CFLAGS: ['-include', '''${RIOTBUILD_CONFIG_HEADER_C}''']}
+  - comment: makefiles/vars.inc.mk and the `export` lines of Makefile.include
+    include: {path: '${RIOTMAKE}/vars.inc.mk'}

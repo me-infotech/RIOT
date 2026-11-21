@@ -1,0 +1,6 @@
+# Build description of the module(s) in sys/stdio_uart. This file is the source: Makefile
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - include: {path: '${RIOTBASE}/Makefile.base'}

@@ -1,0 +1,6 @@
+# Build data of sys/net/gnrc/pktbuf_static/Makefile.include (step G3-1).
+# Format: dist/tools/config_data/README.md (schema 3).
+schema: 3
+rules:
+  - set: {var: USEMODULE_INCLUDES_gnrc_pktbuf_static, value: '${LAST_MAKEFILEDIR}/include', flavor: simple}
+  - add: {USEMODULE_INCLUDES: ['${USEMODULE_INCLUDES_gnrc_pktbuf_static}']}

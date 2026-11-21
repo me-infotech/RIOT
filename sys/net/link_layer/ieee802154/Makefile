@@ -1,15 +1,15 @@
-MODULE = ieee802154
+# Generated from module.yaml by dist/tools/config_data/config_data.py.
+# Do not edit: change module.yaml and run `just generate-config-data`.
 
-SRC = \
-    ieee802154.c \
-    #
+MODULE = ieee802154
+SRC = ieee802154.c
 
 ifneq (,$(filter ieee802154_security,$(USEMODULE)))
-	SRC += security.c
+  SRC += security.c
 endif
 
 ifneq (,$(filter ieee802154_submac,$(USEMODULE)))
-	SRC += submac.c
+  SRC += submac.c
 endif
 
 include $(RIOTBASE)/Makefile.base

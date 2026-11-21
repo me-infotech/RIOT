@@ -32,6 +32,12 @@ Schema 2 (rules of the build system pipeline, step G0-2):
   include $(RIOTMAKE)/utils/strings.mk as the first statement of a file
        that uses `several` (the generator writes it again)
 
+Schema 3 (module Makefiles, step G3-1):
+
+  V = $(wildcard G…)   V = $(filter-out E…,$(wildcard G…))      files value
+  V += $(dir $(wildcard $(addsuffix /F,SEL)))                  subdirs value
+  $(patsubst F,T,SEL) around a selection                       select pattern
+
 Text may refer to variables as $(V) or ${V}; it is stored as ${V}.
 """
 
@@ -144,11 +150,55 @@ def selection(text: str):
     return None
 
 
+def _files(text: str):
+    """{files: …} of `$(wildcard G…)` or `$(filter-out E…,$(wildcard G…))`."""
+    call = _call(text)
+    if call and call[0] == "wildcard" and len(call[1]) == 1:
+        return {"files": {"match": [template(w) for w in call[1][0].split()]}}
+    if call and call[0] == "filter-out" and len(call[1]) == 2:
+        inner = _call(call[1][1])
+        if inner and inner[0] == "wildcard" and len(inner[1]) == 1:
+            return {"files": {"match": [template(w) for w in inner[1][0].split()],
+                              "except": _patterns(call[1][0])}}
+    return None
+
+
+def _subdirs(text: str):
+    """{subdirs: …} of `$(dir $(wildcard $(addsuffix /F,SEL)))`."""
+    call = _call(text)
+    if not (call and call[0] == "dir" and len(call[1]) == 1):
+        return None
+    wild = _call(call[1][0])
+    if not (wild and wild[0] == "wildcard" and len(wild[1]) == 1):
+        return None
+    suffix = _call(wild[1][0])
+    if not (suffix and suffix[0] == "addsuffix" and len(suffix[1]) == 2
+            and suffix[1][0].startswith("/") and "/" not in suffix[1][0][1:]):
+        raise Unsupported(f"$(dir $(wildcard …)) other than of $(addsuffix /FILE,…): {text!r}")
+    sel = selection(suffix[1][1])
+    if sel is None:
+        raise Unsupported(f"$(addsuffix …) of other than a selection in {text!r}")
+    return {"subdirs": {"select": sel, "file": suffix[1][0][1:]}}
+
+
 def select_value(text: str):
     """`{select: …}` of a value that is exactly a selection, optionally inside
-    `$(subst from,to,…)`; None otherwise (schema 2)."""
+    `$(subst from,to,…)`; None otherwise (schema 2). Schema 3: `files`,
+    `subdirs` and `$(patsubst F,T,…)` of a selection."""
     text = text.strip()
     call = _call(text) if text.startswith("$(") else None
+    if call:
+        for kind in (_files, _subdirs):
+            value = kind(text)
+            if value is not None:
+                return value
+    if call and call[0] == "patsubst" and len(call[1]) == 3:
+        sel = selection(call[1][2])
+        inner = {"select": sel} if sel is not None else select_value(call[1][2])
+        if inner is None or "select" not in inner or "pattern" in inner["select"]:
+            raise Unsupported(f"$(patsubst …) of other than a selection in {text!r}")
+        return {"select": {**inner["select"],
+                           "pattern": {"from": template(call[1][0]), "to": template(call[1][1])}}}
     if call and call[0] == "subst":
         if len(call[1]) != 3 or any(re.search(r"[\s$(),#%]", a) for a in call[1][:2]) \
                 or not call[1][0]:

@@ -1,0 +1,248 @@
+# Build description of the module(s) in sys. This file is the source: Makefile
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 3
+rules:
+  - comment: SORT THIS ALPHABETICALLY BY MODULE NAME!
+    if: {has: {var: USEMODULE, match: [asymcute]}}
+    then:
+      - add: {DIRS: [net/application_layer/asymcute]}
+  - if: {has: {var: USEMODULE, match: [benchmark_udp]}}
+    then:
+      - add: {DIRS: [test_utils/benchmark_udp]}
+  - if: {has: {var: USEMODULE, match: [bhp]}}
+    then:
+      - add: {DIRS: [bhp]}
+  - if: {has: {var: USEMODULE, match: [bluetil_%]}}
+    then:
+      - add: {DIRS: [net/ble/bluetil]}
+  - if: {has: {var: USEMODULE, match: [cipher_modes]}}
+    then:
+      - add: {DIRS: [crypto/modes]}
+  - if: {has: {var: USEMODULE, match: [telnet]}}
+    then:
+      - add: {DIRS: [net/application_layer/telnet]}
+  - if: {has: {var: USEMODULE, match: [constfs]}}
+    then:
+      - add: {DIRS: [fs/constfs]}
+  - if: {has: {var: USEMODULE, match: [cord_common]}}
+    then:
+      - add: {DIRS: [net/application_layer/cord/common]}
+  - if: {has: {var: USEMODULE, match: [cord_ep]}}
+    then:
+      - add: {DIRS: [net/application_layer/cord/ep]}
+  - if: {has: {var: USEMODULE, match: [cord_epsim]}}
+    then:
+      - add: {DIRS: [net/application_layer/cord/epsim]}
+  - if: {has: {var: USEMODULE, match: [cord_lc]}}
+    then:
+      - add: {DIRS: [net/application_layer/cord/lc]}
+  - if: {has: {var: USEMODULE, match: [cpp11-compat]}}
+    then:
+      - add: {DIRS: [cpp11-compat]}
+  - if: {has: {var: USEMODULE, match: [credman]}}
+    then:
+      - add: {DIRS: [net/credman]}
+  - if: {has: {var: USEMODULE, match: [csma_sender]}}
+    then:
+      - add: {DIRS: [net/link_layer/csma_sender]}
+  - if: {has: {var: USEMODULE, match: [devfs]}}
+    then:
+      - add: {DIRS: [fs/devfs]}
+  - if: {has: {var: USEMODULE, match: [dhcpv6]}}
+    then:
+      - add: {DIRS: [net/application_layer/dhcpv6]}
+  - if: {has: {var: USEMODULE, match: [dns]}}
+    then:
+      - add: {DIRS: [net/application_layer/dns]}
+  - if: {has: {var: USEMODULE, match: [dsm]}}
+    then:
+      - add: {DIRS: [net/dsm]}
+  - if: {has: {var: USEMODULE, match: [dummy_thread]}}
+    then:
+      - add: {DIRS: [test_utils/dummy_thread]}
+  - if: {has: {var: USEMODULE, match: [eepreg]}}
+    then:
+      - add: {DIRS: [eepreg]}
+  - if: {has: {var: USEMODULE, match: [emcute]}}
+    then:
+      - add: {DIRS: [net/application_layer/emcute]}
+  - if: {has: {var: USEMODULE, match: [eui_provider]}}
+    then:
+      - add: {DIRS: [net/link_layer/eui_provider]}
+  - if: {has: {var: USEMODULE, match: [fib]}}
+    then:
+      - add: {DIRS: [net/network_layer/fib]}
+  - if: {has: {var: USEMODULE, match: [gcoap]}}
+    then:
+      - add: {DIRS: [net/application_layer/gcoap]}
+  - if: {has: {var: USEMODULE, match: [gnrc, gnrc_%]}}
+    then:
+      - add: {DIRS: [net/gnrc]}
+  - if: {has: {var: USEMODULE, match: [gnrc_uhcpc]}}
+    then:
+      - add: {DIRS: [net/gnrc/application_layer/uhcpc]}
+  - if: {has: {var: USEMODULE, match: [hosts]}}
+    then:
+      - add: {DIRS: [net/application_layer/hosts]}
+  - if: {has: {var: USEMODULE, match: [icmpv6]}}
+    then:
+      - add: {DIRS: [net/network_layer/icmpv6]}
+  - if: {has: {var: USEMODULE, match: [ieee802154]}}
+    then:
+      - add: {DIRS: [net/link_layer/ieee802154]}
+  - if: {has: {var: USEMODULE, match: [inet_csum]}}
+    then:
+      - add: {DIRS: [net/crosslayer/inet_csum]}
+  - if: {has: {var: USEMODULE, match: [ipv4_addr]}}
+    then:
+      - add: {DIRS: [net/network_layer/ipv4/addr]}
+  - if: {has: {var: USEMODULE, match: [ipv6_addr]}}
+    then:
+      - add: {DIRS: [net/network_layer/ipv6/addr]}
+  - if: {has: {var: USEMODULE, match: [ipv6_hdr]}}
+    then:
+      - add: {DIRS: [net/network_layer/ipv6/hdr]}
+  - if: {has: {var: USEMODULE, match: [isrpipe_read_timeout]}}
+    then:
+      - add: {DIRS: [isrpipe/read_timeout]}
+  - if: {has: {var: USEMODULE, match: [l2filter]}}
+    then:
+      - add: {DIRS: [net/link_layer/l2filter]}
+  - if: {has: {var: USEMODULE, match: [l2scan_list]}}
+    then:
+      - add: {DIRS: [net/link_layer/l2scan_list]}
+  - if: {has: {var: USEMODULE, match: [l2util]}}
+    then:
+      - add: {DIRS: [net/link_layer/l2util]}
+  - if: {has: {var: USEMODULE, match: [nanocoap]}}
+    then:
+      - add: {DIRS: [net/application_layer/nanocoap]}
+  - if: {has: {var: USEMODULE, match: [net_help]}}
+    then:
+      - add: {DIRS: [net/crosslayer/net_help]}
+  - if: {has: {var: USEMODULE, match: [netdev_test]}}
+    then:
+      - add: {DIRS: [net/netdev_test]}
+  - if: {has: {var: USEMODULE, match: [netif]}}
+    then:
+      - add: {DIRS: [net/netif]}
+  - if: {has: {var: USEMODULE, match: [netopt]}}
+    then:
+      - add: {DIRS: [net/crosslayer/netopt]}
+  - if: {has: {var: USEMODULE, match: [netstats_neighbor]}}
+    then:
+      - add: {DIRS: [net/netstats]}
+  - if: {has: {var: USEMODULE, match: [netutils]}}
+    then:
+      - add: {DIRS: [net/netutils]}
+  - if: {has: {var: USEMODULE, match: [sema]}}
+    then:
+      - add: {DIRS: [sema]}
+  - if: {has: {var: USEMODULE, match: [sema_inv]}}
+    then:
+      - add: {DIRS: [sema_inv]}
+  - if: {has: {var: USEMODULE, match: [sixlowpan]}}
+    then:
+      - add: {DIRS: [net/network_layer/sixlowpan]}
+  - if: {has: {var: USEMODULE, match: [sntp]}}
+    then:
+      - add: {DIRS: [net/application_layer/sntp]}
+  - if: {has: {var: USEMODULE, match: [sock_async_event]}}
+    then:
+      - add: {DIRS: [net/sock/async/event]}
+  - if: {has: {var: USEMODULE, match: [sock_dns]}}
+    then:
+      - add: {DIRS: [net/application_layer/sock_dns]}
+  - if: {has: {var: USEMODULE, match: [sock_dns_mock]}}
+    then:
+      - add: {DIRS: [net/application_layer/sock_dns_mock]}
+  - if: {has: {var: USEMODULE, match: [sock_dodtls]}}
+    then:
+      - add: {DIRS: [net/application_layer/sock_dodtls]}
+  - if: {has: {var: USEMODULE, match: [sock_util]}}
+    then:
+      - add: {DIRS: [net/sock]}
+  - if: {has: {var: USEMODULE, match: [oneway_malloc]}}
+    then:
+      - add: {DIRS: [oneway-malloc]}
+  - if: {has: {var: USEMODULE, match: [posix_inet]}}
+    then:
+      - add: {DIRS: [posix/inet]}
+  - if: {has: {var: USEMODULE, match: [posix_select]}}
+    then:
+      - add: {DIRS: [posix/select]}
+  - if: {has: {var: USEMODULE, match: [posix_semaphore]}}
+    then:
+      - add: {DIRS: [posix/semaphore]}
+  - if: {has: {var: USEMODULE, match: [posix_sockets]}}
+    then:
+      - add: {DIRS: [posix/sockets]}
+  - if: {has: {var: USEMODULE, match: [posix_sleep]}}
+    then:
+      - add: {DIRS: [posix/sleep]}
+  - if: {has: {var: USEMODULE, match: [psa_crypto]}}
+    then:
+      - add: {DIRS: [psa_crypto]}
+  - if: {has: {var: USEMODULE, match: [pthread]}}
+    then:
+      - add: {DIRS: [posix/pthread]}
+  - if: {has: {var: USEMODULE, match: [preprocessor_%]}}
+    then:
+      - add: {DIRS: [preprocessor]}
+  - if: {has: {var: USEMODULE, match: [routing]}}
+    then:
+      - add: {DIRS: [net/routing]}
+  - if: {has: {var: USEMODULE, match: [skald]}}
+    then:
+      - add: {DIRS: [net/ble/skald]}
+  - if: {has: {var: USEMODULE, match: [shell_cmds]}}
+    then:
+      - add: {DIRS: [shell/cmds]}
+  - if: {has: {var: USEMODULE, match: [suit%]}}
+    then:
+      - add: {DIRS: [suit]}
+  - if: {has: {var: USEMODULE, match: [sys_bus]}}
+    then:
+      - add: {DIRS: [bus]}
+  - if: {has: {var: USEMODULE, match: [tcp]}}
+    then:
+      - add: {DIRS: [net/transport_layer/tcp]}
+  - if: {has: {var: USEMODULE, match: [test_utils_interactive_sync]}}
+    then:
+      - add: {DIRS: [test_utils/interactive_sync]}
+  - if: {has: {var: USEMODULE, match: [test_utils_netdev_eth_minimal]}}
+    then:
+      - add: {DIRS: [test_utils/netdev_eth_minimal]}
+  - if: {has: {var: USEMODULE, match: [test_utils_netdev_ieee802154_minimal]}}
+    then:
+      - add: {DIRS: [test_utils/netdev_ieee802154_minimal]}
+  - if: {has: {var: USEMODULE, match: [test_utils_print_stack_usage]}}
+    then:
+      - add: {DIRS: [test_utils/print_stack_usage]}
+  - if: {has: {var: USEMODULE, match: [test_utils_result_output]}}
+    then:
+      - add: {DIRS: [test_utils/result_output]}
+  - if: {has: {var: USEMODULE, match: [tiny_strerror]}}
+    then:
+      - add: {DIRS: [tiny_strerror]}
+  - if: {has: {var: USEMODULE, match: [udp]}}
+    then:
+      - add: {DIRS: [net/transport_layer/udp]}
+  - if: {has: {var: USEMODULE, match: [uhcpc]}}
+    then:
+      - add: {DIRS: [net/application_layer/uhcp]}
+  - if: {has: {var: USEMODULE, match: [unicoap]}}
+    then:
+      - add: {DIRS: [net/application_layer/unicoap]}
+  - if: {has: {var: USEMODULE, match: [usbus, usbus_%]}}
+    then:
+      - add: {DIRS: [usb/usbus]}
+  - if: {has: {var: USEMODULE, match: [ztimer_core]}}
+    then:
+      - add: {DIRS: [ztimer]}
+  - if: {has: {var: USEMODULE, match: [ztimer_xtimer_compat]}}
+    then:
+      - add: {FILTER: [xtimer]}
+  - add: {DIRS: [{subdirs: {select: {var: USEMODULE, except: ['${FILTER}']}, file: Makefile}}]}
+  - include: {path: '${RIOTBASE}/Makefile.base'}

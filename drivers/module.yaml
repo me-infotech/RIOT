@@ -1,0 +1,10 @@
+# Build description of the module(s) in drivers. This file is the source: Makefile
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 3
+rules:
+  - add: {DIRS: [{subdirs: {select: {var: USEMODULE}, file: Makefile}}]}
+  - if: {has: {var: USEMODULE, match: [saul_init_devs]}}
+    then:
+      - add: {DIRS: [saul/init_devs]}
+  - include: {path: '${RIOTBASE}/Makefile.base'}

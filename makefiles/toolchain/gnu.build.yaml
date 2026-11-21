@@ -1,0 +1,39 @@
+# Build data of makefiles/toolchain/gnu.inc.mk (step G3-1). The shell probes
+# of the Make file are toolchain probes of the build algorithm
+# (dist/tools/cmake_gen/toolchain.py), read here as PROBE_* variables; they
+# run the same commands as Make.
+# Format: dist/tools/config_data/README.md (schema 3).
+schema: 3
+rules:
+  - set: {var: CC, value: '${PREFIX}gcc'}
+  - set: {var: CXX, value: '${PREFIX}g++'}
+  - set: {var: CCAS, value: '${CC}', flavor: conditional}
+  - if: {equals: {LTO: '1'}}
+    then:
+      - set: {var: AR, value: '${PREFIX}gcc-ar'}
+      - set: {var: RANLIB, value: '${PREFIX}gcc-ranlib'}
+    else:
+      - set: {var: AR, value: '${PREFIX}ar'}
+      - set: {var: RANLIB, value: '${PREFIX}ranlib'}
+  - set: {var: AS, value: '${PREFIX}as'}
+  - set: {var: NM, value: '${PREFIX}nm'}
+  - set: {var: LINK, value: '${PREFIX}gcc'}
+  - set: {var: LINKXX, value: '${PREFIX}g++'}
+  - set: {var: SIZE, value: '${PREFIX}size'}
+  - comment: 'gnu.inc.mk:22-27: the first of PREFIX-objcopy, gobjcopy, objcopy on PATH'
+    set: {var: OBJCOPY, value: '${PROBE_OBJCOPY}', flavor: conditional}
+  - if: {equals: {OBJCOPY: ''}}
+    then:
+      - warning: objcopy not found. Hex file will not be created.
+      - set: {var: OBJCOPY, value: 'true'}
+  - set: {var: OBJDUMP, value: '${PROBE_OBJDUMP}', flavor: conditional}
+  - comment: 'gnu.inc.mk:33: major version of `CC -dumpversion` (empty without compiler)'
+    set: {var: GCC_VERSION, value: '${PROBE_GCC_VERSION}', flavor: simple}
+  - if: {not: {at_least: {var: GCC_VERSION, version: '8'}}}
+    then:
+      - add: {OPTIONAL_CFLAGS_BLACKLIST: ['-fmacro-prefix-map=${RIOTBASE}/=', '-fdebug-prefix-map=${RIOTBASE}/=']}
+  - add: {OPTIONAL_CFLAGS_BLACKLIST: [-Wdocumentation, -Wno-error=documentation, -Wno-documentation-deprecated-sync]}
+  - set: {var: CFLAGS_STATIC_ANALYSIS, value: -fanalyzer, flavor: simple}
+  - if: {one_of: {var: GCC_VERSION, values: ['12', '13']}}
+    then:
+      - add: {CFLAGS: [--param=min-pagesize=0]}

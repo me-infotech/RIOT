@@ -1,0 +1,15 @@
+# Build data of sys/preprocessor/Makefile.include (step G3-1): the generated
+# header preprocessor_successor.h is a step of the build (BUILD_HEADERS;
+# command of the Make recipe: generate_pp_successor_header.sh).
+# Format: dist/tools/config_data/README.md (schema 3).
+schema: 3
+rules:
+  - set: {var: RIOT_PP_SUCCESSOR_MAX, value: '9999', flavor: conditional}
+  - add: {PSEUDOMODULES: [preprocessor_successor]}
+  - set: {var: USEMODULE_INCLUDES_preprocessor, value: '${BINDIR}/preprocessor', flavor: simple}
+  - add: {USEMODULE_INCLUDES: ['${USEMODULE_INCLUDES_preprocessor}']}
+  - set: {var: RIOT_GENERATE_PP_HEADERS, value: '', flavor: simple}
+  - if: {has: {var: USEMODULE, match: [preprocessor_successor]}}
+    then:
+      - add: {RIOT_GENERATE_PP_HEADERS: ['${BINDIR}/preprocessor/preprocessor_successor.h']}
+  - add: {BUILD_HEADERS: ['${RIOT_GENERATE_PP_HEADERS}']}

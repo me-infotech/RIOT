@@ -1,0 +1,13 @@
+# Build description of the module(s) in sys/fmt. This file is the source: Makefile
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 3
+rules:
+  - comment: exclude submodule sources from *.c wildcard source selection
+    set:
+      var: SRC
+      value: {files: {match: ['*.c'], except: [table.c]}}
+      flavor: simple
+  - comment: enable submodules
+    set: {var: SUBMODULES, value: '1', flavor: simple}
+  - include: {path: '${RIOTBASE}/Makefile.base'}

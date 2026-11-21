@@ -45,6 +45,19 @@ MAKE_ONLY = {
 _CACHE: dict = {}                 # (path, mtime) -> validated rules
 
 
+def _padded(version: str) -> tuple:
+    """`_padded_version` of makefiles/utils/strings.mk: the first three
+    '.'-separated parts, missing ones 0 (Make pads with zeros; a part that is
+    not a number compares as text, as `sort` does)."""
+    parts = (version.split(".") + ["", "", ""])[:3]
+    return tuple(p.zfill(3) for p in parts)
+
+
+def version_at_least(version: str, minimum: str) -> bool:
+    """`version_is_greater_or_equal` of makefiles/utils/strings.mk."""
+    return _padded(version.strip()) >= _padded(minimum)
+
+
 class ResolveError(Exception):
     """An error of the configuration (what Make reports with `$(error …)`)."""
 
@@ -104,6 +117,10 @@ class Evaluator:
             # each value compared word by word (blanks around it do not count)
             return all(" ".join(v.words(name)) == " ".join(val.split())
                        for name, val in value.items())
+        if key == "at_least":
+            return version_at_least(v.get(value["var"]), value["version"])
+        if key == "nonempty":
+            return any(v.get(name).strip() for name in value)
         raise ResolveError(f"unknown condition {key}")
 
     # -- rules --------------------------------------------------------------------------

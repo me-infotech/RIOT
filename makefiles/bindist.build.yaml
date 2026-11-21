@@ -1,0 +1,13 @@
+# Build data of makefiles/bindist.inc.mk (step G3-1): the directories of the
+# binary modules (the USEMODULE part is resolved by the resolver of G0-2).
+# Building from a binary distribution (Makefile.distcheck) is not part of
+# the data.
+# Format: dist/tools/config_data/README.md (schema 3).
+schema: 3
+rules:
+  - set: {var: BUILD_DISTCHECK, value: {files: {match: [Makefile.distcheck]}}}
+  - if: {nonempty: [BUILD_DISTCHECK]}
+    then:
+      - error: building from a binary distribution (Makefile.distcheck) is outside the build data
+    else:
+      - add: {DIRS: ['${BIN_DIRS}']}

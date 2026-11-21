@@ -1,0 +1,41 @@
+# Build data of cpu/cortexm_common/Makefile.include (step G3-1): include
+# path and memory layout; the riotboot sizes and the programmer list are not
+# read by the build of an application.
+# Format: dist/tools/config_data/README.md (schema 3).
+schema: 3
+rules:
+  - add: {INCLUDES: ['-I${RIOTCPU}/cortexm_common/include']}
+  - if: {nonempty: [ROM_START_ADDR, RAM_START_ADDR, ROM_LEN, RAM_LEN]}
+    then:
+      - if: {equals: {ROM_START_ADDR: ''}}
+        then:
+          - error: ROM_START_ADDR is not defined
+      - if: {equals: {RAM_START_ADDR: ''}}
+        then:
+          - error: RAM_START_ADDR is not defined
+      - if: {equals: {ROM_LEN: ''}}
+        then:
+          - error: ROM_LEN is not defined
+      - if: {equals: {RAM_LEN: ''}}
+        then:
+          - error: RAM_LEN is not defined
+      - add: {LINKFLAGS: ['${LINKFLAGPREFIX}--defsym=_rom_start_addr=${ROM_START_ADDR}']}
+      - add: {LINKFLAGS: ['${LINKFLAGPREFIX}--defsym=_ram_start_addr=${RAM_START_ADDR}']}
+      - add: {LINKFLAGS: ['${LINKFLAGPREFIX}--defsym=_rom_length=${ROM_LEN}']}
+      - add: {LINKFLAGS: ['${LINKFLAGPREFIX}--defsym=_ram_length=${RAM_LEN}']}
+  - if: {nonempty: [BACKUP_RAM_LEN]}
+    then:
+      - add: {LINKFLAGS: ['${LINKFLAGPREFIX}--defsym=_backup_ram_start_addr=${BACKUP_RAM_ADDR}']}
+      - add: {LINKFLAGS: ['${LINKFLAGPREFIX}--defsym=_backup_ram_len=${BACKUP_RAM_LEN}']}
+      - add: {CFLAGS: [-DCPU_HAS_BACKUP_RAM=1]}
+  - set: {var: TOOLCHAINS_SUPPORTED, value: gnu llvm}
+  - comment: |-
+      Make adds these two lazily (a conditional expression inside the
+      value); here when the file is read. ROM_OFFSET and FW_ROM_LEN are set
+      by riotboot, outside the scope.
+    if: {nonempty: [ROM_OFFSET]}
+    then:
+      - add: {LINKFLAGS: ['${LINKFLAGPREFIX}--defsym=_rom_offset=${ROM_OFFSET}']}
+  - if: {nonempty: [FW_ROM_LEN]}
+    then:
+      - add: {LINKFLAGS: ['${LINKFLAGPREFIX}--defsym=_fw_rom_length=${FW_ROM_LEN}']}

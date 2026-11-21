@@ -35,15 +35,42 @@ def _selection(sel: dict) -> str:
     return words
 
 
-def value_text(value) -> str:
-    """Make text of a value: a text or `{select: …}` (schema 2)."""
-    if not isinstance(value, dict):
-        return to_make_text(value)
-    sel = value["select"]
+class NotForMake(ValueError):
+    """A construct of the build data (schema 3) that no generated Make file
+    uses (`unique`, `arith`): it is read only by the build without Make."""
+
+
+def _select_text(sel: dict) -> str:
     text = _selection(sel)
     if "replace" in sel:
         text = f"$(subst {sel['replace']['from']},{sel['replace']['to']},{text})"
+    if sel.get("macro"):
+        text = f"$(call uppercase_and_underscore,{text})"
+    if "pattern" in sel:
+        pat = sel["pattern"]
+        text = f"$(patsubst {to_make_text(pat['from'])},{to_make_text(pat['to'])},{text})"
+    if sel.get("unique"):
+        raise NotForMake("`unique` is only used by the build data")
     return text
+
+
+def value_text(value) -> str:
+    """Make text of a value: a text, `{select: …}` (schema 2), `{files: …}`
+    or `{subdirs: …}` (schema 3)."""
+    if not isinstance(value, dict):
+        return to_make_text(value)
+    if "files" in value:
+        files = value["files"]
+        text = f"$(wildcard {_patterns(files['match'])})"
+        if files.get("except"):
+            text = f"$(filter-out {_patterns(files['except'])},{text})"
+        return text
+    if "subdirs" in value:
+        sub = value["subdirs"]
+        return f"$(dir $(wildcard $(addsuffix /{sub['file']},{_select_text(sub['select'])})))"
+    if "arith" in value:
+        raise NotForMake("`arith` is only used by the build data")
+    return _select_text(value["select"])
 
 
 def condition(cond: dict) -> str:
@@ -63,6 +90,11 @@ def condition(cond: dict) -> str:
     elif key == "equals":
         refs = " ".join(f"$({var})" for var in value)
         kind, args = "ifeq", f"{refs},{' '.join(value.values())}"
+    elif key == "at_least":
+        kind = "ifeq"
+        args = f"1,$(call version_is_greater_or_equal,$({value['var']}),{value['version']})"
+    elif key == "nonempty":
+        kind, args = "ifneq", "," + "".join(f"$({var})" for var in value)
     else:
         raise ValueError(f"unknown condition {key}")
     if negated:

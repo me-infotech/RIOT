@@ -1,0 +1,27 @@
+# Build description of the module(s) in cpu/nrf5x_common/periph. This file is the source: Makefile
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - set: {var: MODULE, value: nrf5x_common_periph}
+  - comment: Select the specific implementation for `periph_i2c`
+    if: {has: {var: USEMODULE, match: [periph_i2c]}}
+    then:
+      - if: {one_of: {var: CPU_FAM, values: [nrf52, nrf53, nrf9160]}}
+        then:
+          - add: {SRC: [i2c_nrf52_nrf9160.c]}
+  - comment: |-
+      Select the specific implementation for `periph_pwm`
+      nRF51 has its own PWM driver variant in its periph driver folder
+    if: {has: {var: USEMODULE, match: [periph_pwm]}}
+    then:
+      - if: {one_of: {var: CPU_FAM, values: [nrf52, nrf53, nrf9160]}}
+        then:
+          - add: {SRC: [pwm_nrfxx.c]}
+  - comment: Select the specific implementation for `periph_spi`
+    if: {has: {var: USEMODULE, match: [periph_spi]}}
+    then:
+      - if: {one_of: {var: CPU_FAM, values: [nrf52, nrf53, nrf9160]}}
+        then:
+          - add: {SRC: [spi_nrf52_nrf9160.c]}
+  - include: {path: '${RIOTMAKE}/periph.mk'}

@@ -1,3 +1,5 @@
-MODULE = gnrc_ipv6_hdr
+# Generated from module.yaml by dist/tools/config_data/config_data.py.
+# Do not edit: change module.yaml and run `just generate-config-data`.
 
+MODULE = gnrc_ipv6_hdr
 include $(RIOTBASE)/Makefile.base

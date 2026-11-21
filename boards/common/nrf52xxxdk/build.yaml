@@ -1,0 +1,6 @@
+# Build data of boards/common/nrf52xxxdk/Makefile.include (step G3-1).
+# Format: dist/tools/config_data/README.md (schema 3).
+schema: 3
+rules:
+  - add: {INCLUDES: ['-I${RIOTBOARD}/common/nrf52xxxdk/include']}
+  - include: {path: '${RIOTBOARD}/common/nrf52/Makefile.include'}

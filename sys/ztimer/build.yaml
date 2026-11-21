@@ -1,0 +1,22 @@
+# Build data of sys/ztimer/Makefile.include (step G3-1).
+# Format: dist/tools/config_data/README.md (schema 3).
+schema: 3
+rules:
+  - if: {has: {var: USEMODULE, match: [ztimer_xtimer_compat]}}
+    then:
+      - add: {PSEUDOMODULES: [xtimer]}
+      - if: {not: {has: {var: USEMODULE, match: [ztimer_usec]}}}
+        then:
+          - info: WARNING! xtimer_compat without ztimer_usec may be inaccurate
+  - set: {var: MODULES_ZTIMER_ON_RTT_CONFLICT, value: rtt_rtc}
+  - if: {has: {var: USEMODULE, match: [ztimer_periph_rtt]}}
+    then:
+      - if: {has: {var: CPU, match: [stm32, nrf5%, sam%, kinetis, efm32, fe310]}}
+        then:
+          - set: {var: RTT_FREQUENCY, value: RTT_MAX_FREQUENCY, flavor: conditional}
+          - add: {CFLAGS: ['-DRTT_FREQUENCY=${RTT_FREQUENCY}']}
+      - set: {var: MODULES_ZTIMER_ON_RTT_CONFLICTING, value: {select: {var: USEMODULE, match: ['${MODULES_ZTIMER_ON_RTT_CONFLICT}']}}}
+      - if: {nonempty: [MODULES_ZTIMER_ON_RTT_CONFLICTING]}
+        then:
+          - info: 'WARNING! The following modules conflict with ''ztimer_periph_rtt'': ''${MODULES_ZTIMER_ON_RTT_CONFLICTING}'''
+          - info: To disable ztimer periph_rtt auto-inclusion add 'ztimer_no_periph_rtt' to 'USEMODULE'

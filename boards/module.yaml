@@ -1,0 +1,39 @@
+# Build description of the module(s) in boards. This file is the source: Makefile
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - comment: add default board_init()
+    add: {DIRS: ['${RIOTBOARD}/common/init']}
+  - comment: SORT THIS ALPHABETICALLY BY COMMON BOARD NAME!
+    if: {has: {var: USEMODULE, match: [boards_common_adafruit-nrf52-bootloader]}}
+    then:
+      - add: {DIRS: ['${RIOTBOARD}/common/adafruit-nrf52-bootloader']}
+  - if: {has: {var: USEMODULE, match: [boards_common_esp32]}}
+    then:
+      - add: {DIRS: ['${RIOTBOARD}/common/esp32']}
+  - if: {has: {var: USEMODULE, match: [boards_common_esp32c3]}}
+    then:
+      - add: {DIRS: ['${RIOTBOARD}/common/esp32c3']}
+  - if: {has: {var: USEMODULE, match: [boards_common_esp32c6]}}
+    then:
+      - add: {DIRS: ['${RIOTBOARD}/common/esp32c6']}
+  - if: {has: {var: USEMODULE, match: [boards_common_esp32h2]}}
+    then:
+      - add: {DIRS: ['${RIOTBOARD}/common/esp32h2']}
+  - if: {has: {var: USEMODULE, match: [boards_common_esp32s2]}}
+    then:
+      - add: {DIRS: ['${RIOTBOARD}/common/esp32s2']}
+  - if: {has: {var: USEMODULE, match: [boards_common_esp32s3]}}
+    then:
+      - add: {DIRS: ['${RIOTBOARD}/common/esp32s3']}
+  - if: {has: {var: USEMODULE, match: [boards_common_esp32x]}}
+    then:
+      - add: {DIRS: ['${RIOTBOARD}/common/esp32x']}
+  - if: {has: {var: USEMODULE, match: [boards_common_rpi_pico_2]}}
+    then:
+      - add: {DIRS: ['${RIOTBOARD}/common/rpi-pico-2']}
+  - if: {has: {var: USEMODULE, match: [boards_common_seeedstudio-xiao-nrf52840]}}
+    then:
+      - add: {DIRS: ['${RIOTBOARD}/common/seeedstudio-xiao-nrf52840']}
+  - include: {path: '${RIOTBASE}/Makefile.base'}

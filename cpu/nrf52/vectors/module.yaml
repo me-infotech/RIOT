@@ -1,0 +1,12 @@
+# Build description of the module(s) in cpu/nrf52/vectors. This file is the source: Makefile
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - set: {var: MODULE, value: nrf52_vectors}
+  - set: {var: NO_AUTO_SRC, value: '1'}
+  - set: {var: SRC_FILE, value: 'vectors_${CPU_MODEL}.c'}
+  - add: {SRCS: ['${SRC_FILE}']}
+  - comment: '(file triggers compiler bug. see #5775)'
+    add: {SRC_NOLTO: ['${SRC_FILE}']}
+  - include: {path: '${RIOTBASE}/Makefile.base'}

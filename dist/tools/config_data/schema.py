@@ -7,7 +7,10 @@ the offending value (e.g. `rules[3].then[0].if.has.match[1]`); an empty list
 means the document is valid. Every condition and action is structured:
 the only reference to another value is `${NAME}` in a text, and no Make
 function or other Make syntax is accepted. Schema 2 adds `select` values,
-`${NAME}` as a whole pattern word and the `several` condition.
+`${NAME}` as a whole pattern word and the `several` condition. Schema 3
+(step G3-1) adds the values `files`, `subdirs` and `arith`, `pattern`,
+`macro` and `unique` in a selection and the conditions `at_least` and
+`nonempty`.
 """
 
 import re
@@ -15,7 +18,8 @@ import re
 from rules import NAME_RE, REF_RE, SCHEMAS, needed_schema
 
 ACTIONS = ("if", "add", "set", "include", "error", "warning", "info")
-CONDITIONS = ("has", "selection_equals", "one_of", "equals", "several", "not")
+CONDITIONS = ("has", "selection_equals", "one_of", "equals", "several", "at_least",
+              "nonempty", "not")
 BRANCHES = ("then", "elif", "else")
 FLAVORS = ("recursive", "simple", "conditional")
 # a word of a filter pattern: no blank, no `$`, `,`, `(`, `)`, `#`, at most one `%`
@@ -26,6 +30,14 @@ PATTERN2_RE = re.compile(r"^(?:[^\s$(),#%]*%?[^\s$(),#%]*|\$\{[A-Za-z_][A-Za-z0-
 WORD_RE = re.compile(r"^[^\s$(),#%]+$")
 # the text `replace` changes in each selected word: no blank, `$`, `,`, `(`, `)`, `#`, `%`
 REPLACE_RE = re.compile(r"^[^\s$(),#%]*$")
+# schema 3: a word of a pattern substitution (`%` at most once, `${NAME}` allowed)
+PATSUBST_RE = re.compile(r"^(?:[^\s$(),#%]|\$\{[A-Za-z_][A-Za-z0-9_]*\})*"
+                         r"%?(?:[^\s$(),#%]|\$\{[A-Za-z_][A-Za-z0-9_]*\})*$")
+# schema 3: a file name pattern of `files` (`*`, `?`, `${NAME}`; no blank)
+GLOB_RE = re.compile(r"^(?:[^\s$(),#%]|\$\{[A-Za-z_][A-Za-z0-9_]*\})+$")
+# schema 3: an arithmetic expression of `arith`: integers, `${NAME}`, + - * ( ), `K`
+ARITH_RE = re.compile(r"^(?:[0-9a-fA-FxK+\-* ()]|\$\{[A-Za-z_][A-Za-z0-9_]*\})+$")
+VERSION_RE = re.compile(r"^[0-9]+(?:\.[0-9]+){0,2}$")
 
 
 def _text_problems(text, where, allow_blank=True, allow_percent=True,
@@ -96,7 +108,8 @@ def select_problems(value, where):
     if problems:
         return problems
     sel, where = value["select"], f"{where}.select"
-    problems = _keys_problems(sel, where, ("var",), ("match", "except", "replace"))
+    problems = _keys_problems(sel, where, ("var",), ("match", "except", "replace", "pattern",
+                                                     "macro", "unique"))
     if problems:
         return problems
     problems += _name_problems(sel["var"], f"{where}.var")
@@ -113,7 +126,59 @@ def select_problems(value, where):
                     problems.append(f"{here}.{key}: {rep[key]!r} is not a literal text")
             if rep["from"] == "":
                 problems.append(f"{here}.from: must not be empty")
+    if "pattern" in sel:
+        here = f"{where}.pattern"
+        pat = sel["pattern"]
+        problems += _keys_problems(pat, here, ("from", "to"))
+        if not _keys_problems(pat, here, ("from", "to")):
+            for key in ("from", "to"):
+                if not isinstance(pat[key], str) or not PATSUBST_RE.match(pat[key]):
+                    problems.append(f"{here}.{key}: {pat[key]!r} is not a pattern word")
+            if isinstance(pat["from"], str) and pat["from"].count("%") != 1:
+                problems.append(f"{here}.from: needs exactly one `%`")
+    for flag in ("macro", "unique"):
+        if flag in sel and not isinstance(sel[flag], bool):
+            problems.append(f"{where}.{flag}: must be true or false")
     return problems
+
+
+def value_problems(value, where):
+    """A value of `set` or an item of `add`: a text or one of the structured
+    values (`select`; schema 3: `files`, `subdirs`, `arith`)."""
+    if not isinstance(value, dict):
+        problems = _text_problems(value, where)
+        return problems
+    if len(value) != 1:
+        return [f"{where}: a structured value has exactly one key"]
+    (key, body), = value.items()
+    if key == "select":
+        return select_problems(value, where)
+    here = f"{where}.{key}"
+    if key == "files":
+        problems = _keys_problems(body, here, ("match",), ("except",))
+        if not problems:
+            problems += _words_problems(body["match"], f"{here}.match", GLOB_RE, "file pattern")
+            if "except" in body:
+                problems += _words_problems(body["except"], f"{here}.except", PATTERN2_RE,
+                                            "pattern")
+        return problems
+    if key == "subdirs":
+        problems = _keys_problems(body, here, ("select", "file"))
+        if not problems:
+            problems += select_problems({"select": body["select"]}, here)
+            if not isinstance(body["file"], str) or not WORD_RE.match(body["file"]) \
+                    or "/" in body["file"]:
+                problems.append(f"{here}.file: must be a file name")
+        return problems
+    if key == "arith":
+        problems = _keys_problems(body, here, ("expr",), ("format",))
+        if not problems:
+            if not isinstance(body["expr"], str) or not ARITH_RE.match(body["expr"]):
+                problems.append(f"{here}.expr: {body['expr']!r} is not an expression")
+            if body.get("format", "dec") not in ("dec", "hex"):
+                problems.append(f"{here}.format: dec or hex")
+        return problems
+    return [f"{where}: unknown value {key!r} (select, files, subdirs, arith)"]
 
 
 def condition_problems(cond, where, negated=False):
@@ -131,6 +196,20 @@ def condition_problems(cond, where, negated=False):
         problems = _selection_problems(value, where, ("words",))
         if not problems:
             problems += _words_problems(value["words"], f"{where}.words", WORD_RE, "word")
+        return problems
+    if key == "at_least":
+        problems = _keys_problems(value, where, ("var", "version"))
+        if not problems:
+            problems += _name_problems(value["var"], f"{where}.var")
+            if not isinstance(value["version"], str) or not VERSION_RE.match(value["version"]):
+                problems.append(f"{where}.version: a version like 8 or 4.2.1")
+        return problems
+    if key == "nonempty":
+        if not isinstance(value, list) or not value:
+            return [f"{where}: must be a non-empty list of variable names"]
+        problems = []
+        for i, name in enumerate(value):
+            problems += _name_problems(name, f"{where}[{i}]")
         return problems
     if key == "one_of":
         problems = _keys_problems(value, where, ("var", "values"))
@@ -167,7 +246,7 @@ def _action_problems(rule, key, where):
             return problems + [f"{where}.{var}: must be a non-empty list"]
         for i, item in enumerate(items):
             if isinstance(item, dict):
-                problems += select_problems(item, f"{where}.{var}[{i}]")
+                problems += value_problems(item, f"{where}.{var}[{i}]")
                 continue
             problems += _text_problems(item, f"{where}.{var}[{i}]")
             if isinstance(item, str) and not item.strip():
@@ -179,7 +258,7 @@ def _action_problems(rule, key, where):
             return problems
         problems += _name_problems(value["var"], f"{where}.var")
         if isinstance(value["value"], dict):
-            problems += select_problems(value["value"], f"{where}.value")
+            problems += value_problems(value["value"], f"{where}.value")
         else:
             problems += _text_problems(value["value"], f"{where}.value")
         if value.get("flavor", "recursive") not in FLAVORS:

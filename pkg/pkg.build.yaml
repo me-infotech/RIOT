@@ -1,0 +1,62 @@
+# Build data of pkg/pkg.mk (step G3-1): the defaults and flags every package
+# shares. The recipes of pkg.mk (clone, fetch, patch, prepare) are the
+# package step of the build algorithm (dist/tools/cmake_gen/pkg_prepare.py),
+# which runs the same git commands with the values below.
+# Format: dist/tools/config_data/README.md (schema 3).
+schema: 3
+rules:
+  - if: {equals: {PKG_NAME: ''}}
+    then:
+      - error: PKG_NAME not defined
+  - if: {equals: {PKG_URL: ''}}
+    then:
+      - error: PKG_URL not defined
+  - if: {equals: {PKG_VERSION: ''}}
+    then:
+      - error: PKG_VERSION not defined
+  - if: {equals: {PKG_LICENSE: ''}}
+    then:
+      - error: PKG_LICENSE not defined
+  - if: {nonempty: [PKG_MIRROR_URL]}
+    then:
+      - if: {not: {equals: {PKG_USE_MIRROR: '0'}}}
+        then:
+          - set: {var: PKG_URL, value: '${PKG_MIRROR_URL}'}
+  - set: {var: PKG_DIR, value: '${CURDIR}', flavor: conditional}
+  - set: {var: PKG_PATCH_DIR, value: '${PKG_DIR}/patches', flavor: conditional}
+  - set: {var: PKG_BUILD_OUT_OF_SOURCE, value: '1', flavor: conditional}
+  - if: {equals: {PKG_BUILD_OUT_OF_SOURCE: '1'}}
+    then:
+      - set: {var: PKG_SOURCE_DIR, value: '${PKGDIRBASE}/${PKG_NAME}', flavor: conditional}
+      - set: {var: PKG_BUILD_DIR, value: '${BINDIR}/pkg-build/${PKG_NAME}', flavor: conditional}
+    else:
+      - set: {var: PKG_SOURCE_DIR, value: '${BINDIR}/pkg/${PKG_NAME}', flavor: conditional}
+      - set: {var: PKG_BUILD_DIR, value: '${PKG_SOURCE_DIR}'}
+  - comment: pkg.mk:56-62 (git-cache-rs is not part of the data)
+    set: {var: CARGO_HOME, value: '${HOME}/.cargo', flavor: conditional}
+  - set: {var: BUILD_GIT_CACHE_RS, value: {files: {match: ['${CARGO_HOME}/bin/git-cache']}}}
+  - if: {nonempty: [BUILD_GIT_CACHE_RS, GIT_CACHE_RS]}
+    then:
+      - error: cloning with git-cache-rs is outside the build data (pkg/pkg.mk)
+  - if: {nonempty: [PKG_SOURCE_LOCAL]}
+    then:
+      - error: PKG_SOURCE_LOCAL is outside the build data (pkg/pkg.mk)
+  - if: {equals: {QUIET: '1'}}
+    then:
+      - set: {var: GIT_QUIET, value: --quiet, flavor: conditional}
+  - set: {var: GITFLAGS, value: '-c user.email=buildsystem@riot -c user.name="RIOT buildsystem"', flavor: conditional}
+  - if: {nonempty: [GITAMFLAGS]}
+    then:
+      - error: GITAMFLAGS is outside the build data (deprecated, pkg/pkg.mk)
+  - set: {var: GITAMFLAGS, value: '${GIT_QUIET}', flavor: conditional}
+  - add: {GITAMFLAGS: [--no-gpg-sign --ignore-whitespace --whitespace=nowarn]}
+  - set: {var: PKG_PATCHES, value: {files: {match: ['${PKG_PATCH_DIR}/*.patch']}}}
+  - comment: pkg.mk:220-232
+    add: {CFLAGS: [-Wno-maybe-uninitialized]}
+  - if: {equals: {TOOLCHAIN: llvm}}
+    then:
+      - add: {CFLAGS: [-Wno-documentation]}
+  - if: {at_least: {var: GCC_VERSION, version: '15'}}
+    then:
+      - add: {CFLAGS: [-Wno-unterminated-string-initialization]}
+      - add: {CXXUWFLAGS: [-Wno-unterminated-string-initialization]}

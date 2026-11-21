@@ -1,0 +1,11 @@
+# Build description of the module(s) in makefiles. This file is the source: periph.mk
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - set: {var: MODULE, value: periph, flavor: conditional}
+  - comment: enable submodules
+    set: {var: SUBMODULES, value: '1', flavor: simple}
+  - comment: in case of e.g., <cpu>_periph_common, use periph_* as submodule prefix
+    set: {var: BASE_MODULE, value: periph, flavor: simple}
+  - include: {path: '${RIOTBASE}/Makefile.base'}

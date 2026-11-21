@@ -75,7 +75,7 @@ class ValidatorTest(unittest.TestCase):
             (with_value({"select": {**SEL, "match": ["a${X}"]}}), "is not a pattern"),
             (with_value({"select": {"match": ["a"]}}), "missing key 'var'"),
             (with_value({"select": {**SEL, "sort": True}}), "unknown key 'sort'"),
-            (with_value({"pick": SEL}), "missing key 'select'"),
+            (with_value({"pick": SEL}), "unknown value 'pick'"),
             (with_value({"select": {"var": "A", "replace": {"from": "", "to": "x"}}}),
              "from: must not be empty"),
             (with_value({"select": {"var": "A", "replace": {"from": "a b", "to": "x"}}}),

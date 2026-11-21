@@ -1,0 +1,5 @@
+# Build data of drivers/netdev_ieee802154_submac/Makefile.include (step G3-1).
+# Format: dist/tools/config_data/README.md (schema 3).
+schema: 3
+rules:
+  - add: {PSEUDOMODULES: [netdev_ieee802154_submac_soft_ack]}

@@ -1,0 +1,70 @@
+# Build data of makefiles/arch/cortexm.inc.mk (step G3-1).
+# Format: dist/tools/config_data/README.md (schema 3).
+schema: 3
+rules:
+  - if: {equals: {CPU_MODEL: ''}}
+    then:
+      - error: CPU_MODEL must have been defined by the board/cpu Makefile.features
+  - set: {var: TARGET_ARCH_CORTEXM, value: arm-none-eabi, flavor: conditional}
+  - set: {var: TARGET_ARCH, value: '${TARGET_ARCH_CORTEXM}', flavor: conditional}
+  - set: {var: CFLAGS_CPU, value: '-mcpu=${MCPU} -mlittle-endian -mthumb ${CFLAGS_FPU}'}
+  - if: {not: {equals: {TOOLCHAIN: llvm}}}
+    then:
+      - add: {CFLAGS: [-mno-thumb-interwork]}
+      - if: {equals: {CPU_ARCH: armv6m}}
+        then:
+          - add: {CFLAGS_CPU: [-march=armv6s-m]}
+  - set: {var: CFLAGS_LINK, value: -ffunction-sections -fdata-sections -fshort-enums}
+  - set: {var: CFLAGS_DBG, value: -ggdb -g3, flavor: conditional}
+  - set: {var: CFLAGS_OPT, value: -Os, flavor: conditional}
+  - add: {CFLAGS: ['${CFLAGS_CPU}', '${CFLAGS_LINK}', '${CFLAGS_DBG}', '${CFLAGS_OPT}']}
+  - add: {ASFLAGS: ['${CFLAGS_CPU}']}
+  - add: {LINKFLAGS: ['-L${RIOTCPU}/${CPU}/ldscripts', '-L${RIOTCPU}/cortexm_common/ldscripts']}
+  - set: {var: LINKER_SCRIPT, value: '${CPU_MODEL}.ld', flavor: conditional}
+  - add: {LINKFLAGS: ['-T${LINKER_SCRIPT}', '-Wl,--fatal-warnings']}
+  - add: {LINKFLAGS: ['${CFLAGS_CPU}', '${CFLAGS_DBG}', '${CFLAGS_OPT}', -static, -lgcc, -nostartfiles]}
+  - add: {LINKFLAGS: ['-Wl,--gc-sections']}
+  - add: {CFLAGS: [{select: {var: CPU_MODEL, macro: true, pattern: {from: '%', to: '-DCPU_MODEL_%'}}}]}
+  - add: {CFLAGS: [{select: {var: CPU_CORE, macro: true, pattern: {from: '%', to: '-DCPU_CORE_%'}}}]}
+  - if: {has: {var: USEMODULE, match: [cortexm_fpu]}}
+    then:
+      - if: {one_of: {var: CPU_CORE, values: [cortex-m33, cortex-m7]}}
+        then:
+          - set: {var: CFLAGS_FPU, value: -mfloat-abi=hard -mfpu=fpv5-sp-d16, flavor: conditional}
+        else:
+          - set: {var: CFLAGS_FPU, value: -mfloat-abi=hard -mfpu=fpv4-sp-d16, flavor: conditional}
+    else:
+      - set: {var: CFLAGS_FPU, value: -mfloat-abi=soft, flavor: conditional}
+  - if: {equals: {CPU_CORE: cortex-m4f}}
+    then:
+      - set: {var: MCPU, value: cortex-m4}
+    else:
+      - set: {var: MCPU, value: '${CPU_CORE}', flavor: conditional}
+  - if: {has: {var: USEPKG, match: [cmsis-dsp]}}
+    then:
+      - if: {equals: {CPU_CORE: cortex-m0}}
+        then:
+          - add: {CFLAGS: [-DARM_MATH_CM0]}
+        elif:
+          - if: {equals: {CPU_CORE: cortex-m0plus}}
+            then:
+              - add: {CFLAGS: [-DARM_MATH_CM0PLUS]}
+          - if: {equals: {CPU_CORE: cortex-m23}}
+            then:
+              - add: {CFLAGS: [-DARM_MATH_CM23]}
+          - if: {equals: {CPU_CORE: cortex-m3}}
+            then:
+              - add: {CFLAGS: [-DARM_MATH_CM3]}
+          - if: {equals: {CPU_CORE: cortex-m33}}
+            then:
+              - add: {CFLAGS: [-DARM_MATH_CM33]}
+          - if: {equals: {CPU_CORE: cortex-m4}}
+            then:
+              - add: {CFLAGS: [-DARM_MATH_CM4]}
+          - if: {equals: {CPU_CORE: cortex-m4f}}
+            then:
+              - add: {CFLAGS: [-DARM_MATH_CM4]}
+          - if: {equals: {CPU_CORE: cortex-m7}}
+            then:
+              - add: {CFLAGS: [-DARM_MATH_CM7]}
+  - include: {path: '${RIOTCPU}/cortexm_common/Makefile.include'}

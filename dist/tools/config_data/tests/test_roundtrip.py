@@ -137,11 +137,8 @@ class RepositoryRoundTripTest(unittest.TestCase):
     def test_original_generated_and_yaml_rules_are_equal(self):
         for path in config_data.converted_files(self.scope):
             with self.subTest(path=path):
-                with open(os.path.join(R.RIOTBASE, path), encoding="utf-8") as file:
-                    generated = file.read()
-                rules = config_data.load_valid(os.path.join(R.RIOTBASE, R.yaml_name(path)))
-                original = config_data.git_show(self.scope["base"], path)
-                self.assertEqual(config_data.roundtrip_problems(original, generated, rules), [])
+                self.assertEqual(config_data.file_roundtrip_problems(path, self.scope,
+                                                                     self.scope["base"]), [])
 
     def test_roundtrip_command(self):
         result = subprocess.run([sys.executable, os.path.join(TOOL, "config_data.py"),

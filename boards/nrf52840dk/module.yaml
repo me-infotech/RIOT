@@ -1,0 +1,8 @@
+# Build description of the module(s) in boards/nrf52840dk. This file is the source: Makefile
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - set: {var: MODULE, value: board}
+  - set: {var: DIRS, value: '${RIOTBOARD}/common/nrf52xxxdk'}
+  - include: {path: '${RIOTBASE}/Makefile.base'}

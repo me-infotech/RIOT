@@ -1,3 +1,6 @@
+# Generated from module.yaml by dist/tools/config_data/config_data.py.
+# Do not edit: change module.yaml and run `just generate-config-data`.
+
 # The module name would otherwise default to `cpu`, which clashes with the
 # module of the CPU itself.
 MODULE = cpus
@@ -6,6 +9,7 @@ MODULE = cpus
 ifneq (,$(filter cpu_common_rp2,$(USEMODULE)))
   DIRS += $(RIOTCPU)/common/rp2
 endif
+
 ifneq (,$(filter cpu_common_rp2350,$(USEMODULE)))
   DIRS += $(RIOTCPU)/common/rp2350
 endif

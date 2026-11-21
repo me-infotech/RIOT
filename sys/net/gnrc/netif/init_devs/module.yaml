@@ -1,0 +1,9 @@
+# Build description of the module(s) in sys/net/gnrc/netif/init_devs. This file is the source: Makefile
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - set: {var: MODULE, value: gnrc_netif_init_devs}
+  - comment: this module is expected to pass static analysis
+    set: {var: MODULE_SUPPORTS_STATIC_ANALYSIS, value: '1', flavor: simple}
+  - include: {path: '${RIOTMAKE}/auto_init.inc.mk'}

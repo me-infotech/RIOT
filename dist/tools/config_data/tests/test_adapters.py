@@ -43,16 +43,18 @@ class UpToDateTest(unittest.TestCase):
 
     def test_yaml_files_are_exactly_the_scope(self):
         scope = config_data.load_scope()
-        expected = sorted(os.path.join(R.RIOTBASE, R.yaml_name(p))
+        expected = sorted(os.path.join(R.RIOTBASE, config_data.data_name(p, scope))
                           for p in config_data.converted_files(scope))
         self.assertEqual(config_data.all_yaml(), expected)
 
     def test_generated_files_carry_the_header(self):
-        for path in config_data.converted_files(config_data.load_scope()):
+        scope = config_data.load_scope()
+        for path in config_data.converted_files(scope):
             with self.subTest(path=path):
                 with open(os.path.join(R.RIOTBASE, path), encoding="utf-8") as file:
                     first = file.readline()
-                self.assertEqual(first, f"# Generated from {os.path.basename(R.yaml_name(path))}"
+                data = config_data.data_name(path, scope)
+                self.assertEqual(first, f"# Generated from {os.path.basename(data)}"
                                         " by dist/tools/config_data/config_data.py.\n")
 
 

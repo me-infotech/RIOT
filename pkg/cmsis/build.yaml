@@ -1,0 +1,14 @@
+# Build data of pkg/cmsis/Makefile.include (step G3-1).
+# Format: dist/tools/config_data/README.md (schema 3).
+schema: 3
+rules:
+  - add: {INCLUDES: ['-isystem${PKGDIRBASE}/cmsis/CMSIS/Core/Include']}
+  - if: {has: {var: USEMODULE, match: [cmsis-dsp]}}
+    then:
+      - add: {INCLUDES: ['-isystem${PKGDIRBASE}/cmsis/CMSIS/DSP/Include', '-isystem${PKGDIRBASE}/cmsis/CMSIS/DSP/PrivateInclude']}
+      - add: {CFLAGS: ['-DARM_CPU="cortex-m4"']}
+  - if: {has: {var: USEMODULE, match: [cmsis-nn]}}
+    then:
+      - add: {INCLUDES: ['-isystem${PKGDIRBASE}/cmsis/CMSIS/DSP/Include', '-isystem${PKGDIRBASE}/cmsis/CMSIS/NN/Include']}
+      - add: {CFLAGS: [-Wno-sign-compare]}
+  - add: {PSEUDOMODULES: [cmsis, cmsis-dsp, cmsis-nn]}

@@ -1,0 +1,117 @@
+# Build data of makefiles/vars.inc.mk (step G3-1): the variables Make
+# exports to the Make processes of the modules and packages (`export` in
+# vars.inc.mk, in that order, and the other `export` lines of
+# Makefile.include, makefiles/pkg/pkg.mk and cpu/nrf52/Makefile.include that
+# the build in scope reaches). The build without Make gives the modules
+# exactly these variables (dist/tools/cmake_gen).
+# Format: dist/tools/config_data/README.md (schema 3).
+schema: 3
+rules:
+  - comment: makefiles/vars.inc.mk:4-120
+    add:
+      BUILD_EXPORTED:
+        - Q
+        - QQ
+        - QUIET
+        - QUIETER
+        - OS
+        - OS_ARCH
+        - APPLICATION
+        - APPLICATION_MODULE
+        - BOARD
+        - CPU
+        - CPU_MODEL
+        - CPU_CORE
+        - CPU_ARCH
+        - CPU_FAM
+        - INCLUDES
+        - CXXINCLUDES
+        - NATIVEINCLUDES
+        - GCC_C_INCLUDES
+        - GCC_CXX_INCLUDES
+        - GCC_VERSION
+        - USEMODULE
+        - BIN_USEMODULE
+        - USEPKG
+        - DISABLE_MODULE
+        - RIOTBASE
+        - RIOTCPU
+        - RIOTBOARD
+        - EXTERNAL_BOARD_DIRS
+        - BOARDDIR
+        - RIOTPKG
+        - RIOTTOOLS
+        - RIOTPROJECT
+        - RIOTMAKE
+        - RIOTKCONFIG
+        - BINDIRBASE
+        - BINDIR
+        - RIOT_TEST_HASH_DIR
+        - CARGO_TARGET_DIR
+        - BUILD_DIR
+        - APPDIR
+        - PKG_PATHS
+        - PKGDIRBASE
+        - PYTHONPATH
+        - FEATURES_REQUIRED
+        - FEATURES_PROVIDED
+        - FEATURES_OPTIONAL
+        - FEATURES_USED
+        - TOOLCHAIN
+        - TARGET_ARCH
+        - TARGET_ARCH_LLVM
+        - PREFIX
+        - CC
+        - CXX
+        - CCAS
+        - CFLAGS
+        - CFLAGS_CPU
+        - CFLAGS_STATIC_ANALYSIS
+        - RCFLAGS_WRITE_SARIF
+        - CXXUWFLAGS
+        - CXXEXFLAGS
+        - CCASUWFLAGS
+        - CCASEXFLAGS
+        - AS
+        - ASFLAGS
+        - LINK
+        - NM
+        - RANLIB
+        - ARCHIVES
+        - LTOFLAGS
+        - OBJCOPY
+        - OFLAGS
+        - OBJDUMP
+        - OBJDUMPFLAGS
+        - SIZE
+        - SIZEFLAGS
+        - UNDEF
+        - WERROR
+        - WPEDANTIC
+        - FLASH_ADDR
+        - ELFFILE
+        - HEXFILE
+        - DEVELHELP
+        - DLCACHE
+        - DOWNLOAD_TO_FILE
+        - UNZIP_HERE
+        - LAZYSPONGE
+        - LAZYSPONGE_FLAGS
+        - FLAGS_FOR_AFL
+        - RUST_TARGET
+        - RUSTFLAGS
+  - comment: Makefile.include:210, :272, :435, :634; cpu/nrf52/Makefile.include:12-15
+    add:
+      BUILD_EXPORTED:
+        - RIOTBUILD_CONFIG_HEADER_C
+        - __RIOTBUILD_FLAG
+        - CCACHE_CPP2
+        - GENSRC
+        - MCUBOOT_IMAGE_ALIGN
+        - MCUBOOT_SLOT0_SIZE
+        - MCUBOOT_SLOT1_SIZE
+        - MCUBOOT_SLOT2_SIZE
+  - comment: Makefile.include:272
+    set: {var: __RIOTBUILD_FLAG, value: RIOT, flavor: simple}
+  - comment: Makefile.include:435
+    set: {var: CCACHE_CPP2, value: 'yes'}

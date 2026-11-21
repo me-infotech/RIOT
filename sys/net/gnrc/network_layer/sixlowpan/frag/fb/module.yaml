@@ -1,0 +1,7 @@
+# Build description of the module(s) in sys/net/gnrc/network_layer/sixlowpan/frag/fb. This file is the source: Makefile
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - set: {var: MODULE, value: gnrc_sixlowpan_frag_fb, flavor: simple}
+  - include: {path: '${RIOTBASE}/Makefile.base'}

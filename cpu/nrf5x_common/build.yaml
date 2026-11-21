@@ -1,0 +1,15 @@
+# Build data of cpu/nrf5x_common/Makefile.include (step G3-1). The vendor
+# headers that the Make file fetches with the recipe
+# fetch_nrfx_vendor_headers are a package step of the build: its data is
+# cpu/nrf5x_common/nrfx.pkg.yaml (BUILD_PACKAGES).
+# Format: dist/tools/config_data/README.md (schema 3).
+schema: 3
+rules:
+  - add: {CFLAGS: [{select: {var: CPU_FAM, macro: true, pattern: {from: '%', to: '-DCPU_FAM_%'}}}]}
+  - set: {var: ROM_START_ADDR, value: '0x00000000', flavor: conditional}
+  - set: {var: RAM_START_ADDR, value: '0x20000000', flavor: conditional}
+  - set: {var: LINKER_SCRIPT, value: cortexm.ld, flavor: conditional}
+  - add: {INCLUDES: ['-I${RIOTCPU}/nrf5x_common/include']}
+  - add: {INCLUDES: ['-I${BUILD_DIR}/nrf5x_nrfx_mdk/${CPU_FAM}']}
+  - comment: 'Makefile.include:15-19: BUILDDEPS += fetch_nrfx_vendor_headers'
+    add: {BUILD_PACKAGES: ['${RIOTCPU}/nrf5x_common/Makefile.nrfx']}

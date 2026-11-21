@@ -253,7 +253,7 @@ def application(ev, info_goal: bool = True) -> int:
 
 def expected_errors(ev):
     """Makefile.include:908-993: problems of the result; an error unless
-    CONTINUE_ON_EXPECTED_ERRORS=1 (the toolchain test, :968-983, needs the
+    CONTINUE_ON_EXPECTED_ERRORS=1 (the toolchain test, :970-984, needs the
     CPU's Makefile.include and is not part of the data: see README)."""
     v = ev.v
     problems = []

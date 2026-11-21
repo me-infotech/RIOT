@@ -1,0 +1,42 @@
+# Build data of makefiles/libc/newlib.mk (step G3-1). The shell probes of
+# the Make file are probes of the build algorithm (same commands as Make):
+#   PROBE_LINK_NANO_SPECS          exit status of `LINK -specs=nano.specs -E -`
+#   PROBE_LINK_NANO_WCHAR_WARNING  exit status of grep for the wchar_t warning
+#                                  of a link with -specs=nano.specs (0: found)
+#   PROBE_NEWLIB_INCLUDE_DIR       newlib.mk:30-55: the directory of newlib.h
+#                                  (compiler search path, known locations,
+#                                  next to the compiler)
+#   PROBE_NEWLIB_NANO_INCLUDE_DIR  the first of NEWLIB_INCLUDE_DIR/newlib-nano,
+#                                  …/newlib/nano, …/nano that exists
+# Format: dist/tools/config_data/README.md (schema 3).
+schema: 3
+rules:
+  - if: {has: {var: USEMODULE, match: [newlib_nano]}}
+    then:
+      - if: {equals: {PROBE_LINK_NANO_SPECS: '0'}}
+        then:
+          - set: {var: USE_NEWLIB_NANO, value: '1'}
+          - if: {equals: {PROBE_LINK_NANO_WCHAR_WARNING: '0'}}
+            then:
+              - add: {CFLAGS: [-fshort-wchar]}
+              - add: {LINKFLAGS: ['-Wl,--no-wchar-size-warning']}
+  - if: {has: {var: USEMODULE, match: [newlib_gnu_source]}}
+    then:
+      - add: {CFLAGS: [-D_GNU_SOURCE=1]}
+  - if: {equals: {USE_NEWLIB_NANO: '1'}}
+    then:
+      - add: {LINKFLAGS: [-specs=nano.specs]}
+  - add: {LINKFLAGS: [-lc]}
+  - if: {equals: {NEWLIB_INCLUDE_DIR: ''}}
+    then:
+      - set: {var: NEWLIB_INCLUDE_DIR, value: '${PROBE_NEWLIB_INCLUDE_DIR}', flavor: simple}
+  - if: {equals: {TOOLCHAIN: llvm}}
+    then:
+      - error: the llvm toolchain is outside the build data (makefiles/libc/newlib.mk)
+  - if: {equals: {USE_NEWLIB_NANO: '1'}}
+    then:
+      - set: {var: NEWLIB_NANO_INCLUDE_DIR, value: '${PROBE_NEWLIB_NANO_INCLUDE_DIR}', flavor: conditional}
+      - if: {nonempty: [NEWLIB_NANO_INCLUDE_DIR]}
+        then:
+          - set: {var: INCLUDES, value: '-isystem ${NEWLIB_NANO_INCLUDE_DIR} ${INCLUDES}', flavor: simple}
+  - add: {LINKFLAGS: ['-Wl,-wrap=__assert_func']}

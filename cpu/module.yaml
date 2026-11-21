@@ -1,0 +1,17 @@
+# Build description of the module(s) in cpu. This file is the source: Makefile
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - comment: |-
+      The module name would otherwise default to `cpu`, which clashes with the
+      module of the CPU itself.
+    set: {var: MODULE, value: cpus}
+  - comment: SORT THIS ALPHABETICALLY BY COMMON CPU MODULE NAME!
+    if: {has: {var: USEMODULE, match: [cpu_common_rp2]}}
+    then:
+      - add: {DIRS: ['${RIOTCPU}/common/rp2']}
+  - if: {has: {var: USEMODULE, match: [cpu_common_rp2350]}}
+    then:
+      - add: {DIRS: ['${RIOTCPU}/common/rp2350']}
+  - include: {path: '${RIOTBASE}/Makefile.base'}

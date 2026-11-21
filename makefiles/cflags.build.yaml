@@ -1,0 +1,57 @@
+# Build data of makefiles/cflags.inc.mk (step G3-1). Toolchain probes are
+# PROBE_* variables of the build algorithm (same commands as Make).
+# Format: dist/tools/config_data/README.md (schema 3).
+schema: 3
+rules:
+  - comment: 'cflags.inc.mk:2-7: exit status of `CC -std=c11 -E -`'
+    if: {not: {has: {var: CFLAGS, match: [-std=%]}}}
+    then:
+      - if: {equals: {PROBE_CC_STD_C11: '0'}}
+        then:
+          - add: {CFLAGS: [-std=c11]}
+  - add: {OPTIONAL_CFLAGS: [-fno-delete-null-pointer-checks]}
+  - if: {not: {equals: {CC_NOCOLOR: '1'}}}
+    then:
+      - add: {OPTIONAL_CFLAGS: [-fdiagnostics-color]}
+  - add: {CFLAGS: [-fwrapv, -Wstrict-overflow]}
+  - add: {OPTIONAL_CFLAGS: [-Wstrict-prototypes, -Wold-style-definition, -Wdocumentation, -Wno-documentation-deprecated-sync]}
+  - add: {CXXUWFLAGS: [-std=%, -Wstrict-prototypes, -Wold-style-definition]}
+  - comment: 'cflags.inc.mk:36-41: exit status of `CC -std=c++14 -E -`'
+    if: {not: {has: {var: CXXEXFLAGS, match: [-std=%]}}}
+    then:
+      - if: {equals: {PROBE_CC_STD_CXX14: '0'}}
+        then:
+          - add: {CXXEXFLAGS: [-std=c++14]}
+  - if: {equals: {LTO: '1'}}
+    then:
+      - warning: Building with Link-Time-Optimizations is currently an experimental feature. Expect broken binaries.
+      - set: {var: LTOFLAGS, value: -flto}
+      - add: {LINKFLAGS: ['${LTOFLAGS}', -ffunction-sections, -fdata-sections]}
+  - if: {equals: {BUILD_IN_DOCKER: '1'}}
+    then:
+      - set: {var: LINKER_SUPPORTS_NOEXECSTACK, value: determine-later-inside-docker, flavor: simple}
+  - comment: 'cflags.inc.mk:58: link test with `-z noexecstack`'
+    set: {var: LINKER_SUPPORTS_NOEXECSTACK, value: '${PROBE_LINK_NOEXECSTACK}', flavor: conditional}
+  - if: {equals: {LINKER_SUPPORTS_NOEXECSTACK: '1'}}
+    then:
+      - add: {LINKFLAGS: [-z noexecstack]}
+  - add: {CFLAGS: [-fno-common, -ffunction-sections -fdata-sections]}
+  - add: {OPTIONAL_CFLAGS: [-gz]}
+  - add: {CFLAGS: [-Wall -Wextra]}
+  - add: {OPTIONAL_CFLAGS: [-Wformat=2, -Wformat-overflow, -Wformat-truncation, '-fmacro-prefix-map=${RIOTBASE}/=', '-fdebug-prefix-map=${RIOTBASE}/=', -Wcast-align]}
+  - add: {CFLAGS: [-Wmissing-include-dirs]}
+  - if: {not: {has: {var: CFLAGS, match: [-DDEVELHELP]}}}
+    then:
+      - if: {not: {equals: {FORCE_ASSERTS: '1'}}}
+        then:
+          - add: {CFLAGS: [-DNDEBUG]}
+  - add: {CFLAGS: [{select: {var: OPTIONAL_CFLAGS, except: ['${OPTIONAL_CFLAGS_BLACKLIST}']}}]}
+  - add: {CXXEXFLAGS: [-Wno-missing-field-initializers]}
+  - if: {nonempty: [RAM_START_ADDR]}
+    then:
+      - add: {CFLAGS: ['-DCPU_RAM_BASE=${RAM_START_ADDR}']}
+  - comment: 'cflags.inc.mk:120-123: RAM_LEN as hexadecimal number (`NK` = N*1024)'
+    if: {nonempty: [RAM_LEN]}
+    then:
+      - set: {var: CPU_RAM_SIZE, value: {arith: {expr: '${RAM_LEN}', format: hex}}}
+      - add: {CFLAGS: ['-DCPU_RAM_SIZE=${CPU_RAM_SIZE}']}

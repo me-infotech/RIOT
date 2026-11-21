@@ -1,0 +1,21 @@
+# Build data of makefiles/default-radio-settings.inc.mk (step G3-1).
+# `ifndef CONFIG_KCONFIG_MODULE_IEEE802154`: Kconfig is not part of the data.
+# Format: dist/tools/config_data/README.md (schema 3).
+schema: 3
+rules:
+  - if: {nonempty: [CONFIG_KCONFIG_MODULE_IEEE802154]}
+    then:
+      - error: Kconfig (CONFIG_KCONFIG_MODULE_IEEE802154) is outside the build data
+  - if: {nonempty: [DEFAULT_CHANNEL]}
+    then:
+      - if: {has: {var: USEMODULE, match: [cc110x]}}
+        then:
+          - add: {CFLAGS: ['-DCONFIG_CC110X_DEFAULT_CHANNEL=${DEFAULT_CHANNEL}']}
+      - if: {has: {var: USEMODULE, match: [at86rf212b]}}
+        then:
+          - add: {CFLAGS: ['-DCONFIG_IEEE802154_DEFAULT_SUBGHZ_CHANNEL=${DEFAULT_CHANNEL}']}
+        else:
+          - add: {CFLAGS: ['-DCONFIG_IEEE802154_DEFAULT_CHANNEL=${DEFAULT_CHANNEL}']}
+  - if: {nonempty: [DEFAULT_PAN_ID]}
+    then:
+      - add: {CFLAGS: ['-DCONFIG_IEEE802154_DEFAULT_PANID=${DEFAULT_PAN_ID}']}

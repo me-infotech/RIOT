@@ -1,0 +1,15 @@
+# Build description of the module(s) in core. This file is the source: Makefile
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 3
+rules:
+  - comment: exclude submodule sources from *.c wildcard source selection
+    set:
+      var: SRC
+      value: {files: {match: ['*.c'], except: [mbox.c, msg.c, msg_bus.c, thread.c, thread_flags.c, thread_flags_group.c]}}
+      flavor: simple
+  - comment: enable submodules
+    set: {var: SUBMODULES, value: '1', flavor: simple}
+  - comment: this module is expected to pass static analysis
+    set: {var: MODULE_SUPPORTS_STATIC_ANALYSIS, value: '1', flavor: simple}
+  - include: {path: '${RIOTBASE}/Makefile.base'}

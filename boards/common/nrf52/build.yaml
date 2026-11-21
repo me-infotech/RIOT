@@ -1,0 +1,7 @@
+# Build data of boards/common/nrf52/Makefile.include (step G3-1): the include
+# path; the rest of the Make file selects and configures the programmer
+# (flashing, step G3-2).
+# Format: dist/tools/config_data/README.md (schema 3).
+schema: 3
+rules:
+  - add: {INCLUDES: ['-I${RIOTBOARD}/common/nrf52/include']}

@@ -10,6 +10,11 @@
 # tools only; the commands are no longer Make targets. Applications are still
 # built with make in their directory. Tested with just 1.59.0.
 
+# Rules: a recipe never calls make; inputs are repository files only; the
+# commands are no longer Make targets. The applications of step G3-1 are
+# built with `just build` (CMake + Ninja, dist/tools/cmake_gen); all others
+# are still built with make in their directory. Tested with just 1.59.0.
+
 # Recipe lines run with /bin/sh, as GNU Make ran them.
 set shell := ["/bin/sh", "-c"]
 
@@ -101,3 +106,8 @@ list-ttys:
 # Regenerate the Make files (Makefile.dep, Makefile.features) from their YAML source.
 generate-config-data:
     @./dist/tools/config_data/config_data.py generate
+
+# Build an application without Make: CMake + Ninja from the data (step G3-1).
+# Example: just build examples/basic/hello-world nrf52840dk; VAR=VALUE as for make.
+build app board *vars:
+    @./dist/tools/cmake_gen/cmake_gen.py build -C {{ quote(app) }} BOARD={{ quote(board) }} {{ vars }}

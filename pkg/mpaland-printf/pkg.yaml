@@ -1,0 +1,17 @@
+# Package data of pkg/mpaland-printf/Makefile (step G3-1): source, version and
+# build of the package. Make keeps reading its Makefile (recipes of
+# pkg/pkg.mk); the build without Make reads this file
+# (dist/tools/cmake_gen/pkg_prepare.py for the source, the module data
+# mpaland-printf.module.yaml for the build).
+# Format: dist/tools/config_data/README.md (schema 3).
+schema: 3
+rules:
+  - set: {var: PKG_NAME, value: mpaland-printf}
+  - set: {var: PKG_URL, value: 'https://github.com/mpaland/printf'}
+  - comment: 4.0.0
+    set: {var: PKG_VERSION, value: 0dd4b64bc778bf55229428cefccba4c0a81f384b}
+  - set: {var: PKG_LICENSE, value: MIT}
+  - include: {path: '${RIOTBASE}/pkg/pkg.mk'}
+  - comment: 'Makefile:9-10: the module file mpaland-printf.mk, built in the source directory'
+    set: {var: PKG_BUILD_MODULE_DIR, value: '${PKG_SOURCE_DIR}'}
+  - set: {var: PKG_BUILD_MODULE_FILE, value: '${RIOTPKG}/${PKG_NAME}/${PKG_NAME}.mk'}

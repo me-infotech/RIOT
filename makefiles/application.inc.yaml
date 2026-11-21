@@ -1,0 +1,25 @@
+# Rules of the build system (application) in makefiles. This file is the source: application.inc.mk
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - set: {var: MODULE, value: '${APPLICATION_MODULE}'}
+  - add: {DIRS: ['${RIOTCPU}/${CPU}', '${BOARDDIR}', '${RIOTBASE}/boards', '${RIOTCPU}', '${RIOTBASE}/core',
+        '${RIOTBASE}/core/lib', '${RIOTBASE}/drivers', '${RIOTBASE}/sys']}
+  - comment: |-
+      For regular modules, adding files to BLOBS, SRC, SRCXX, ASMSRC or ASSMSRC
+      in their Makefile is sufficient to explicitely set the variables.
+
+      Application modules are different, as they use this makefile to build, thus
+      application level variables are not available unless exported.
+
+      But exporting would pre-set the variables for all submakefiles.
+
+      As workaround, $(RIOTBASE)/Makefile.include passes the above-listed variables
+      to this Makefile as APPLICATION_*.
+    set: {var: BLOBS, value: '${APPLICATION_BLOBS}'}
+  - set: {var: SRC, value: '${APPLICATION_SRC}'}
+  - set: {var: SRCXX, value: '${APPLICATION_SRCXX}'}
+  - set: {var: ASMSRC, value: '${APPLICATION_ASMSRC}'}
+  - set: {var: ASSMSRC, value: '${APPLICATION_ASSMSRC}'}
+  - include: {path: '${RIOTBASE}/Makefile.base'}

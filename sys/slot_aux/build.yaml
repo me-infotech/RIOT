@@ -1,0 +1,13 @@
+# Build data of sys/slot_aux/Makefile.include (step G3-1).
+# Format: dist/tools/config_data/README.md (schema 3).
+schema: 3
+rules:
+  - set: {var: SLOT_AUX_LEN, value: '0', flavor: conditional}
+  - comment: 'slot_aux/Makefile.include:6: ROM_LEN (`NK` = N*1024) minus SLOT_AUX_LEN'
+    set: {var: SLOT_AUX_OFFSET, value: {arith: {expr: '${ROM_LEN}-${SLOT_AUX_LEN}', format: dec}}, flavor: conditional}
+  - add: {LINKFLAGS: ['${LINKFLAGPREFIX}--defsym=_slot_aux_offset=${SLOT_AUX_OFFSET}']}
+  - add: {LINKFLAGS: ['${LINKFLAGPREFIX}--defsym=_slot_aux_len=${SLOT_AUX_LEN}']}
+  - if: {not: {equals: {SLOT_AUX_LEN: '0'}}}
+    then:
+      - add: {CFLAGS: ['-DCONFIG_SLOT_AUX_OFFSET=${SLOT_AUX_OFFSET}']}
+      - add: {CFLAGS: ['-DCONFIG_SLOT_AUX_LEN=${SLOT_AUX_LEN}']}

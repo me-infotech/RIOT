@@ -1,0 +1,14 @@
+# Build description of the module(s) in cpu/nrf52. This file is the source: Makefile
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - comment: define the module that is build
+    set: {var: MODULE, value: cpu}
+  - comment: add a list of subdirectories, that should also be build
+    set: {var: DIRS, value: 'periph ${RIOTCPU}/cortexm_common ${RIOTCPU}/nrf5x_common vectors'}
+  - comment: build the nrf802154 driver if selected
+    if: {has: {var: USEMODULE, match: [nrf802154]}}
+    then:
+      - add: {DIRS: [radio/nrf802154]}
+  - include: {path: '${RIOTBASE}/Makefile.base'}

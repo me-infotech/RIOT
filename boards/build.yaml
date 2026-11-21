@@ -1,0 +1,36 @@
+# Build data of boards/Makefile.include (step G3-1): the Make files of common
+# board code, included when its module is used. They are not converted yet:
+# using one of them stops the build without Make (outside the data).
+# Format: dist/tools/config_data/README.md (schema 3).
+schema: 3
+rules:
+  - if: {has: {var: USEMODULE, match: [boards_common_adafruit-nrf52-bootloader]}}
+    then:
+      - include: {path: '${RIOTBOARD}/common/adafruit-nrf52-bootloader/Makefile.include'}
+  - if: {has: {var: USEMODULE, match: [boards_common_esp32]}}
+    then:
+      - include: {path: '${RIOTBOARD}/common/esp32/Makefile.include'}
+  - if: {has: {var: USEMODULE, match: [boards_common_esp32c3]}}
+    then:
+      - include: {path: '${RIOTBOARD}/common/esp32c3/Makefile.include'}
+  - if: {has: {var: USEMODULE, match: [boards_common_esp32c6]}}
+    then:
+      - include: {path: '${RIOTBOARD}/common/esp32c6/Makefile.include'}
+  - if: {has: {var: USEMODULE, match: [boards_common_esp32h2]}}
+    then:
+      - include: {path: '${RIOTBOARD}/common/esp32h2/Makefile.include'}
+  - if: {has: {var: USEMODULE, match: [boards_common_esp32s2]}}
+    then:
+      - include: {path: '${RIOTBOARD}/common/esp32s2/Makefile.include'}
+  - if: {has: {var: USEMODULE, match: [boards_common_esp32s3]}}
+    then:
+      - include: {path: '${RIOTBOARD}/common/esp32s3/Makefile.include'}
+  - if: {has: {var: USEMODULE, match: [boards_common_esp32x]}}
+    then:
+      - include: {path: '${RIOTBOARD}/common/esp32x/Makefile.include'}
+  - if: {has: {var: USEMODULE, match: [boards_common_rpi_pico_2]}}
+    then:
+      - include: {path: '${RIOTBOARD}/common/rpi-pico-2/Makefile.include'}
+  - if: {has: {var: USEMODULE, match: [boards_common_seeedstudio-xiao-nrf52840]}}
+    then:
+      - include: {path: '${RIOTBOARD}/common/seeedstudio-xiao-nrf52840/Makefile.include'}

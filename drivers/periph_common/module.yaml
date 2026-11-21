@@ -1,0 +1,22 @@
+# Build description of the module(s) in drivers/periph_common. This file is the source: Makefile
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+#
+# Written by hand (step G3-1): the original Makefile built the source list
+# with $(subst …) and $(addprefix …)/$(addsuffix …); the same list is
+# expressed with pattern substitutions (`pattern`). Make parity checks it.
+schema: 3
+rules:
+  - comment: every source file but init.c is a submodule periph_<name>
+    set:
+      var: PERIPH_COMMON_MODULES_SRCS_ALL
+      value: {files: {match: ['*.c'], except: [init.c]}}
+  - set:
+      var: PERIPH_COMMON_MODULES
+      value: {select: {var: PERIPH_COMMON_MODULES_SRCS_ALL, pattern: {from: '%.c', to: 'periph_%'}}}
+  - set:
+      var: PERIPH_COMMON_MODULES_USED
+      value: {select: {var: USEMODULE, match: ['${PERIPH_COMMON_MODULES}']}}
+  - set: {var: SRC, value: init.c}
+  - add: {SRC: [{select: {var: PERIPH_COMMON_MODULES_USED, pattern: {from: 'periph_%', to: '%.c'}}}]}
+  - include: {path: '${RIOTBASE}/Makefile.base'}

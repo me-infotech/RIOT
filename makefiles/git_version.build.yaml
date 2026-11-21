@@ -1,0 +1,20 @@
+# Build data of makefiles/git_version.inc.mk (step G3-1). The two git calls
+# of the Make file are probes of the build algorithm (PROBE_GIT_DESCRIBE:
+# `git --git-dir=RIOTBASE/.git describe --always --abbrev=4`,
+# PROBE_GIT_BRANCH: `git --git-dir=RIOTBASE/.git rev-parse --abbrev-ref HEAD`).
+# Format: dist/tools/config_data/README.md (schema 3).
+schema: 3
+rules:
+  - set: {var: GIT_DESCRIBE, value: '${PROBE_GIT_DESCRIBE}'}
+  - set: {var: GIT_BRANCH, value: '${PROBE_GIT_BRANCH}'}
+  - comment: the branch with a leading dash, nothing on master
+    set: {var: BUILD_GIT_BRANCH_SUFFIX, value: {select: {var: GIT_BRANCH, except: [master], pattern: {from: '%', to: '-%'}}}}
+  - set: {var: _GIT_VERSION, value: '${GIT_DESCRIBE}${BUILD_GIT_BRANCH_SUFFIX}'}
+  - if: {nonempty: [GIT_DESCRIBE]}
+    then:
+      - set: {var: GIT_VERSION, value: '${_GIT_VERSION}', flavor: conditional}
+  - if: {nonempty: [GIT_VERSION]}
+    then:
+      - set: {var: RIOT_VERSION_GIT, value: '${GIT_VERSION}'}
+    else:
+      - set: {var: RIOT_VERSION_GIT, value: "'UNKNOWN (builddir: ${RIOTBASE})'"}

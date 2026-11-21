@@ -1,0 +1,153 @@
+# Build description of the module(s) in sys/net/gnrc. This file is the source: Makefile
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - if: {has: {var: USEMODULE, match: [gnrc_dhcpv6]}}
+    then:
+      - add: {DIRS: [application_layer/dhcpv6]}
+  - if: {has: {var: USEMODULE, match: [gnrc_icmpv6]}}
+    then:
+      - add: {DIRS: [network_layer/icmpv6]}
+  - if: {has: {var: USEMODULE, match: [gnrc_icmpv6_echo]}}
+    then:
+      - add: {DIRS: [network_layer/icmpv6/echo]}
+  - if: {has: {var: USEMODULE, match: [gnrc_icmpv6_error]}}
+    then:
+      - add: {DIRS: [network_layer/icmpv6/error]}
+  - if: {has: {var: USEMODULE, match: [gnrc_ipv6]}}
+    then:
+      - add: {DIRS: [network_layer/ipv6]}
+  - if: {has: {var: USEMODULE, match: [gnrc_ipv6_ext]}}
+    then:
+      - add: {DIRS: [network_layer/ipv6/ext]}
+  - if: {has: {var: USEMODULE, match: [gnrc_ipv6_ext_frag]}}
+    then:
+      - add: {DIRS: [network_layer/ipv6/ext/frag]}
+  - if: {has: {var: USEMODULE, match: [gnrc_ipv6_ext_opt]}}
+    then:
+      - add: {DIRS: [network_layer/ipv6/ext/opt]}
+  - if: {has: {var: USEMODULE, match: [gnrc_ipv6_ext_rh]}}
+    then:
+      - add: {DIRS: [network_layer/ipv6/ext/rh]}
+  - if: {has: {var: USEMODULE, match: [gnrc_ipv6_hdr]}}
+    then:
+      - add: {DIRS: [network_layer/ipv6/hdr]}
+  - if: {has: {var: USEMODULE, match: [gnrc_ipv6_nib]}}
+    then:
+      - add: {DIRS: [network_layer/ipv6/nib]}
+  - if: {has: {var: USEMODULE, match: [gnrc_ipv6_whitelist]}}
+    then:
+      - add: {DIRS: [network_layer/ipv6/whitelist]}
+  - if: {has: {var: USEMODULE, match: [gnrc_ipv6_blacklist]}}
+    then:
+      - add: {DIRS: [network_layer/ipv6/blacklist]}
+  - if: {has: {var: USEMODULE, match: [gnrc_ndp]}}
+    then:
+      - add: {DIRS: [network_layer/ndp]}
+  - if: {has: {var: USEMODULE, match: [gnrc_netapi]}}
+    then:
+      - add: {DIRS: [netapi]}
+  - if: {has: {var: USEMODULE, match: [gnrc_netapi_notify]}}
+    then:
+      - add: {DIRS: [netapi/notify]}
+  - if: {has: {var: USEMODULE, match: [gnrc_netif, gnrc_netif_%]}}
+    then:
+      - add: {DIRS: [netif]}
+  - if: {has: {var: USEMODULE, match: [gnrc_netreg]}}
+    then:
+      - add: {DIRS: [netreg]}
+  - if: {has: {var: USEMODULE, match: [gnrc_pkt]}}
+    then:
+      - add: {DIRS: [pkt]}
+  - if: {has: {var: USEMODULE, match: [gnrc_pktbuf_malloc]}}
+    then:
+      - add: {DIRS: [pktbuf_malloc]}
+  - if: {has: {var: USEMODULE, match: [gnrc_lorawan]}}
+    then:
+      - add: {DIRS: [link_layer/lorawan]}
+  - if: {has: {var: USEMODULE, match: [gnrc_pktbuf_static]}}
+    then:
+      - add: {DIRS: [pktbuf_static]}
+  - if: {has: {var: USEMODULE, match: [gnrc_pktbuf]}}
+    then:
+      - add: {DIRS: [pktbuf]}
+  - if: {has: {var: USEMODULE, match: [gnrc_priority_pktqueue]}}
+    then:
+      - add: {DIRS: [priority_pktqueue]}
+  - if: {has: {var: USEMODULE, match: [gnrc_pktdump]}}
+    then:
+      - add: {DIRS: [pktdump]}
+  - if: {has: {var: USEMODULE, match: [gnrc_pktshark]}}
+    then:
+      - add: {DIRS: [pktshark]}
+  - if: {has: {var: USEMODULE, match: [gnrc_rpl]}}
+    then:
+      - add: {DIRS: [routing/rpl]}
+  - if: {has: {var: USEMODULE, match: [gnrc_rpl_srh]}}
+    then:
+      - add: {DIRS: [routing/rpl/srh]}
+  - if: {has: {var: USEMODULE, match: [gnrc_rpl_p2p]}}
+    then:
+      - add: {DIRS: [routing/rpl/p2p]}
+  - if: {has: {var: USEMODULE, match: [gnrc_ipv6_static_addr]}}
+    then:
+      - add: {DIRS: [network_layer/ipv6/static_addr]}
+  - if: {has: {var: USEMODULE, match: [gnrc_ipv6_auto_subnets]}}
+    then:
+      - add: {DIRS: [routing/ipv6_auto_subnets]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan]}}
+    then:
+      - add: {DIRS: [network_layer/sixlowpan]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan_ctx]}}
+    then:
+      - add: {DIRS: [network_layer/sixlowpan/ctx]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan_frag]}}
+    then:
+      - add: {DIRS: [network_layer/sixlowpan/frag]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan_frag_fb]}}
+    then:
+      - add: {DIRS: [network_layer/sixlowpan/frag/fb]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan_frag_minfwd]}}
+    then:
+      - add: {DIRS: [network_layer/sixlowpan/frag/minfwd]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan_frag_rb]}}
+    then:
+      - add: {DIRS: [network_layer/sixlowpan/frag/rb]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan_frag_sfr]}}
+    then:
+      - add: {DIRS: [network_layer/sixlowpan/frag/sfr]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan_frag_stats]}}
+    then:
+      - add: {DIRS: [network_layer/sixlowpan/frag/stats]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan_frag_vrb]}}
+    then:
+      - add: {DIRS: [network_layer/sixlowpan/frag/vrb]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan_iphc]}}
+    then:
+      - add: {DIRS: [network_layer/sixlowpan/iphc]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan_nd]}}
+    then:
+      - add: {DIRS: [network_layer/sixlowpan/nd]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sock]}}
+    then:
+      - add: {DIRS: [sock]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sock_ip]}}
+    then:
+      - add: {DIRS: [sock/ip]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sock_udp]}}
+    then:
+      - add: {DIRS: [sock/udp]}
+  - if: {has: {var: USEMODULE, match: [gnrc_sock_tcp]}}
+    then:
+      - add: {DIRS: [sock/tcp]}
+  - if: {has: {var: USEMODULE, match: [gnrc_udp]}}
+    then:
+      - add: {DIRS: [transport_layer/udp]}
+  - if: {has: {var: USEMODULE, match: [gnrc_tcp]}}
+    then:
+      - add: {DIRS: [transport_layer/tcp]}
+  - if: {has: {var: USEMODULE, match: [gnrc_tx_sync]}}
+    then:
+      - add: {DIRS: [tx_sync]}
+  - include: {path: '${RIOTBASE}/Makefile.base'}

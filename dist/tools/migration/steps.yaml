@@ -104,3 +104,17 @@ steps:
     requires:
       pip: [pyyaml]
     docs: dist/tools/resolver/README.md
+
+  - id: g3-01-all
+    title: Build an application with CMake and Ninja from the data, without Make
+    group: "3"
+    targets:
+      - name: all
+        now: just build <application> <board> [VAR=VALUE…]
+        hardware: false
+    tests:
+      - dist/tools/cmake_gen/tests
+    requires:
+      pip: [pyyaml]
+      tools: [just@1.59.0]
+    docs: dist/tools/cmake_gen/README.md

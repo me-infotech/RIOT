@@ -1,0 +1,18 @@
+# Build description of the module(s) in core/lib. This file is the source: Makefile
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 3
+rules:
+  - set: {var: MODULE, value: core_lib}
+  - comment: enable submodules
+    set: {var: SUBMODULES, value: '1', flavor: simple}
+  - comment: |-
+      set this so the panic and init code is available as "core_panic" and "core_init"
+      instead of "core_lib_..."
+    set: {var: BASE_MODULE, value: core}
+  - comment: exclude submodule sources from *.c wildcard source selection
+    set:
+      var: SRC
+      value: {files: {match: ['*.c'], except: [panic.c, init.c]}}
+      flavor: simple
+  - include: {path: '${RIOTBASE}/Makefile.base'}

@@ -9,13 +9,16 @@ The YAML file next to a `Makefile.dep` (`deps.yaml`), `Makefile.features`
 (`makefiles/<name>.inc.mk` -> `<name>.inc.yaml`) or an application
 `Makefile` (`riot-app.yaml`) is the source; the Make file is generated from
 it and checked in, so that Make keeps working until nothing reads it any
-more.
+more. Step G3-1 adds the build description of the modules: a module
+`Makefile` is generated from `module.yaml`, a shared module rule file
+`<x>.mk` from `<x>.module.yaml` (`translate --module`).
 
   config_data.py generate [--check] [YAML…]   write (check) the Make files
   config_data.py validate [YAML…]             check the YAML against the schema
-  config_data.py translate [--force] MAKEFILE…
+  config_data.py translate [--force] [--module] MAKEFILE…
                                               one-off conversion: write the YAML
-                                              next to each Make file
+                                              next to each Make file (--module:
+                                              a module Makefile -> module.yaml)
   config_data.py roundtrip [--rev REV] [MAKEFILE…]
                                               rules of the original Make file
                                               (at REV) == rules of the generated
@@ -83,10 +86,12 @@ def expected_make_text(path: str) -> str:
     return generate.make_text(load_valid(path), os.path.basename(path))
 
 
-def title(make_path: str) -> str:
+def title(make_path: str, module: bool = False) -> str:
     directory = os.path.dirname(rel(make_path)) or "the repository root"
     base = os.path.basename(make_path)
-    if base == R.APP_MAKE:
+    if module:
+        what = "Build description of the module(s) in"
+    elif base == R.APP_MAKE:
         what = "Configuration of the application"
     elif base.endswith(R.INC_MAKE):
         what = f"Rules of the build system ({base[:-len(R.INC_MAKE)]}) in"
@@ -115,12 +120,12 @@ def roundtrip_problems(original_text: str, generated_text: str, yaml_rules: list
 def cmd_translate(args) -> int:
     failed = 0
     for make_path in args.files:
-        target = R.yaml_name(make_path)
+        target = R.module_yaml_name(make_path) if args.module else R.yaml_name(make_path)
         try:
             with open(make_path, encoding="utf-8") as file:
                 original = file.read()
             rules = translate(original, rel(make_path))
-            text = R.dump_yaml(rules, title(make_path))
+            text = R.dump_yaml(rules, title(make_path, args.module))
             document = yaml.safe_load(text)
             problems = schema.validate(document)
             problems += roundtrip_problems(
@@ -193,14 +198,37 @@ def load_scope() -> dict:
 def converted_files(scope: dict) -> list:
     """Every Make file generated from YAML for the scope: the dependency and
     feature files Make reads (G0-1), the rule files of the build system
-    pipeline and the application Makefiles (G0-2)."""
+    pipeline and the application Makefiles (G0-2), the module Makefiles
+    (G3-1)."""
     apps = [os.path.join(d, R.APP_MAKE) for d in scope["applications"].values()]
-    return sorted(scope["files"] + scope.get("pipeline", []) + apps)
+    return sorted(scope["files"] + scope.get("pipeline", []) + apps
+                  + scope.get("modules", []))
+
+
+def data_name(path: str, scope: dict) -> str:
+    """The YAML source of a converted Make file of the scope."""
+    if path in scope.get("modules", []):
+        return R.module_yaml_name(path)
+    return R.yaml_name(path)
 
 
 def git_show(rev: str, path: str) -> str:
     return subprocess.run(["git", "-C", R.RIOTBASE, "show", f"{rev}:{path}"],
                           capture_output=True, text=True, check=True).stdout
+
+
+def file_roundtrip_problems(path: str, scope: dict, rev: str) -> list:
+    """Round trip of one converted Make file of the scope (relative path)."""
+    yaml_path = os.path.join(R.RIOTBASE, data_name(path, scope))
+    with open(os.path.join(R.RIOTBASE, path), encoding="utf-8") as file:
+        generated = file.read()
+    rules = load_valid(yaml_path)
+    if path in scope.get("restructured", []):
+        # written by hand with other constructs (reason in the YAML header):
+        # generated = YAML here; the behaviour is checked by Make parity
+        same = R.normalise(translate(generated, "generated")) == R.normalise(rules)
+        return [] if same else ["rules of the generated Make file differ from the YAML"]
+    return roundtrip_problems(git_show(rev, path), generated, rules)
 
 
 def cmd_roundtrip(args) -> int:
@@ -209,11 +237,8 @@ def cmd_roundtrip(args) -> int:
     files = [rel(f) for f in args.files] or converted_files(scope)
     failed = 0
     for path in files:
-        yaml_path = os.path.join(R.RIOTBASE, R.yaml_name(path))
-        with open(os.path.join(R.RIOTBASE, path), encoding="utf-8") as file:
-            generated = file.read()
         try:
-            problems = roundtrip_problems(git_show(rev, path), generated, load_valid(yaml_path))
+            problems = file_roundtrip_problems(path, scope, rev)
         except (ValueError, subprocess.CalledProcessError) as err:
             problems = [str(err).strip()]
         for problem in problems:
@@ -275,6 +300,7 @@ def main(argv=None) -> int:
     cmd.set_defaults(func=cmd_validate)
     cmd = sub.add_parser("translate")
     cmd.add_argument("--force", action="store_true")
+    cmd.add_argument("--module", action="store_true")
     cmd.add_argument("files", nargs="+")
     cmd.set_defaults(func=cmd_translate)
     cmd = sub.add_parser("roundtrip")

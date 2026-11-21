@@ -1,0 +1,8 @@
+# Build description of the module(s) in pkg/mpaland-printf. This file is the source: mpaland-printf.mk
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - set: {var: MODULE, value: mpaland-printf, flavor: simple}
+  - set: {var: SRC, value: printf.c, flavor: simple}
+  - include: {path: '${RIOTBASE}/Makefile.base'}

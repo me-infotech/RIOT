@@ -49,6 +49,12 @@ File names
 Format (schema 1)
 -----------------
 
+Schema 2 (step G0-2) and schema 3 (step G3-1: `files`, `subdirs`, `arith`
+values; `pattern`, `macro`, `unique` in a selection; conditions `at_least`,
+`nonempty`; module data `module.yaml` -> generated module `Makefile`) are
+described in `dist/tools/resolver/README.md` and
+`dist/tools/cmake_gen/README.md`.
+
 ```yaml
 schema: 1
 rules:                       # evaluated in order, like the Make file

@@ -1,5 +1,7 @@
-SRC := random.c
+# Generated from module.yaml by dist/tools/config_data/config_data.py.
+# Do not edit: change module.yaml and run `just generate-config-data`.
 
+SRC := random.c
 BASE_MODULE := prng
 SUBMODULES := 1
 

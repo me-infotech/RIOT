@@ -1,0 +1,7 @@
+# Build data of boards/nrf52840dk/Makefile.include (step G3-1): only what the
+# build reads; Make keeps reading the Make file, whose other settings (J-Link,
+# OpenOCD, terminal) are flashing and debugging (step G3-2 and later).
+# Format: dist/tools/config_data/README.md (schema 3).
+schema: 3
+rules:
+  - include: {path: '${RIOTBOARD}/common/nrf52xxxdk/Makefile.include'}

@@ -1,0 +1,14 @@
+# Build description of the module(s) in sys/net/link_layer/ieee802154. This file is the source: Makefile
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - set: {var: MODULE, value: ieee802154}
+  - set: {var: SRC, value: ieee802154.c}
+  - if: {has: {var: USEMODULE, match: [ieee802154_security]}}
+    then:
+      - add: {SRC: [security.c]}
+  - if: {has: {var: USEMODULE, match: [ieee802154_submac]}}
+    then:
+      - add: {SRC: [submac.c]}
+  - include: {path: '${RIOTBASE}/Makefile.base'}

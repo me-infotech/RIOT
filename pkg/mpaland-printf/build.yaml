@@ -1,0 +1,10 @@
+# Build data of pkg/mpaland-printf/Makefile.include (step G3-1).
+# Format: dist/tools/config_data/README.md (schema 3).
+schema: 3
+rules:
+  - comment: wrap stdio functions to use mpaland's printf instead of the one from the standard C lib
+    add: {LINKFLAGS: ['-Wl,-wrap=printf', '-Wl,-wrap=fprintf', '-Wl,-wrap=dprintf', '-Wl,-wrap=sprintf', '-Wl,-wrap=snprintf', '-Wl,-wrap=vprintf', '-Wl,-wrap=vfprintf', '-Wl,-wrap=vdprintf', '-Wl,-wrap=vsprintf', '-Wl,-wrap=vsnprintf', '-Wl,-wrap=putchar', '-Wl,-wrap=putc', '-Wl,-wrap=fputc', '-Wl,-wrap=puts', '-Wl,-wrap=fputs']}
+  - add: {LINKFLAGS: ['-Wl,-wrap=_printf_common', '-Wl,-wrap=_fprintf_r', '-Wl,-wrap=_printf_r', '-Wl,-wrap=iprintf', '-Wl,-wrap=fiprintf']}
+  - if: {has: {var: FEATURES_USED, match: [newlib]}}
+    then:
+      - add: {CFLAGS: [-D__int64_t_defined=1]}

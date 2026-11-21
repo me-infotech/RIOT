@@ -1,3 +1,6 @@
+# Generated from module.yaml by dist/tools/config_data/config_data.py.
+# Do not edit: change module.yaml and run `just generate-config-data`.
+
 # define the module that is build
 MODULE = cpu
 
@@ -6,7 +9,7 @@ DIRS = periph $(RIOTCPU)/cortexm_common $(RIOTCPU)/nrf5x_common vectors
 
 # build the nrf802154 driver if selected
 ifneq (,$(filter nrf802154,$(USEMODULE)))
-    DIRS += radio/nrf802154
+  DIRS += radio/nrf802154
 endif
 
 include $(RIOTBASE)/Makefile.base

@@ -1,0 +1,14 @@
+# Build description of the module(s) in sys/ztimer. This file is the source: Makefile
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - comment: make all code end up in "ztimer_core.a"
+    set: {var: MODULE, value: ztimer_core, flavor: simple}
+  - comment: ensure that "ztimer_foo" builds "ztimer_foo.c", not "ztimer_core_foo.c"
+    set: {var: BASE_MODULE, value: ztimer, flavor: simple}
+  - comment: ztimer_core files
+    set: {var: SRC, value: core.c util.c periodic.c, flavor: simple}
+  - comment: enable submodules
+    set: {var: SUBMODULES, value: '1', flavor: simple}
+  - include: {path: '${RIOTBASE}/Makefile.base'}

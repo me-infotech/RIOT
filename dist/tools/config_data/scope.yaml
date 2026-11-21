@@ -69,3 +69,108 @@ pipeline:
 - makefiles/deprecated_modules.inc.mk
 - makefiles/features_modules.inc.mk
 - makefiles/stdio.inc.mk
+# Step G3-1: rule files that module Makefiles include (application module,
+# auto_init submodules).
+- makefiles/application.inc.mk
+- makefiles/auto_init.inc.mk
+# Step G3-1 (build without Make): the module Makefiles Make reads when it
+# builds the applications above for nrf52840dk (the directories of its
+# DIRS recursion and the package module file). Their YAML is
+# `module.yaml` (`<x>.module.yaml` for `<x>.mk`); the Makefile is generated.
+modules:
+- boards/Makefile
+- boards/common/init/Makefile
+- boards/common/nrf52xxxdk/Makefile
+- boards/nrf52840dk/Makefile
+- core/Makefile
+- core/lib/Makefile
+- cpu/Makefile
+- cpu/cortexm_common/Makefile
+- cpu/cortexm_common/periph/Makefile
+- cpu/nrf52/Makefile
+- cpu/nrf52/periph/Makefile
+- cpu/nrf52/radio/nrf802154/Makefile
+- cpu/nrf52/vectors/Makefile
+- cpu/nrf5x_common/Makefile
+- cpu/nrf5x_common/periph/Makefile
+- drivers/Makefile
+- drivers/netdev/Makefile
+- drivers/netdev_ieee802154_submac/Makefile
+- drivers/periph_common/Makefile
+- examples/advanced/bindist/abc/Makefile
+- makefiles/periph.mk
+- pkg/mpaland-printf/mpaland-printf.mk
+- sys/Makefile
+- sys/auto_init/Makefile
+- sys/div/Makefile
+- sys/event/Makefile
+- sys/evtimer/Makefile
+- sys/fmt/Makefile
+- sys/frac/Makefile
+- sys/iolist/Makefile
+- sys/isrpipe/Makefile
+- sys/libc/Makefile
+- sys/luid/Makefile
+- sys/malloc_thread_safe/Makefile
+- sys/net/crosslayer/inet_csum/Makefile
+- sys/net/gnrc/Makefile
+- sys/net/gnrc/netapi/Makefile
+- sys/net/gnrc/netif/Makefile
+- sys/net/gnrc/netif/hdr/Makefile
+- sys/net/gnrc/netif/ieee802154/Makefile
+- sys/net/gnrc/netif/init_devs/Makefile
+- sys/net/gnrc/netif/pktq/Makefile
+- sys/net/gnrc/netreg/Makefile
+- sys/net/gnrc/network_layer/icmpv6/Makefile
+- sys/net/gnrc/network_layer/icmpv6/echo/Makefile
+- sys/net/gnrc/network_layer/icmpv6/error/Makefile
+- sys/net/gnrc/network_layer/ipv6/Makefile
+- sys/net/gnrc/network_layer/ipv6/hdr/Makefile
+- sys/net/gnrc/network_layer/ipv6/nib/Makefile
+- sys/net/gnrc/network_layer/ndp/Makefile
+- sys/net/gnrc/network_layer/sixlowpan/Makefile
+- sys/net/gnrc/network_layer/sixlowpan/ctx/Makefile
+- sys/net/gnrc/network_layer/sixlowpan/frag/Makefile
+- sys/net/gnrc/network_layer/sixlowpan/frag/fb/Makefile
+- sys/net/gnrc/network_layer/sixlowpan/frag/rb/Makefile
+- sys/net/gnrc/network_layer/sixlowpan/iphc/Makefile
+- sys/net/gnrc/network_layer/sixlowpan/nd/Makefile
+- sys/net/gnrc/pkt/Makefile
+- sys/net/gnrc/pktbuf/Makefile
+- sys/net/gnrc/pktbuf_static/Makefile
+- sys/net/gnrc/pktshark/Makefile
+- sys/net/gnrc/routing/rpl/Makefile
+- sys/net/gnrc/sock/Makefile
+- sys/net/gnrc/sock/udp/Makefile
+- sys/net/gnrc/transport_layer/udp/Makefile
+- sys/net/link_layer/eui_provider/Makefile
+- sys/net/link_layer/ieee802154/Makefile
+- sys/net/link_layer/l2util/Makefile
+- sys/net/netif/Makefile
+- sys/net/netutils/Makefile
+- sys/net/network_layer/icmpv6/Makefile
+- sys/net/network_layer/ipv6/addr/Makefile
+- sys/net/network_layer/ipv6/hdr/Makefile
+- sys/net/network_layer/sixlowpan/Makefile
+- sys/net/sock/Makefile
+- sys/net/sock/async/event/Makefile
+- sys/net/transport_layer/udp/Makefile
+- sys/newlib_syscalls_default/Makefile
+- sys/od/Makefile
+- sys/posix/inet/Makefile
+- sys/preprocessor/Makefile
+- sys/ps/Makefile
+- sys/random/Makefile
+- sys/shell/Makefile
+- sys/shell/cmds/Makefile
+- sys/stdio/Makefile
+- sys/stdio_uart/Makefile
+- sys/trickle/Makefile
+- sys/tsrb/Makefile
+- sys/ztimer/Makefile
+# Written by hand with other constructs than the original (reason in the
+# YAML header): generated = YAML is checked, the behaviour by Make parity
+# (dist/tools/cmake_gen/tests).
+restructured:
+- drivers/periph_common/Makefile
+- makefiles/auto_init.inc.mk

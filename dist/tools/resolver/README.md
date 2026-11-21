@@ -139,7 +139,7 @@ python3 -m unittest discover -s dist/tools/config_data/tests -v   # schema 2, ad
 | P4 command line | `test_info_parity.CommandLineTest` | all targets of a pair, json, exit codes 1/2/3 |
 | N1-N3 no Make | `test_no_make.*` | audit-hook trace over the whole sample and three requests outside the data: no Make file opened, no process; stub `make` on PATH never called; no process module imported; positive probes for each detector |
 | S1-S5 schema 2, adapters | `config_data/tests/test_schema2.*`, `test_adapters.UpToDateTest` | validator, translator, generator, normal form, file names; generated pipeline/app Makefiles up to date |
-| M make parity | `config_data/tests/test_parity.LiveMakeParityTest` | live `make info-*` (10 targets, 6 pairs) and `make -n -k` (hello-world) with the generated files vs. golden |
+| M make parity | `config_data/tests/test_parity.LiveMakeParityTest` | live `make info-*` (11 targets, 6 pairs) and `make -n -k` (hello-world) with the generated files vs. golden |
 | O1 register | `dist/tools/migration/tests` | step `g0-02-resolver` (G0, `targets: []`, `provides`) |
 
 67 tests in 5 modules (algorithm 29, variables 11, evaluate 10, info
@@ -188,7 +188,7 @@ Limits
 
 - Only the scope above; each further application/board needs its files
   converted (`config_data.py translate`, `scope.yaml`).
-- Not modelled: the toolchain check (`Makefile.include:968-983`, needs
+- Not modelled: the toolchain check (`Makefile.include:970-984`, needs
   `TOOLCHAINS_SUPPORTED` of the CPU's `Makefile.include`; both CPUs support
   `gnu`), Kconfig, board aliases, the environment (only command line
   variables; the golden files were recorded with `env -i`), messages of

@@ -1,0 +1,8 @@
+# Build description of the module(s) in sys/event. This file is the source: Makefile
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - set: {var: SRC, value: event.c, flavor: simple}
+  - set: {var: SUBMODULES, value: '1', flavor: simple}
+  - include: {path: '${RIOTBASE}/Makefile.base'}

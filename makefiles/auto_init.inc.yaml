@@ -1,0 +1,22 @@
+# Rules of the build system (auto_init) in makefiles. This file is the source: auto_init.inc.mk
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+#
+# Written by hand (step G3-1): the original used nested $(subst …),
+# $(addprefix …) and $(addsuffix …); the same lists are expressed with
+# pattern substitutions (`pattern`). Make parity checks it.
+schema: 3
+rules:
+  - set: {var: AUTO_INIT_PREFIX, value: auto_init_}
+  - set: {var: AUTO_INIT_SRCS, value: {files: {match: ['${AUTO_INIT_PREFIX}*.c']}}}
+  - set:
+      var: AUTO_INIT_MODULES_AVAILABLE
+      value: {select: {var: AUTO_INIT_SRCS, pattern: {from: '${AUTO_INIT_PREFIX}%.c', to: '%'}}}
+  - set:
+      var: AUTO_INIT_MODULES_USED
+      value: {select: {var: USEMODULE, match: ['${AUTO_INIT_MODULES_AVAILABLE}']}}
+  - set:
+      var: AUTO_INIT_MODULES_USED_SRCS
+      value: {select: {var: AUTO_INIT_MODULES_USED, pattern: {from: '%', to: '${AUTO_INIT_PREFIX}%.c'}}}
+  - set: {var: SRC, value: 'init.c ${AUTO_INIT_MODULES_USED_SRCS}'}
+  - include: {path: '${RIOTBASE}/Makefile.base'}

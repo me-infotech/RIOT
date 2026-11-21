@@ -1,0 +1,18 @@
+# Build description of the module(s) in cpu/nrf5x_common. This file is the source: Makefile
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - set: {var: MODULE, value: cpu_common}
+  - set: {var: DIRS, value: periph}
+  - if: {has: {var: USEMODULE, match: [nrf_shared_serial_irq]}}
+    then:
+      - add: {DIRS: [shared_irq]}
+  - comment: build one of the radio drivers, if enabled
+    if: {has: {var: USEMODULE, match: [nrfble]}}
+    then:
+      - add: {DIRS: [radio/nrfble]}
+  - if: {has: {var: USEMODULE, match: [nrfmin]}}
+    then:
+      - add: {DIRS: [radio/nrfmin]}
+  - include: {path: '${RIOTBASE}/Makefile.base'}

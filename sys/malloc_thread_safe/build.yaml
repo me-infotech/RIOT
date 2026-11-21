@@ -1,0 +1,5 @@
+# Build data of sys/malloc_thread_safe/Makefile.include (step G3-1).
+# Format: dist/tools/config_data/README.md (schema 3).
+schema: 3
+rules:
+  - add: {LINKFLAGS: ['-Wl,-wrap=malloc -Wl,-wrap=calloc -Wl,-wrap=realloc -Wl,-wrap=free']}

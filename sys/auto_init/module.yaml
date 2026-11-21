@@ -1,0 +1,39 @@
+# Build description of the module(s) in sys/auto_init. This file is the source: Makefile
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - if: {has: {var: USEMODULE, match: [gnrc_netif_init]}}
+    then:
+      - add: {DIRS: [netif]}
+  - if: {has: {var: USEMODULE, match: [saul_init]}}
+    then:
+      - add: {DIRS: [saul]}
+  - if: {has: {var: USEMODULE, match: [auto_init_can]}}
+    then:
+      - add: {DIRS: [can]}
+  - if: {has: {var: USEMODULE, match: [auto_init_loramac]}}
+    then:
+      - add: {DIRS: [loramac]}
+  - if: {has: {var: USEMODULE, match: [auto_init_radiolib]}}
+    then:
+      - add: {DIRS: [radiolib]}
+  - if: {has: {var: USEMODULE, match: [auto_init_multimedia]}}
+    then:
+      - add: {DIRS: [multimedia]}
+  - if: {has: {var: USEMODULE, match: [auto_init_usbus]}}
+    then:
+      - add: {DIRS: [usb]}
+  - if: {has: {var: USEMODULE, match: [auto_init_security]}}
+    then:
+      - add: {DIRS: [security]}
+  - if: {has: {var: USEMODULE, match: [auto_init_screen]}}
+    then:
+      - add: {DIRS: [screen]}
+  - if: {has: {var: USEMODULE, match: [auto_init_wdt_event]}}
+    then:
+      - add: {DIRS: [wdt_event]}
+  - if: {has: {var: USEMODULE, match: [auto_init_wdt_thread]}}
+    then:
+      - add: {DIRS: [wdt_thread]}
+  - include: {path: '${RIOTBASE}/Makefile.base'}

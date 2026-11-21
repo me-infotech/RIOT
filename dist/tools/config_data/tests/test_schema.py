@@ -75,7 +75,7 @@ class InvalidDocumentTest(unittest.TestCase):
 
     CASES = [
         # (path, new value, expected text in a problem)
-        (["schema"], 3, "schema: must be one of 1, 2"),
+        (["schema"], 4, "schema: must be one of 1, 2, 3"),
         (["rules"], {}, "must be a list"),
         (["extra"], 1, "unknown key 'extra'"),
         (["rules", 1, "if", "has", "match"], ["$(X)_a"], "is not a pattern"),

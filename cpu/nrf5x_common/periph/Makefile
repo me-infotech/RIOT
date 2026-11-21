@@ -1,3 +1,6 @@
+# Generated from module.yaml by dist/tools/config_data/config_data.py.
+# Do not edit: change module.yaml and run `just generate-config-data`.
+
 MODULE = nrf5x_common_periph
 
 # Select the specific implementation for `periph_i2c`

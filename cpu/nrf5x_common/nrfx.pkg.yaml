@@ -1,0 +1,35 @@
+# Package data of cpu/nrf5x_common/Makefile.nrfx (step G3-1): the nRF vendor
+# headers, fetched like a package and copied to `vendor/`. Make keeps reading
+# Makefile.nrfx (recipe fetch_nrfx_vendor_headers of
+# cpu/nrf5x_common/Makefile.include); the build without Make reads this file
+# (dist/tools/cmake_gen/pkg_prepare.py).
+# Format: dist/tools/config_data/README.md (schema 3).
+schema: 3
+rules:
+  - set: {var: PKG_NAME, value: nrf5x_nrfx_mdk}
+  - set: {var: PKG_URL, value: 'https://github.com/NordicSemiconductor/nrfx'}
+  - comment: Release 3.14.0
+    set: {var: PKG_VERSION, value: 11f57e578c7feea13f21c79ea0efab2630ac68c7}
+  - set: {var: PKG_LICENSE, value: BSD-3-Clause}
+  - if: {equals: {CPU_FAM: nrf51}}
+    then:
+      - set: {var: PKG_SPARSE_PATHS, value: mdk/nrf51.h}
+      - add: {PKG_SPARSE_PATHS: [mdk/nrf51_bitfields.h, mdk/nrf51822_peripherals.h]}
+    elif:
+      - if: {equals: {CPU_FAM: nrf52}}
+        then:
+          - set: {var: PKG_SPARSE_PATHS, value: mdk/nrf52.h}
+          - add: {PKG_SPARSE_PATHS: [mdk/nrf52_bitfields.h, mdk/nrf52810.h, mdk/nrf52810_bitfields.h, mdk/nrf52810_name_change.h, mdk/nrf52810_peripherals.h, mdk/nrf52811.h, mdk/nrf52811_bitfields.h, mdk/nrf52811_peripherals.h, mdk/nrf52832_peripherals.h, mdk/nrf52833.h, mdk/nrf52833_bitfields.h, mdk/nrf52833_peripherals.h, mdk/nrf52840.h, mdk/nrf52840_bitfields.h, mdk/nrf52840_name_change.h, mdk/nrf52840_peripherals.h]}
+    else:
+      - comment: |-
+          Makefile.nrfx: `else ifneq (nrf53%, $(CPU_FAM))` compares with the
+          literal text `nrf53%`, so it holds for every CPU family
+        add: {PKG_SPARSE_PATHS: [mdk/nrf5340_application.h, mdk/nrf5340_application_bitfields.h, mdk/nrf5340_application_name_change.h, mdk/nrf5340_application_peripherals.h, mdk/nrf5340_network.h, mdk/nrf5340_network_bitfields.h, mdk/nrf5340_network_name_change.h, mdk/nrf5340_network_peripherals.h]}
+  - set: {var: PKG_SOURCE_DIR, value: '${BUILD_DIR}/nrf5x_nrfx_mdk/${CPU_FAM}'}
+  - set: {var: PKG_PATCH_DIR, value: '${RIOTCPU}/nrf5x_common/include/vendor/patches'}
+  - set: {var: VENDOR_FOLDER, value: '${PKG_SOURCE_DIR}/vendor'}
+  - include: {path: '${RIOTBASE}/pkg/pkg.mk'}
+  - comment: 'Makefile.nrfx:74-84: copy mdk/<name> to vendor/<name> after patching'
+    set: {var: PKG_COPY_FROM, value: '${PKG_SOURCE_DIR}/mdk'}
+  - set: {var: PKG_COPY_TO, value: '${VENDOR_FOLDER}'}
+  - set: {var: PKG_COPY_FILES, value: {select: {var: PKG_SPARSE_PATHS, pattern: {from: 'mdk/%', to: '%'}}}}

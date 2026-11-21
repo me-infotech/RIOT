@@ -1,0 +1,7 @@
+# Build data of cpu/Makefile.include (step G3-1).
+# Format: dist/tools/config_data/README.md (schema 3).
+schema: 3
+rules:
+  - if: {has: {var: USEMODULE, match: [cpu_common_rp2350]}}
+    then:
+      - include: {path: '${RIOTCPU}/common/rp2350/Makefile.include'}

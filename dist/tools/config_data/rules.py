@@ -18,9 +18,13 @@ RIOTBASE = os.path.normpath(os.path.join(HERE, "..", "..", ".."))
 # Schema 1: the format of step G0-1. Schema 2 (step G0-2) adds selections
 # (`select` values, `${NAME}` as a pattern word, the `several` condition) for
 # the rules of the build system pipeline; every schema-1 document is also a
-# valid schema-2 document. A file declares the lowest schema it needs.
-SCHEMA = 2
-SCHEMAS = (1, 2)
+# valid schema-2 document. Schema 3 (step G3-1, build without Make) adds the
+# constructs of the module Makefiles and of the build data: `files` and
+# `subdirs` values, `pattern`, `macro` and `unique` in a selection, `arith`
+# values and the conditions `at_least` and `nonempty`. A file declares the
+# lowest schema it needs.
+SCHEMA = 3
+SCHEMAS = (1, 2, 3)
 
 # `${NAME}` in a text: the value of the variable NAME. It is the only
 # reference the data format knows; Make functions are not allowed.
@@ -35,6 +39,21 @@ KINDS = (("Makefile.dep", "deps.yaml"), ("Makefile.features", "provides.yaml"),
 # system pipeline in makefiles/ (`<name>.inc.mk`).
 APP_MAKE, APP_DATA = "Makefile", "riot-app.yaml"
 INC_MAKE, INC_DATA = ".inc.mk", ".inc.yaml"
+# Step G3-1: the build description of a module. A module `Makefile` ->
+# `module.yaml`, a shared module rule file `<x>.mk` (e.g. makefiles/periph.mk,
+# pkg/mpaland-printf/mpaland-printf.mk) -> `<x>.module.yaml`.
+MODULE_MAKE, MODULE_DATA = "Makefile", "module.yaml"
+MODULE_SUFFIX = ".module.yaml"
+
+
+def module_yaml_name(make_path: str) -> str:
+    """The module data file of a module `Makefile` or `<x>.mk` (step G3-1)."""
+    directory, base = os.path.split(make_path)
+    if base == MODULE_MAKE:
+        return os.path.join(directory, MODULE_DATA)
+    if base.endswith(".mk") and not base.endswith(INC_MAKE) and len(base) > 3:
+        return os.path.join(directory, base[:-3] + MODULE_SUFFIX)
+    raise ValueError(f"not a module Make file: {make_path}")
 
 
 def yaml_name(make_path: str) -> str:
@@ -63,6 +82,10 @@ def make_name(yaml_path: str) -> str:
     directory, base = os.path.split(yaml_path)
     if base == APP_DATA:
         return os.path.join(directory, APP_MAKE)
+    if base == MODULE_DATA:
+        return os.path.join(directory, MODULE_MAKE)
+    if base.endswith(MODULE_SUFFIX) and len(base) > len(MODULE_SUFFIX):
+        return os.path.join(directory, base[:-len(MODULE_SUFFIX)] + ".mk")
     if base.endswith(INC_DATA) and len(base) > len(INC_DATA):
         return os.path.join(directory, base[:-len(INC_DATA)] + INC_MAKE)
     for make, data in KINDS:
@@ -77,6 +100,8 @@ def make_name(yaml_path: str) -> str:
 def is_yaml_name(path: str) -> bool:
     base = os.path.basename(path)
     if base == APP_DATA or (base.endswith(INC_DATA) and len(base) > len(INC_DATA)):
+        return True
+    if base == MODULE_DATA or (base.endswith(MODULE_SUFFIX) and len(base) > len(MODULE_SUFFIX)):
         return True
     return any(base == data or base.endswith("." + data) for _, data in KINDS)
 
@@ -159,8 +184,36 @@ def _schema2_selection(sel) -> bool:
         is_ref_word(w) for key in ("match", "except") for w in sel.get(key) or [])
 
 
+SCHEMA3_VALUES = ("files", "subdirs", "arith")
+SCHEMA3_SELECT = ("pattern", "macro", "unique")
+SCHEMA3_CONDITIONS = ("at_least", "nonempty")
+
+
+def _values(rules: list):
+    for rule in walk(rules):
+        if "add" in rule:
+            yield from (i for items in rule["add"].values() for i in items)
+        if "set" in rule:
+            yield rule["set"].get("value")
+
+
+def _schema3(rules: list) -> bool:
+    for cond in conditions(rules):
+        if next(iter(cond)) in SCHEMA3_CONDITIONS:
+            return True
+    for value in _values(rules):
+        if isinstance(value, dict):
+            if any(k in value for k in SCHEMA3_VALUES):
+                return True
+            if any(k in value.get("select", {}) for k in SCHEMA3_SELECT):
+                return True
+    return False
+
+
 def needed_schema(rules: list) -> int:
-    """1 unless the rules use a construct of schema 2."""
+    """1 unless the rules use a construct of schema 2 or 3."""
+    if _schema3(rules):
+        return 3
     for cond in conditions(rules):
         (key, value), = cond.items()
         if key == "several" or _schema2_selection(value):
@@ -247,8 +300,13 @@ def _normal_cond(cond: dict) -> dict:
 
 
 def _normal_value(value):
-    if isinstance(value, dict):
+    if isinstance(value, dict) and "select" in value:
         return {"select": _normal_selection(value["select"])}
+    if isinstance(value, dict) and "files" in value:
+        return {"files": {k: v for k, v in value["files"].items() if v or k != "except"}}
+    if isinstance(value, dict) and "subdirs" in value:
+        sub = value["subdirs"]
+        return {"subdirs": {**sub, "select": _normal_selection(sub["select"])}}
     return value
 
 
