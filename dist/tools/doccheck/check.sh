@@ -36,13 +36,14 @@ else
     CRESET=
 fi
 
-# Execute `doc-ci` instead of `doc` to download and use the Doxygen version
-# specified in `doc/doxygen/Makefile`, but only if the machine is
-# `Linux x86_64` to avoid having to compile Doxygen.
+# Execute `make doc-ci` instead of `just doc` to download and use the Doxygen
+# version specified in `doc/doxygen/Makefile` (it then runs `just doc` with
+# it), but only if the machine is `Linux x86_64` to avoid having to compile
+# Doxygen.
 if [[ "$(uname -s -m)" == "Linux x86_64" ]]; then
     DOXY_OUTPUT=$(make -C "${RIOTBASE}" doc-ci 2>&1)
 else
-    DOXY_OUTPUT=$(make -C "${RIOTBASE}" doc 2>&1)
+    DOXY_OUTPUT=$(just --justfile "${RIOTBASE}/justfile" doc 2>&1)
 fi
 
 DOXY_OUTPUT=$(echo "${DOXY_OUTPUT}" | grep -Fvf "${EXCLUDE_SIMPLE_FILE}" | \
@@ -52,7 +53,7 @@ DOXY_ERRCODE=$?
 RESULT=0
 
 if [ "${DOXY_ERRCODE}" -ne 0 ] ; then
-    echo "'make doc' exited with non-zero code (${DOXY_ERRCODE})"
+    echo "'just doc' exited with non-zero code (${DOXY_ERRCODE})"
     echo "${DOXY_OUTPUT}"
     RESULT=2
 else

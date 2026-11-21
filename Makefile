@@ -1,15 +1,21 @@
 .all:
 
-.PHONY: all doc doc-man doc-latex docclean doc-starlight welcome
+.PHONY: all doc-man doc-latex doc-ci docclean doc-starlight welcome
 
 all: welcome
 	@echo ""
 	@exit 1
 
-doc doc-man doc-latex doc-ci:
-	@./dist/tools/features_yaml2mx/features_yaml2mx.py \
-		features.yaml \
-		--output-md doc/doxygen/src/feature_list.md
+# `doc` moved to just (`just doc`). The formats still built with Make reuse
+# its steps: Make may call just, a just recipe never calls make.
+JUST ?= just
+
+doc-man doc-latex:
+	@"$(JUST)" --justfile "$(CURDIR)/justfile" _doc-feature-list
+	"$(MAKE)" -C doc/doxygen $@
+
+# doc/doxygen downloads the required Doxygen and runs `just doc` with it.
+doc-ci:
 	"$(MAKE)" -C doc/doxygen $@
 
 doc-starlight:
@@ -62,10 +68,10 @@ define welcome_message
 	@echo " generate-{board,driver,example,module,pkg,test}"
 	@echo " info-{applications,boards,emulated-boards} info-applications-supported-boards"
 	@echo " clean distclean docclean pkg-clean"
-	@echo " doc doc-{starlight,man,latex}"
+	@echo " doc-{starlight,man,latex,ci}"
 	@echo ""
 	@echo "Repository commands that moved to just (run 'just --list'):"
-	@echo " generate-features print-versions"
+	@echo " doc generate-features print-versions"
 	@echo ""
 	@echo "==> tl;dr Try running:"
 	@echo "    cd examples/basic/default"
@@ -75,7 +81,10 @@ endef
 welcome:
 	$(call welcome_message)
 
-.DEFAULT:
+# `doc` moved to just, but it is also the name of the documentation directory:
+# without this rule Make would report the existing directory as up to date.
+.PHONY: doc
+.DEFAULT doc:
 	@echo '*** ERROR: unrecognized target "$@"'
 	@echo ""
 	$(call welcome_message)

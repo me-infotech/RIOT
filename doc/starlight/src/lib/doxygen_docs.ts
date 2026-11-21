@@ -232,7 +232,7 @@ export interface ApiDocLocation {
    * exists, and else the one of the published API documentation.
    */
   tagFile?: string;
-  /** Tag file of a local build of the API documentation (`make doc`) */
+  /** Tag file of a local build of the API documentation (`just doc`) */
   localTagFile: string;
   /**
    * Path for the copy of a downloaded tag file, so that the download is only
