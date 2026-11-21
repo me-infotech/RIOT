@@ -180,7 +180,8 @@ restructured:
 # data name with `.mk` (build.yaml -> build.mk), which the Make file includes
 # where the build part was (once per `section`); `none`: every rule is a
 # `stand_in` (the Make file keeps that logic), nothing is generated.
-# build_base: the commit the Make files were split from (G3-1 on master).
+# build_base: the commit the Make files were split from (G3-1, on branch
+# migration/g3-01-all; not on master).
 build_base: 8c98d25e9b0af679e288c1ad2f88e222337c7e5a
 build:
   build.yaml: {make: Makefile.include, adapter: part}

@@ -1,0 +1,121 @@
+# golden output of GNU Make for the parity tests of step G3-3 (bindist without Make)
+# generator: dist/tools/bindist/tests/record_golden.py
+# commit: 8324f6c5e9e9eeb99a843501b355f5d832f169e3 (git checkout, unchanged; the application copied outside it)
+# date: 2026-11-21
+# make: GNU Make 4.3
+# cp: cp (GNU coreutils) 9.4
+# environment: env -i PATH HOME LC_ALL=C; umask 022; stdout, then stderr
+# sources: mode 0644/0755, mtime 1700000000; stand-in build products (objects, ELF, binary of the build plan)
+# masked: RIOT_VERSION computed from git (not when set on the command line), git describe
+## default: make -n -o all bindist [examples/advanced/bindist]
+## exit: 0
+mkdir -p bindist
+for i in Makefile bin/nrf52840dk/abc/*.o bin/nrf52840dk/application_bindist/*.o ; do \
+	echo Copying $i to bindist. ; \
+	cp -a --parents $i bindist ; \
+	done
+cp -a bin/nrf52840dk/bindist.bin bindist
+echo "BINDIST_RIOT_VERSION=@RIOT_VERSION@" > bindist/Makefile.distcheck
+echo "BINDIST_GIT_HEAD=$(git -C @RIOTBASE@ describe)" >> bindist/Makefile.distcheck
+## default: make -o all bindist [examples/advanced/bindist]
+## exit: 0
+Copying Makefile to bindist.
+Copying bin/nrf52840dk/abc/abc.o to bindist.
+Copying bin/nrf52840dk/application_bindist/main.o to bindist.
+## default: tree bindist/ [examples/advanced/bindist]
+Makefile file 0644 1142 698906908b2b mtime=kept
+Makefile.distcheck file 0644 (content: own section) mtime=new
+bin dir 0755 mtime=kept
+bin/nrf52840dk dir 0755 mtime=kept
+bin/nrf52840dk/abc dir 0755 mtime=kept
+bin/nrf52840dk/abc/abc.o file 0644 19 84aaf80464c6 mtime=kept
+bin/nrf52840dk/application_bindist dir 0755 mtime=kept
+bin/nrf52840dk/application_bindist/main.o file 0644 36 9a501adc7c36 mtime=kept
+bindist.bin file 0644 21 9a681281b48b mtime=kept
+## default: file bindist/Makefile.distcheck [examples/advanced/bindist]
+BINDIST_RIOT_VERSION=@RIOT_VERSION@
+BINDIST_GIT_HEAD=@GIT_DESCRIBE@
+## dist-files: make -n -o all bindist [examples/advanced/bindist 'DIST_FILES=Makefile abc/abc.c']
+## exit: 0
+mkdir -p bindist
+for i in Makefile abc/abc.c ; do \
+	echo Copying $i to bindist. ; \
+	cp -a --parents $i bindist ; \
+	done
+cp -a bin/nrf52840dk/bindist.bin bindist
+echo "BINDIST_RIOT_VERSION=@RIOT_VERSION@" > bindist/Makefile.distcheck
+echo "BINDIST_GIT_HEAD=$(git -C @RIOTBASE@ describe)" >> bindist/Makefile.distcheck
+## dist-files: make -o all bindist [examples/advanced/bindist 'DIST_FILES=Makefile abc/abc.c']
+## exit: 0
+Copying Makefile to bindist.
+Copying abc/abc.c to bindist.
+## dist-files: tree bindist/ [examples/advanced/bindist 'DIST_FILES=Makefile abc/abc.c']
+Makefile file 0644 1142 698906908b2b mtime=kept
+Makefile.distcheck file 0644 (content: own section) mtime=new
+abc dir 0755 mtime=kept
+abc/abc.c file 0644 454 6818b15b7157 mtime=kept
+bindist.bin file 0644 21 9a681281b48b mtime=kept
+## dist-files: file bindist/Makefile.distcheck [examples/advanced/bindist 'DIST_FILES=Makefile abc/abc.c']
+BINDIST_RIOT_VERSION=@RIOT_VERSION@
+BINDIST_GIT_HEAD=@GIT_DESCRIBE@
+## riot-version: make -n -o all bindist [examples/advanced/bindist RIOT_VERSION=9.9-test]
+## exit: 0
+mkdir -p bindist
+for i in Makefile bin/nrf52840dk/abc/*.o bin/nrf52840dk/application_bindist/*.o ; do \
+	echo Copying $i to bindist. ; \
+	cp -a --parents $i bindist ; \
+	done
+cp -a bin/nrf52840dk/bindist.bin bindist
+echo "BINDIST_RIOT_VERSION=9.9-test" > bindist/Makefile.distcheck
+echo "BINDIST_GIT_HEAD=$(git -C @RIOTBASE@ describe)" >> bindist/Makefile.distcheck
+## riot-version: make -o all bindist [examples/advanced/bindist RIOT_VERSION=9.9-test]
+## exit: 0
+Copying Makefile to bindist.
+Copying bin/nrf52840dk/abc/abc.o to bindist.
+Copying bin/nrf52840dk/application_bindist/main.o to bindist.
+## riot-version: tree bindist/ [examples/advanced/bindist RIOT_VERSION=9.9-test]
+Makefile file 0644 1142 698906908b2b mtime=kept
+Makefile.distcheck file 0644 (content: own section) mtime=new
+bin dir 0755 mtime=kept
+bin/nrf52840dk dir 0755 mtime=kept
+bin/nrf52840dk/abc dir 0755 mtime=kept
+bin/nrf52840dk/abc/abc.o file 0644 19 84aaf80464c6 mtime=kept
+bin/nrf52840dk/application_bindist dir 0755 mtime=kept
+bin/nrf52840dk/application_bindist/main.o file 0644 36 9a501adc7c36 mtime=kept
+bindist.bin file 0644 21 9a681281b48b mtime=kept
+## riot-version: file bindist/Makefile.distcheck [examples/advanced/bindist RIOT_VERSION=9.9-test]
+BINDIST_RIOT_VERSION=9.9-test
+BINDIST_GIT_HEAD=@GIT_DESCRIBE@
+## bindirbase: make -n -o all bindist [examples/advanced/bindist BINDIRBASE=@TMP@/elsewhere]
+## exit: 0
+mkdir -p bindist
+for i in Makefile bin/nrf52840dk/abc/*.o bin/nrf52840dk/application_bindist/*.o ; do \
+	echo Copying $i to bindist. ; \
+	cp -a --parents $i bindist ; \
+	done
+cp -a bin/nrf52840dk/bindist.bin bindist
+echo "BINDIST_RIOT_VERSION=@RIOT_VERSION@" > bindist/Makefile.distcheck
+echo "BINDIST_GIT_HEAD=$(git -C @RIOTBASE@ describe)" >> bindist/Makefile.distcheck
+## no-products: make -n -o all bindist [examples/advanced/bindist]
+## exit: 0
+mkdir -p bindist
+for i in Makefile bin/nrf52840dk/abc/*.o bin/nrf52840dk/application_bindist/*.o ; do \
+	echo Copying $i to bindist. ; \
+	cp -a --parents $i bindist ; \
+	done
+cp -a bin/nrf52840dk/bindist.bin bindist
+echo "BINDIST_RIOT_VERSION=@RIOT_VERSION@" > bindist/Makefile.distcheck
+echo "BINDIST_GIT_HEAD=$(git -C @RIOTBASE@ describe)" >> bindist/Makefile.distcheck
+## no-products: make -o all bindist [examples/advanced/bindist]
+## exit: 2
+Copying Makefile to bindist.
+Copying bin/nrf52840dk/abc/*.o to bindist.
+Copying bin/nrf52840dk/application_bindist/*.o to bindist.
+cp: failed to get attributes of 'bin': No such file or directory
+cp: failed to get attributes of 'bin': No such file or directory
+make: *** [@RIOTBASE@/makefiles/bindist.inc.mk:13: bindist] Error 1
+## no-products: tree bindist/ [examples/advanced/bindist]
+Makefile file 0644 1142 698906908b2b mtime=kept
+## no-products: file bindist/Makefile.distcheck [examples/advanced/bindist]
+(no file)
+## end

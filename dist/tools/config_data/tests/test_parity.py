@@ -68,12 +68,16 @@ class GoldenFilesTest(unittest.TestCase):
         self.assertEqual(sorted(found), SCOPE["files"])
 
 
+NEW_ADAPTERS = ("flash.inc.mk", ".dist.inc.mk")
+
+
 def without_flash_adapters(result: tuple) -> tuple:
     """MAKEFILE_LIST without the Make adapters generated from the flash data
-    (step G3-2, `*flash.inc.mk`): new files that the Make files of the base
-    commit did not include; the settings in them were in those Make files."""
+    (step G3-2, `*flash.inc.mk`) and the distribution data (step G3-3,
+    `<x>.dist.inc.mk`): new files that the Make files of the base commit did
+    not include; the settings in them were in those Make files."""
     status, lines = result
-    return status, [" ".join(w for w in line.split(" ") if not w.endswith("flash.inc.mk"))
+    return status, [" ".join(w for w in line.split(" ") if not w.endswith(NEW_ADAPTERS))
                     if "Makefile.include" in line else line for line in lines]
 
 

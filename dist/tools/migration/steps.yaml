@@ -154,3 +154,17 @@ steps:
       pip: [pyyaml]
       tools: [just@1.59.0]
     docs: dist/tools/flash/README.md
+
+  - id: g3-03-bindist
+    title: Make a binary distribution from the distribution data, without Make
+    group: "3"
+    targets:
+      - name: bindist
+        now: just bindist <application> <board> [VAR=VALUE…]
+        hardware: false
+    tests:
+      - dist/tools/bindist/tests
+    requires:
+      pip: [pyyaml]
+      tools: [just@1.59.0]
+    docs: dist/tools/bindist/README.md

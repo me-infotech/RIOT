@@ -1,0 +1,10 @@
+# Distribution data of makefiles/bindist.inc.mk (step G3-3): what `bindist`
+# copies besides the files the application names in DIST_FILES. Source of
+# bindist.dist.inc.mk (`just generate-dist-data`), which bindist.inc.mk
+# includes first. Format: dist/tools/bindist/README.md.
+schema: 3
+rules:
+  - comment: |-
+      the objects of the binary modules, where Make's recipe finds them
+      (bin/<BOARD>: Make's default BINDIR, relative to the application)
+    add: {DIST_FILES: [{select: {var: BIN_USEMODULE, pattern: {from: '%', to: 'bin/${BOARD}/%/*.o'}}}]}

@@ -12,9 +12,10 @@
 
 # Rules: a recipe never calls make; inputs are repository files only; the
 # commands are no longer Make targets. The applications of step G3-1 are
-# built with `just build` (CMake + Ninja, dist/tools/cmake_gen) and flashed
-# with `just flash` (dist/tools/flash); all others are still built and
-# flashed with make in their directory. Tested with just 1.59.0.
+# built with `just build` (CMake + Ninja, dist/tools/cmake_gen), flashed
+# with `just flash` (dist/tools/flash) and distributed as binaries with
+# `just bindist` (dist/tools/bindist); all others are still built, flashed
+# and distributed with make in their directory. Tested with just 1.59.0.
 
 # Recipe lines run with /bin/sh, as GNU Make ran them.
 set shell := ["/bin/sh", "-c"]
@@ -123,3 +124,15 @@ generate-flash-data:
 # Example: just flash examples/basic/hello-world nrf52840dk PROGRAMMER=openocd
 flash app board *vars:
     @./dist/tools/flash/flash.py flash -C {{ quote(app) }} BOARD={{ quote(board) }} {{ vars }}
+
+# Regenerate the Make adapters (<x>.dist.inc.mk) from the distribution data
+# (maintenance of step G3-3; private: not a former Make target).
+[private]
+generate-dist-data:
+    @./dist/tools/bindist/bindist.py generate
+
+# Build (as `just build`, in Make's BINDIR <app>/bin/<board>) and make the
+# binary distribution <app>/bindist without Make (step G3-3).
+# Example: just bindist examples/advanced/bindist nrf52840dk
+bindist app board *vars:
+    @./dist/tools/bindist/bindist.py bindist -C {{ quote(app) }} BOARD={{ quote(board) }} {{ vars }}

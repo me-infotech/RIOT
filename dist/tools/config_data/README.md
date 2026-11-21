@@ -301,6 +301,13 @@ read flash data, so both are empty there (FLASHFILE is ELFFILE, which
 BUILD_FILES names anyway; no module reads FLASH_ADDR), while Make reads them
 through the adapters, so its values are unchanged.
 
+Distribution data (step G3-3, `dist/tools/bindist/README.md`) shares no
+value with the build data either: `makefiles/bindist.dist.yaml` adds the
+objects of the binary modules to DIST_FILES; `makefiles/bindist.inc.mk`
+includes its adapter (`bindist.dist.inc.mk`) as its first statement and its
+build part (`bindist.build.mk`) where it was. The build without Make reads
+only `bindist.build.yaml`; `dist/tools/bindist` reads both.
+
 Schema 4 adds what the generated Make needs to say exactly what the Make
 file said (every schema 1-3 file stays valid):
 

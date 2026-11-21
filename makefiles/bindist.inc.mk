@@ -1,7 +1,10 @@
+# The files of the distribution besides the application's DIST_FILES are
+# distribution data: makefiles/bindist.dist.yaml. The file included here is
+# generated from it (`just generate-dist-data`); edit the YAML, not it.
+include $(RIOTMAKE)/bindist.dist.inc.mk
+
 # Avoid including APPLICATION_MODULE twice to prevent multiple definition errors
 USEMODULE += $(filter-out $(APPLICATION_MODULE),$(BIN_USEMODULE))
-
-DIST_FILES += $(BIN_USEMODULE:%=bin/$(BOARD)/%/*.o)
 
 # The directories of the binary modules are build data:
 # makefiles/bindist.build.yaml. The file included here is generated from it
