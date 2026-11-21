@@ -10,14 +10,18 @@
 # locally. Add a step here, never a test directory to a workflow.
 #
 # Keys of a step:
-#   id        unique, `<roadmap phase>-<topic>`; the CI job is named after it
+#   id        unique, `<roadmap phase>-<topic>` or `g<group>-<NN>-<topic>`
+#             (as the branch); the CI job is named after it
 #   title     one line
-#   group     1 | 2A | 2B | 2C | 3 (taxonomy of the migration concept)
-#   targets   the migrated targets; each target is in exactly one step
+#   group     1 | 2A | 2B | 2C | 3 (taxonomy of the migration concept), or
+#             G0 for the foundation (configuration as data, resolver)
+#   targets   the migrated targets; each target is in exactly one step;
+#             empty (`[]`) for a G0 step, which migrates no Make target
 #     name      former Make target
 #     now       how it is run after the migration
 #     hardware  true if it needs a board; then `board_test` says how it is
 #               tested on the board (manually, not in CI)
+#   provides  G0 only: the commands the step adds (same keys as a target)
 #   tests     directories with unittest modules (test_*.py), relative to the
 #             repository root; each is run as its own unittest discovery
 #   requires  what CI installs before running the tests
@@ -71,3 +75,18 @@ steps:
       pip: [pyudev]
       tools: [just@1.59.0]
     docs: dist/tools/task_layer/README.md
+
+  - id: g0-01-config-data
+    title: Dependency and feature configuration as YAML data, Make files generated from it
+    group: G0
+    targets: []
+    provides:
+      - name: generate-config-data
+        now: just generate-config-data
+        hardware: false
+    tests:
+      - dist/tools/config_data/tests
+    requires:
+      pip: [pyyaml]
+      tools: [just@1.59.0]
+    docs: dist/tools/config_data/README.md

@@ -1,0 +1,311 @@
+# Dependency rules of sys/shell. This file is the source: Makefile.dep
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - add: {USEMODULE: [stdin]}
+  - if: {has: {var: USEMODULE, match: [shell_cmds_default]}}
+    then:
+      - add: {USEMODULE: [shell_cmd_sys]}
+      - if: {has: {var: USEMODULE, match: [netif]}}
+        then:
+          - add: {USEMODULE: [l2util]}
+      - if: {has: {var: USEMODULE, match: [app_metadata]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_app_metadata]}
+      - if: {has: {var: USEMODULE, match: [at30tse75x]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_at30tse75x]}
+      - if: {has: {var: USEMODULE, match: [benchmark_udp]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_benchmark_udp]}
+      - if: {has: {var: USEPKG, match: [bplib]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_bplib]}
+      - if: {has: {var: USEMODULE, match: [ccn-lite-utils]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_ccn-lite-utils]}
+      - if: {has: {var: USEMODULE, match: [conn_can]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_conn_can]}
+      - if: {has: {var: USEMODULE, match: [cord_ep]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_cord_ep]}
+      - if: {has: {var: USEPKG, match: [cryptoauthlib]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_cryptoauthlib]}
+      - if: {has: {var: USEMODULE, match: [dfplayer]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_dfplayer]}
+      - if: {has: {var: USEMODULE, match: [fib]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_fib]}
+      - if: {has: {var: USEMODULE, match: [gnrc_ipv6_ext_frag_stats]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_gnrc_ipv6_frag_stats]}
+      - if: {has: {var: USEMODULE, match: [gnrc_ipv6_nib]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_gnrc_ipv6_nib]}
+      - if: {has: {var: USEMODULE, match: [gnrc_ipv6_whitelist]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_whitelist]}
+      - if: {has: {var: USEMODULE, match: [gnrc_ipv6_blacklist]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_blacklist]}
+      - if: {has: {var: USEMODULE, match: [gnrc_icmpv6_echo]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_gnrc_icmpv6_echo]}
+      - if: {has: {var: USEMODULE, match: [gnrc_netif]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_gnrc_netif]}
+          - if: {has: {var: USEMODULE, match: [lora]}}
+            then:
+              - add: {USEMODULE: [shell_cmd_gnrc_netif_lora]}
+      - if: {has: {var: USEMODULE, match: [gnrc_txtsnd]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_gnrc_txtsnd]}
+      - if: {has: {var: USEMODULE, match: [gnrc_netif_lorawan]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_gnrc_netif_lorawan]}
+      - if: {has: {var: USEMODULE, match: [gnrc_rpl]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_gnrc_rpl]}
+      - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan_ctx]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_gnrc_sixlowpan_ctx]}
+      - if: {has: {var: USEMODULE, match: [gnrc_sixlowpan_frag_stats]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_gnrc_sixlowpan_frag_stats]}
+      - if: {has: {var: USEMODULE, match: [lpc2387]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_heap]}
+      - if: {has: {var: USEMODULE, match: [lwip_netif]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_lwip_netif]}
+      - if: {has: {var: USEMODULE, match: [mci]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_mci]}
+      - if: {has: {var: USEMODULE, match: [nanocoap_vfs]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_nanocoap_vfs]}
+      - if: {has: {var: USEMODULE, match: [netstats_neighbor]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_netstats_neighbor]}
+      - if: {has: {var: USEMODULE, match: [nimble_netif]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_nimble_netif]}
+      - if: {has: {var: USEMODULE, match: [nimble_statconn]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_nimble_statconn]}
+      - if: {has: {var: USEPKG, match: [opendsme]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_opendsme]}
+      - if: {has: {var: USEMODULE, match: [openthread-cli-%]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_openthread]}
+      - if: {has: {var: USEPKG, match: [openwsn]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_openwsn]}
+      - if: {has: {var: USEMODULE, match: [rtt_rtc, periph_rtc]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_rtc]}
+      - if: {has: {var: USEMODULE, match: [saul_reg]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_saul_reg]}
+      - if: {has: {var: USEPKG, match: [semtech-loramac]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_semtech-loramac]}
+      - if: {has: {var: USEMODULE, match: [sntp]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_sntp]}
+      - if: {has: {var: USEMODULE, match: [sock_udp]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_udp]}
+      - if: {has: {var: USEMODULE, match: [unicoap_client]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_coap]}
+      - if: {has: {var: USEMODULE, match: [periph_pm]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_pm]}
+      - if: {has: {var: USEMODULE, match: [ps]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_ps]}
+      - if: {has: {var: USEMODULE, match: [sht1x]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_sht1x]}
+      - if: {has: {var: USEMODULE, match: [vfs]}}
+        then:
+          - add: {USEMODULE: [shell_cmd_vfs]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_app_metadata]}}
+    then:
+      - add: {USEMODULE: [app_metadata]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_at30tse75x]}}
+    then:
+      - add: {USEMODULE: [at30tse75x]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_benchmark_udp]}}
+    then:
+      - add: {USEMODULE: [benchmark_udp]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_ccn-lite-utils]}}
+    then:
+      - add: {USEMODULE: [ccn-lite-utils]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_coap]}}
+    then:
+      - add: {USEMODULE: [unicoap, unicoap_client, unicoap_client_uri]}
+      - if: {has: {var: USEMODULE, match: [sock_udp]}}
+        then:
+          - add: {USEMODULE: [unicoap_driver_udp]}
+      - if: {has: {var: USEMODULE, match: [sock_dtls]}}
+        then:
+          - add: {USEMODULE: [unicoap_driver_dtls]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_conn_can]}}
+    then:
+      - add: {USEMODULE: [conn_can]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_cord_ep]}}
+    then:
+      - add: {USEMODULE: [cord_ep, sock_util, uri_parser]}
+  - if: {has: {var: USEPKG, match: [shell_cmd_cryptoauthlib]}}
+    then:
+      - add: {USEMODULE: [cryptoauthlib]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_dfplayer]}}
+    then:
+      - add: {USEMODULE: [auto_init_multimedia, dfplayer, fmt]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_fib]}}
+    then:
+      - add: {USEMODULE: [fib, posix_inet]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_gnrc_icmpv6_echo]}}
+    then:
+      - add: {USEMODULE: [gnrc_icmpv6_echo, netutils, ztimer_usec]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_gnrc_ipv6_blacklist]}}
+    then:
+      - add: {USEMODULE: [gnrc_ipv6_blacklist]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_gnrc_ipv6_ext_frag_stats]}}
+    then:
+      - add: {USEMODULE: [gnrc_ipv6_frag_stats]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_gnrc_ipv6_nib]}}
+    then:
+      - add: {USEMODULE: [gnrc_ipv6_nib]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_gnrc_ipv6_whitelist]}}
+    then:
+      - add: {USEMODULE: [gnrc_ipv6_whitelist]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_gnrc_netif]}}
+    then:
+      - add: {USEMODULE: [gnrc_netif, fmt]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_gnrc_netif_lorawan]}}
+    then:
+      - add: {USEMODULE: [gnrc_netif_lorawan, shell_cmd_gnrc_netif_lora, shell_cmd_gnrc_netif]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_gnrc_pktbuf]}}
+    then:
+      - add: {USEMODULE: [gnrc_pktbuf]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_gnrc_rpl]}}
+    then:
+      - add: {USEMODULE: [gnrc_rpl]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_gnrc_sixlowpan_ctx]}}
+    then:
+      - add: {USEMODULE: [gnrc_sixlowpan_ctx]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_gnrc_sixlowpan_frag_stats]}}
+    then:
+      - add: {USEMODULE: [gnrc_sixlowpan_frag_stats]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_gnrc_udp]}}
+    then:
+      - add: {USEMODULE: [gnrc_udp, gnrc_pktdump, netutils]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_i2c_scan]}}
+    then:
+      - add: {FEATURES_REQUIRED: [periph_i2c]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_iw]}}
+    then:
+      - add: {USEMODULE: [ztimer_sec]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_lwip_netif]}}
+    then:
+      - add: {USEMODULE: [lwip_netif, posix_inet]}
+      - if: {has: {var: USEMODULE, match: [lwip_ipv4]}}
+        then:
+          - add: {USEMODULE: [ipv4_addr]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_mci]}}
+    then:
+      - add: {USEMODULE: [mci]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_md5sum]}}
+    then:
+      - add: {USEMODULE: [shell_cmd_vfs]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_mtd]}}
+    then:
+      - add: {USEMODULE: [fmt, mtd, od]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_nanocoap_vfs]}}
+    then:
+      - add: {USEMODULE: [nanocoap_vfs, vfs_util, nanocoap_link_format]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_netstats_neighbor]}}
+    then:
+      - add: {USEMODULE: [netstats_neighbor]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_nimble_netif]}}
+    then:
+      - add: {USEMODULE: [fmt, nimble_netif, nimble_scanlist, nimble_scanner]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_nimble_statconn]}}
+    then:
+      - add: {USEMODULE: [nimble_statconn]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_openwsn]}}
+    then:
+      - add: {USEMODULE: [ipv6_addr, l2util, netif]}
+      - add: {USEPKG: [openwsn]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_pm]}}
+    then:
+      - add: {FEATURES_REQUIRED: [periph_pm]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_ps]}}
+    then:
+      - add: {USEMODULE: [ps]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_random_cmd]}}
+    then:
+      - add: {USEMODULE: [random]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_rtc]}}
+    then:
+      - add: {FEATURES_REQUIRED_ANY: [periph_rtc|periph_rtt]}
+      - comment: |-
+          beware: this is a bit more tricky than it looks. Before the
+          FEAUTRES_REQUIRED_ANY is taken into account, neither periph_rtc nor
+          periph_rtt is used. Once it comes to affect, at least one will be in use.
+          If periph_rtc is not in used but periph_rtt is, we can provide the RTC
+          with rtt_rtc.
+        if: {selection_equals: {var: USEMODULE, match: [periph_rtc, periph_rtt], words: [periph_rtt]}}
+        then:
+          - add: {USEMODULE: [rtt_rtc]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_rtt]}}
+    then:
+      - add: {FEATURES_REQUIRED: [periph_rtt]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_saul_reg]}}
+    then:
+      - add: {USEMODULE: [saul_reg]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_semtech-loramac]}}
+    then:
+      - add: {USEPKG: [semtech-loramac]}
+      - add: {USEMODULE: [fmt]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_sha1sum]}}
+    then:
+      - add: {USEMODULE: [shell_cmd_vfs]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_sha256sum]}}
+    then:
+      - add: {USEMODULE: [shell_cmd_vfs]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_sht1x]}}
+    then:
+      - add: {USEMODULE: [sht1x]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_sntp]}}
+    then:
+      - add: {USEMODULE: [sntp]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_suit]}}
+    then:
+      - add: {USEMODULE: [suit_transport_worker]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_udp_server]}}
+    then:
+      - add: {USEMODULE: [od, shell_cmd_udp, sock_async_event]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_udp]}}
+    then:
+      - add: {USEMODULE: [fmt, sock_udp, sock_util]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_udptty]}}
+    then:
+      - add: {USEMODULE: [sock_async, sock_udp]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_vfs]}}
+    then:
+      - add: {USEMODULE: [vfs, tiny_strerror]}
+  - if: {has: {var: USEMODULE, match: [shell_cmd_xipfs]}}
+    then:
+      - add: {USEMODULE: [xipfs]}
+  - if: {has: {var: USEMODULE, match: [shell_democommands]}}
+    then:
+      - add: {USEMODULE: [rust_riotmodules, shell]}

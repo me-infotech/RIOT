@@ -97,3 +97,7 @@ _doc-doxygen-version:
 [no-cd]
 list-ttys:
     @{{ justfile_directory() }}/dist/tools/usb-serial/ttys.py
+
+# Regenerate the Make files (Makefile.dep, Makefile.features) from their YAML source.
+generate-config-data:
+    @./dist/tools/config_data/config_data.py generate

@@ -1,4 +1,8 @@
+# Generated from deps.yaml by dist/tools/config_data/config_data.py.
+# Do not edit: change deps.yaml and run `just generate-config-data`.
+
 DEFAULT_MODULE += auto_init_xtimer
+
 # In whatever combination of backends periph_timer will be required
 # - xtimer (only) -> periph_timer
 # - xtimer_on_ztimer -> ztimer_usec -> ztimer_periph_timer -> periph_timer

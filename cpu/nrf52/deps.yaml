@@ -1,0 +1,44 @@
+# Dependency rules of cpu/nrf52. This file is the source: Makefile.dep
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - add: {USEMODULE: [nrf52_vectors]}
+  - if: {has: {var: CPU_MODEL, match: [nrf52811xxaa, nrf52820xxaa, nrf52833xxaa, nrf52840xxaa]}}
+    then:
+      - comment: include dependencies for 802.15.4 radio
+        include: {path: '${RIOTCPU}/nrf52/Makefile.nrf802154.dep'}
+    else:
+      - comment: include dependencies for BLE
+        include: {path: '${RIOTCPU}/nrf52/Makefile.nimble.dep'}
+  - if: {has: {var: USEMODULE, match: [nrf802154]}}
+    then:
+      - add: {FEATURES_REQUIRED: [periph_timer, radio_nrf802154]}
+      - add: {USEMODULE: [luid, ieee802154]}
+      - if: {has: {var: USEMODULE, match: [netdev]}}
+        then:
+          - add: {USEMODULE: [netdev_ieee802154_submac]}
+      - if: {has: {var: USEMODULE, match: [ieee802154_submac]}}
+        then:
+          - add: {USEMODULE: [ieee802154_submac_soft_ack, ieee802154_submac_soft_csma_ca, ieee802154_submac_soft_frame_retrans]}
+  - if: {has: {var: USEMODULE, match: [nrfble]}}
+    then:
+      - add: {FEATURES_REQUIRED: [radio_nrfble]}
+  - comment: The nrf52832 requires gpio IRQ with SPI to work around errata 58
+    if: {has: {var: CPU_MODEL, match: [nrf52832xxaa]}}
+    then:
+      - if: {has: {var: USEMODULE, match: [periph_spi]}}
+        then:
+          - add: {FEATURES_REQUIRED: [periph_gpio_irq]}
+  - if: {has: {var: USEMODULE, match: [periph_uart_nonblocking]}}
+    then:
+      - add: {USEMODULE: [tsrb]}
+  - if: {has: {var: USEMODULE, match: [saul_nrf_vddh]}}
+    then:
+      - add: {FEATURES_REQUIRED: [periph_adc]}
+  - if: {has: {var: USEMODULE, match: [periph_spi]}}
+    then:
+      - add: {USEMODULE: [periph_spi_gpio_mode]}
+  - include: {path: '${RIOTCPU}/nrf52/periph/Makefile.dep'}
+  - include: {path: '${RIOTCPU}/nrf5x_common/Makefile.dep'}
+  - include: {path: '${RIOTCPU}/cortexm_common/Makefile.dep'}

@@ -1,3 +1,6 @@
+# Generated from deps.yaml by dist/tools/config_data/config_data.py.
+# Do not edit: change deps.yaml and run `just generate-config-data`.
+
 ifneq (,$(filter bhp,$(USEMODULE)))
   USEMODULE += bhp_event
 endif
@@ -28,7 +31,7 @@ ifneq (,$(filter netdev_default,$(USEMODULE)))
   USEMODULE += gnrc_netif
 endif
 
-ifneq (,$(filter gnrc_dhcpv6_%, $(USEMODULE)))
+ifneq (,$(filter gnrc_dhcpv6_%,$(USEMODULE)))
   USEMODULE += gnrc_dhcpv6
 endif
 
@@ -73,7 +76,8 @@ endif
 
 ifneq (,$(filter gnrc_sock_udp,$(USEMODULE)))
   USEMODULE += gnrc_udp
-  USEMODULE += random     # to generate random ports
+  # to generate random ports
+  USEMODULE += random
 endif
 
 ifneq (,$(filter gnrc_sock_tcp,$(USEMODULE)))
@@ -144,22 +148,22 @@ ifneq (,$(filter gnrc_netif_bus,$(USEMODULE)))
   USEMODULE += core_msg_bus
 endif
 
-ifneq (,$(filter netdev_eth slipdev, $(USEMODULE)))
-  ifeq (,$(filter gnrc_sixloenc, $(USEMODULE)))
-    ifneq (,$(filter gnrc_ipv6, $(USEMODULE)))
+ifneq (,$(filter netdev_eth slipdev,$(USEMODULE)))
+  ifeq (,$(filter gnrc_sixloenc,$(USEMODULE)))
+    ifneq (,$(filter gnrc_ipv6,$(USEMODULE)))
       USEMODULE += gnrc_ipv6_classic
     endif
   endif
 endif
 
 ifneq (,$(filter ieee802154 nrfmin esp_now cc110x gnrc_sixloenc,$(USEMODULE)))
-  ifneq (,$(filter gnrc_ipv6, $(USEMODULE)))
+  ifneq (,$(filter gnrc_ipv6,$(USEMODULE)))
     USEMODULE += gnrc_sixlowpan
   endif
-  ifneq (,$(filter gnrc_ipv6_default, $(USEMODULE)))
+  ifneq (,$(filter gnrc_ipv6_default,$(USEMODULE)))
     USEMODULE += gnrc_sixlowpan_default
   endif
-  ifneq (,$(filter gnrc_ipv6_router_default, $(USEMODULE)))
+  ifneq (,$(filter gnrc_ipv6_router_default,$(USEMODULE)))
     USEMODULE += gnrc_sixlowpan_router_default
   endif
 endif
@@ -246,7 +250,7 @@ endif
 ifneq (,$(filter gnrc_sixlowpan_frag_sfr_congure,$(USEMODULE)))
   USEMODULE += gnrc_sixlowpan_frag_sfr
   ifeq (,$(filter gnrc_sixlowpan_frag_sfr_congure_% congure_mock,$(USEMODULE)))
-	# pick Appendix C as default congestion control
+    # pick Appendix C as default congestion control
     USEMODULE += gnrc_sixlowpan_frag_sfr_congure_sfr
   endif
 endif
@@ -493,21 +497,21 @@ ifneq (,$(filter gnrc,$(USEMODULE)))
   USEMODULE += gnrc_netif
   USEMODULE += gnrc_netif_hdr
   USEMODULE += gnrc_pktbuf
-	ifneq (,$(filter gnrc_ipv6,$(USEMODULE)))
-	  ifneq (,$(filter nimble_netif,$(USEMODULE)))
+  ifneq (,$(filter gnrc_ipv6,$(USEMODULE)))
+    ifneq (,$(filter nimble_netif,$(USEMODULE)))
       USEMODULE += gnrc_netapi_notify
-	  endif
-	endif
-  ifneq (,$(filter sock_async, $(USEMODULE)))
+    endif
+  endif
+  ifneq (,$(filter sock_async,$(USEMODULE)))
     USEMODULE += gnrc_sock_async
   endif
-  ifneq (,$(filter sock_ip, $(USEMODULE)))
+  ifneq (,$(filter sock_ip,$(USEMODULE)))
     USEMODULE += gnrc_sock_ip
   endif
-  ifneq (,$(filter sock_udp, $(USEMODULE)))
+  ifneq (,$(filter sock_udp,$(USEMODULE)))
     USEMODULE += gnrc_sock_udp
   endif
-  ifneq (,$(filter sock_tcp, $(USEMODULE)))
+  ifneq (,$(filter sock_tcp,$(USEMODULE)))
     USEMODULE += gnrc_sock_tcp
   endif
 endif
@@ -516,19 +520,20 @@ ifneq (,$(filter gnrc_netapi_notify,$(USEMODULE)))
   USEMODULE += sema_inv
 endif
 
-ifneq (,$(filter gnrc_pktbuf, $(USEMODULE)))
-  ifeq (,$(filter gnrc_pktbuf_%, $(USEMODULE)))
+ifneq (,$(filter gnrc_pktbuf,$(USEMODULE)))
+  ifeq (,$(filter gnrc_pktbuf_%,$(USEMODULE)))
     USEMODULE += gnrc_pktbuf_static
   endif
-  ifeq (shell_cmd_gnrc_pktbuf,$(filter gnrc_pktbuf_%, $(USEMODULE)))
+  ifeq (shell_cmd_gnrc_pktbuf,$(filter gnrc_pktbuf_%,$(USEMODULE)))
     USEMODULE += gnrc_pktbuf_static
   endif
   DEFAULT_MODULE += auto_init_gnrc_pktbuf
   USEMODULE += gnrc_pkt
 endif
 
-ifneq (,$(filter gnrc_pktbuf_%, $(USEMODULE)))
-  USEMODULE += gnrc_pktbuf # make MODULE_GNRC_PKTBUF macro available for all implementations
+ifneq (,$(filter gnrc_pktbuf_%,$(USEMODULE)))
+  # make MODULE_GNRC_PKTBUF macro available for all implementations
+  USEMODULE += gnrc_pktbuf
 endif
 
 ifneq (,$(filter shell_cmd_gnrc_pktbuf,$(USEMODULE)))

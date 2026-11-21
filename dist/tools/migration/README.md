@@ -32,9 +32,12 @@ Adding a migration step
 1. Migrate the target(s) and write unit tests next to the code they test
    (`<tool>/tests/test_*.py`), following the pattern of the group.
 2. Document the step in a README (targets, rules, rule → test matrix).
-3. Add the step to `steps.yaml`: `id` (`<roadmap phase>-<topic>`), `group`,
-   `targets` (`name`, `now`, `hardware`; `board_test` for hardware targets),
-   `tests`, `requires`, `docs`.
+3. Add the step to `steps.yaml`: `id` (`<roadmap phase>-<topic>` or, like
+   the branch, `g<group>-<NN>-<topic>`), `group`, `targets` (`name`, `now`,
+   `hardware`; `board_test` for hardware targets), `tests`, `requires`,
+   `docs`. A step of the foundation (group `G0`: configuration as data,
+   resolver) migrates no Make target: `targets: []`, and `provides` lists
+   the commands it adds (same keys as a target).
 4. Run `dist/tools/migration/run_tests.py --step <id>` and
    `python3 -m unittest discover -s dist/tools/migration/tests`.
 
@@ -47,8 +50,8 @@ Rules enforced by `tests/test_steps.py`
 
 | Rule | Fails when |
 |---|---|
-| O1 consistent register | unknown or missing key, unknown group, duplicate step id or target, missing test directory or test module, hardware target without `board_test` |
-| O2 no migrated target without tests | a public `just` recipe is not registered, or a registered `just` target does not exist |
+| O1 consistent register | unknown or missing key, unknown group, duplicate step id or target, missing test directory or test module, hardware target without `board_test`; a `G0` step with targets or without `provides`, `provides` outside `G0` |
+| O2 no migrated target without tests | a public `just` recipe is not registered (as a target or under `provides`), or a registered `just` command does not exist |
 | O3 one place for CI | another workflow runs a registered test directory, or `migration-tests.yml` lists test directories instead of using the register |
 
 Hardware targets

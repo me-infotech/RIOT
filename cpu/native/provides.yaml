@@ -1,0 +1,29 @@
+# Provided features and CPU data of cpu/native. This file is the source: Makefile.features
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - if: {equals: {OS: FreeBSD}}
+    then:
+      - set: {var: DISABLE_LIBSTDCPP, value: '1', flavor: conditional}
+  - add: {FEATURES_PROVIDED: [arch_native, cpp]}
+  - if: {not: {equals: {DISABLE_LIBSTDCPP: '1'}}}
+    then:
+      - comment: |-
+          libstdc++ on FreeBSD is broken (does not work with -m32)
+          Override with "export DISABLE_LIBSTDCPP=0"
+        add: {FEATURES_PROVIDED: [libstdcpp]}
+  - add: {FEATURES_PROVIDED: [periph_cpuid, periph_eeprom, periph_flashpage, periph_flashpage_pagewise,
+        periph_hwrng, periph_i2c, periph_pm, periph_pwm, periph_timer_periodic, periph_timer_query_freqs]}
+  - if: {equals: {OS: Linux, OS_ARCH: x86_64}}
+    then:
+      - add: {FEATURES_PROVIDED: [rust_target]}
+  - add: {FEATURES_PROVIDED: [ssp]}
+  - if: {equals: {OS: Linux}}
+    then:
+      - comment: Access to hardware SPI bus is only supported on Linux hosts
+        add: {FEATURES_PROVIDED: [periph_spi]}
+      - comment: Hardware GPIO access is only available on Linux hosts
+        add: {FEATURES_PROVIDED: [periph_gpio, periph_gpio_irq]}
+      - comment: CAN is only supported on Linux through socketCAN
+        add: {FEATURES_PROVIDED: [periph_can]}

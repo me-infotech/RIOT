@@ -1,0 +1,269 @@
+# Dependency rules of drivers. This file is the source: Makefile.dep
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - comment: driver pseudo-modules dependencies (in alphabetical order)
+  - if: {has: {var: USEMODULE, match: [adc%1c]}}
+    then:
+      - add: {USEMODULE: [adcxx1c]}
+  - if: {has: {var: USEMODULE, match: [ads101%, ads111%]}}
+    then:
+      - add: {USEMODULE: [ads1x1x]}
+  - if: {has: {var: USEMODULE, match: [amg88%]}}
+    then:
+      - add: {USEMODULE: [amg88xx]}
+  - if: {has: {var: USEMODULE, match: [apds99%]}}
+    then:
+      - add: {USEMODULE: [apds99xx]}
+  - if: {has: {var: USEMODULE, match: [at24c%]}}
+    then:
+      - add: {USEMODULE: [at24cxxx]}
+  - if: {has: {var: USEMODULE, match: [at86rf215%]}}
+    then:
+      - add: {USEMODULE: [at86rf215]}
+  - if: {has: {var: USEMODULE, match: [at86rf%], except: [at86rf215%]}}
+    then:
+      - add: {USEMODULE: [at86rf2xx]}
+  - if: {has: {var: USEMODULE, match: [bme680_%]}}
+    then:
+      - add: {USEMODULE: [bme680]}
+  - if: {has: {var: USEMODULE, match: [bm%280_i2c]}}
+    then:
+      - add: {USEMODULE: [bmx280]}
+  - if: {has: {var: USEMODULE, match: [bm%280_spi]}}
+    then:
+      - add: {USEMODULE: [bmx280]}
+  - if: {has: {var: USEMODULE, match: [bq2429x_int]}}
+    then:
+      - add: {USEMODULE: [bq2429x]}
+  - if: {has: {var: USEMODULE, match: [cc110%]}}
+    then:
+      - add: {USEMODULE: [cc110x]}
+  - if: {has: {var: USEMODULE, match: [ccs811_%]}}
+    then:
+      - add: {USEMODULE: [ccs811]}
+  - if: {has: {var: USEMODULE, match: [ethos_%]}}
+    then:
+      - add: {USEMODULE: [ethos]}
+  - if: {has: {var: USEMODULE, match: [ft6%, ft5%, ft3%]}}
+    then:
+      - add: {USEMODULE: [ft5x06]}
+  - if: {has: {var: USEMODULE, match: [gp8%]}}
+    then:
+      - add: {USEMODULE: [gp8xxx]}
+  - if: {has: {var: USEMODULE, match: [hmc5883l_%]}}
+    then:
+      - add: {USEMODULE: [hmc5883l]}
+  - if: {has: {var: USEMODULE, match: [hm330%]}}
+    then:
+      - add: {USEMODULE: [hm330x]}
+  - if: {has: {var: USEMODULE, match: [ina2%]}}
+    then:
+      - add: {USEMODULE: [ina2xx]}
+  - if: {has: {var: USEMODULE, match: [ina3221_%]}}
+    then:
+      - add: {USEMODULE: [ina3221]}
+  - if: {has: {var: USEMODULE, match: [itg320x_%]}}
+    then:
+      - add: {USEMODULE: [itg320x]}
+  - if: {has: {var: USEMODULE, match: [l3gxxxx_%]}}
+    then:
+      - add: {USEMODULE: [l3gxxxx]}
+  - if: {has: {var: USEMODULE, match: [lis2dh12%]}}
+    then:
+      - add: {USEMODULE: [lis2dh12]}
+  - if: {has: {var: USEMODULE, match: [llcc68]}}
+    then:
+      - add: {USEMODULE: [sx126x]}
+  - if: {has: {var: USEMODULE, match: [tmp1075, lm75%]}}
+    then:
+      - add: {USEMODULE: [lm75]}
+  - if: {has: {var: USEMODULE, match: [lps331ap, lps2%]}}
+    then:
+      - add: {USEMODULE: [lpsxxx]}
+  - if: {has: {var: USEMODULE, match: [lsm6ds%]}}
+    then:
+      - add: {USEMODULE: [lsm6dsxx]}
+  - if: {has: {var: USEMODULE, match: [ltc4150_%]}}
+    then:
+      - add: {USEMODULE: [ltc4150]}
+  - if: {has: {var: USEMODULE, match: [m24c%]}}
+    then:
+      - add: {USEMODULE: [at24cxxx]}
+  - if: {has: {var: USEMODULE, match: [max313%]}}
+    then:
+      - add: {USEMODULE: [max313xx]}
+  - if: {has: {var: USEMODULE, match: [mhz19_%]}}
+    then:
+      - add: {USEMODULE: [mhz19]}
+  - if: {has: {var: USEMODULE, match: [mpu9%50]}}
+    then:
+      - add: {USEMODULE: [mpu9x50]}
+  - if: {has: {var: USEMODULE, match: [mrf24j40m%]}}
+    then:
+      - add: {USEMODULE: [mrf24j40]}
+  - if: {has: {var: USEMODULE, match: [mcp23%17, mcp23x17_%]}}
+    then:
+      - add: {USEMODULE: [mcp23x17]}
+  - if: {has: {var: USEMODULE, match: [mtd_%]}}
+    then:
+      - add: {USEMODULE: [mtd]}
+  - comment: |-
+      nrfmin is a concrete module but comes from cpu/nrf5x_common. Due to limitations
+      in the dependency resolution mechanism it's not possible to move its
+      dependency resolution at cpu level.
+    if: {has: {var: USEMODULE, match: [nrfmin]}}
+    then:
+      - add: {FEATURES_REQUIRED: [radio_nrfmin, periph_cpuid]}
+  - if: {has: {var: USEMODULE, match: [nrf24l01p_ng_%]}}
+    then:
+      - add: {USEMODULE: [nrf24l01p_ng]}
+  - if: {has: {var: USEMODULE, match: [pcf857%]}}
+    then:
+      - add: {USEMODULE: [pcf857x]}
+  - if: {has: {var: FEATURES_USED, match: [periph_flashpage_aux]}}
+    then:
+      - add: {FEATURES_REQUIRED: [periph_flashpage_pagewise]}
+  - if: {has: {var: FEATURES_USED, match: [periph_ptp_timer, periph_ptp_speed_adjustment]}}
+    then:
+      - add: {FEATURES_REQUIRED: [periph_ptp]}
+  - if: {has: {var: USEMODULE, match: [periph_usbdev]}}
+    then:
+      - add: {USEMODULE: [periph_usbdev_clk]}
+  - if: {has: {var: USEMODULE, match: [periph_usbdev_hs_ulpi]}}
+    then:
+      - add: {FEATURES_REQUIRED: [periph_usbdev_hs_ulpi]}
+      - add: {USEMODULE: [periph_usbdev_hs]}
+  - if: {has: {var: USEMODULE, match: [periph_usbdev_hs_utmi]}}
+    then:
+      - add: {FEATURES_REQUIRED: [periph_usbdev_hs_utmi]}
+      - add: {USEMODULE: [periph_usbdev_hs]}
+  - if: {has: {var: USEMODULE, match: [periph_usbdev_hs]}}
+    then:
+      - add: {FEATURES_REQUIRED: [periph_usbdev_hs]}
+  - if: {has: {var: USEMODULE, match: [pn532_i2c]}}
+    then:
+      - add: {FEATURES_REQUIRED: [periph_i2c]}
+      - add: {USEMODULE: [pn532]}
+  - if: {has: {var: USEMODULE, match: [pn532_spi]}}
+    then:
+      - add: {FEATURES_REQUIRED: [periph_spi]}
+      - add: {USEMODULE: [pn532]}
+  - if: {has: {var: USEMODULE, match: [qmc5883l_%]}}
+    then:
+      - add: {USEMODULE: [qmc5883l]}
+  - if: {has: {var: USEMODULE, match: [rn2%3]}}
+    then:
+      - add: {USEMODULE: [rn2xx3]}
+  - if: {has: {var: USEMODULE, match: [sdp3x_%]}}
+    then:
+      - add: {USEMODULE: [sdp3x]}
+  - if: {has: {var: USEMODULE, match: [sen5%]}}
+    then:
+      - add: {USEMODULE: [sen5x]}
+  - if: {has: {var: USEMODULE, match: [servo_%]}}
+    then:
+      - add: {USEMODULE: [servo]}
+  - if: {has: {var: USEMODULE, match: [shield_llcc68]}}
+    then:
+      - add: {FEATURES_REQUIRED: [arduino_pins, arduino_shield_uno, arduino_spi]}
+      - add: {USEMODULE: [llcc68]}
+  - if: {has: {var: USEMODULE, match: [shield_sx1262]}}
+    then:
+      - add: {FEATURES_REQUIRED: [arduino_pins, arduino_shield_uno, arduino_spi]}
+      - add: {USEMODULE: [sx1262]}
+  - if: {has: {var: USEMODULE, match: [shield_w5100]}}
+    then:
+      - add: {FEATURES_REQUIRED: [arduino_pins, arduino_shield_isp, arduino_shield_uno, arduino_spi]}
+      - add: {USEMODULE: [w5100]}
+  - if: {has: {var: USEMODULE, match: [sht1%]}}
+    then:
+      - add: {USEMODULE: [sht1x]}
+  - if: {has: {var: USEMODULE, match: [shtc%]}}
+    then:
+      - add: {USEMODULE: [shtcx]}
+  - if: {has: {var: USEMODULE, match: [si114%]}}
+    then:
+      - add: {USEMODULE: [si114x]}
+  - if: {has: {var: USEMODULE, match: [si70%]}}
+    then:
+      - add: {USEMODULE: [si70xx]}
+  - if: {has: {var: USEMODULE, match: [slipdev]}}
+    then:
+      - add: {USEMODULE: [slipdev_net]}
+  - if: {has: {var: USEMODULE, match: [slipdev_%, stdio_slipdev]}}
+    then:
+      - add: {USEMODULE: [slipmux]}
+  - if: {has: {var: USEMODULE, match: [stmpe811_%]}}
+    then:
+      - add: {USEMODULE: [stmpe811]}
+  - if: {has: {var: USEMODULE, match: [st77%]}}
+    then:
+      - add: {USEMODULE: [st77xx]}
+  - if: {has: {var: USEMODULE, match: [sx126%]}}
+    then:
+      - add: {USEMODULE: [sx126x]}
+  - if: {has: {var: USEMODULE, match: [sx127%]}}
+    then:
+      - add: {USEMODULE: [sx127x]}
+  - if: {has: {var: USEMODULE, match: [tmp00%]}}
+    then:
+      - add: {USEMODULE: [tmp00x]}
+  - if: {has: {var: USEMODULE, match: [usbdev_synopsys_dwc2]}}
+    then:
+      - add: {FEATURES_REQUIRED: [periph_usbdev]}
+      - add: {USEMODULE: [ztimer_msec]}
+  - if: {has: {var: USEMODULE, match: [vcnl40%0]}}
+    then:
+      - add: {USEMODULE: [vcnl40x0]}
+  - if: {has: {var: USEMODULE, match: [vl6180x_%]}}
+    then:
+      - add: {USEMODULE: [vl6180x]}
+  - if: {has: {var: USEMODULE, match: [ws281x_%]}}
+    then:
+      - add: {USEMODULE: [ws281x]}
+  - if: {has: {var: USEMODULE, match: [saul_bat_voltage]}}
+    then:
+      - add: {FEATURES_REQUIRED: [periph_adc, board_bat_voltage]}
+  - if: {has: {var: USEMODULE, match: [saul_adc]}}
+    then:
+      - add: {FEATURES_REQUIRED: [periph_adc]}
+  - if: {has: {var: USEMODULE, match: [saul_gpio]}}
+    then:
+      - add: {FEATURES_REQUIRED: [periph_gpio]}
+  - if: {has: {var: USEMODULE, match: [saul_pwm]}}
+    then:
+      - add: {FEATURES_REQUIRED: [periph_pwm]}
+  - if: {has: {var: USEMODULE, match: [saul]}}
+    then:
+      - add: {USEMODULE: [phydat]}
+  - if: {has: {var: USEMODULE, match: [saul_nrf_temperature]}}
+    then:
+      - add: {FEATURES_REQUIRED: [periph_temperature]}
+  - comment: Enable periph_uart when periph_uart_nonblocking is enabled
+    if: {has: {var: USEMODULE, match: [periph_uart_nonblocking]}}
+    then:
+      - add: {FEATURES_REQUIRED: [periph_uart]}
+  - comment: Enable periph_gpio when periph_gpio_irq is enabled
+    if: {has: {var: USEMODULE, match: [periph_gpio_irq]}}
+    then:
+      - add: {FEATURES_REQUIRED: [periph_gpio]}
+  - if: {has: {var: USEMODULE, match: [periph_timer_periodic]}}
+    then:
+      - add: {FEATURES_REQUIRED: [periph_timer]}
+  - if: {has: {var: USEMODULE, match: [periph_wdt_auto_start]}}
+    then:
+      - add: {FEATURES_REQUIRED: [periph_wdt]}
+  - if: {has: {var: USEMODULE, match: [netdev_%], except: [netdev_default, netdev_new_api, netdev_legacy_api]}}
+    then:
+      - add: {USEMODULE: [netdev]}
+      - comment: Don't register netdevs if there is only a single one of them
+        if: {not: {has: {var: USEMODULE, match: [gnrc_netif_single]}}}
+        then:
+          - add: {USEMODULE: [netdev_register]}
+  - if: {has: {var: USEMODULE, match: [gnrc_netif_timestamp]}}
+    then:
+      - if: {has: {var: USEMODULE, match: [netdev_ieee802154]}}
+        then:
+          - add: {USEMODULE: [netdev_ieee802154_rx_timestamp]}

@@ -1,0 +1,56 @@
+# Provided features and CPU data of cpu/cortexm_common. This file is the source: Makefile.features
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - add: {FEATURES_PROVIDED: [arch_32bit, arch_arm, bug_newlib_broken_stdio, cortexm_svc, cpp, cpu_check_address,
+        cpu_core_cortexm, dbgpin, libstdcpp, newlib, periph_flashpage_aux, periph_pm, picolibc, puf_sram,
+        ssp]}
+  - comment: cortex-m33, cortex-m4f and cortex-m7 provide FPU support
+    if: {one_of: {var: CPU_CORE, values: [cortex-m33, cortex-m4f, cortex-m7]}}
+    then:
+      - add: {FEATURES_PROVIDED: [cortexm_fpu]}
+  - comment: |-
+      Set CPU_ARCH depending on the CPU_CORE
+
+      RUST_TARGET is only used when building Rust code; any users need to require
+      the `rust_target` feature to esnure things are checked properly.
+    if: {equals: {CPU_CORE: cortex-m0}}
+    then:
+      - set: {var: CPU_ARCH, value: armv6m, flavor: simple}
+      - set: {var: RUST_TARGET, value: thumbv6m-none-eabi}
+    elif:
+      - if: {equals: {CPU_CORE: cortex-m0plus}}
+        then:
+          - set: {var: CPU_ARCH, value: armv6m, flavor: simple}
+          - set: {var: RUST_TARGET, value: thumbv6m-none-eabi}
+      - if: {equals: {CPU_CORE: cortex-m23}}
+        then:
+          - set: {var: CPU_ARCH, value: armv8m, flavor: simple}
+          - comment: RUST_TARGET = thumbv8m.base-none-eabi
+      - if: {equals: {CPU_CORE: cortex-m3}}
+        then:
+          - set: {var: CPU_ARCH, value: armv7m, flavor: simple}
+          - set: {var: RUST_TARGET, value: thumbv7m-none-eabi}
+      - if: {equals: {CPU_CORE: cortex-m33}}
+        then:
+          - set: {var: CPU_ARCH, value: armv8m, flavor: simple}
+          - add: {FEATURES_PROVIDED: [cortexm_stack_limit]}
+          - comment: RUST_TARGET = thumbv8m.main-none-eabi
+      - if: {equals: {CPU_CORE: cortex-m4}}
+        then:
+          - set: {var: CPU_ARCH, value: armv7m, flavor: simple}
+          - set: {var: RUST_TARGET, value: thumbv7em-none-eabi}
+      - if: {equals: {CPU_CORE: cortex-m4f}}
+        then:
+          - set: {var: CPU_ARCH, value: armv7m, flavor: simple}
+          - set: {var: RUST_TARGET, value: thumbv7em-none-eabihf}
+      - if: {equals: {CPU_CORE: cortex-m7}}
+        then:
+          - set: {var: CPU_ARCH, value: armv7m, flavor: simple}
+    else:
+      - error: 'Unknown cortexm core: ${CPU_CORE}'
+  - if: {not: {equals: {RUST_TARGET: ''}}}
+    then:
+      - add: {FEATURES_PROVIDED: [rust_target]}
+  - add: {FEATURES_PROVIDED: [no_idle_thread]}

@@ -1,0 +1,9 @@
+# Dependency rules of cpu. This file is the source: Makefile.dep
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - comment: SORT THIS ALPHABETICALLY BY COMMON CPU MODULE NAME!
+    if: {has: {var: USEMODULE, match: [cpu_common_rp2350]}}
+    then:
+      - include: {path: '${RIOTCPU}/common/rp2350/Makefile.dep'}

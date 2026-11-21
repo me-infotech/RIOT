@@ -1,0 +1,12 @@
+# Provided features and CPU data of boards/common/nrf52. This file is the source: Makefile.features
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - set: {var: CPU, value: nrf52}
+  - comment: Put defined MCU peripherals here (in alphabetical order)
+    add: {FEATURES_PROVIDED: [periph_rtt]}
+  - add: {FEATURES_PROVIDED: [periph_timer]}
+  - comment: Put other features for this board (in alphabetical order)
+    add: {FEATURES_PROVIDED: [netif]}
+  - add: {FEATURES_PROVIDED: [riotboot]}

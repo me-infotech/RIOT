@@ -1,3 +1,6 @@
+# Generated from deps.yaml by dist/tools/config_data/config_data.py.
+# Do not edit: change deps.yaml and run `just generate-config-data`.
+
 # driver pseudo-modules dependencies (in alphabetical order)
 
 ifneq (,$(filter adc%1c,$(USEMODULE)))
@@ -24,7 +27,7 @@ ifneq (,$(filter at86rf215%,$(USEMODULE)))
   USEMODULE += at86rf215
 endif
 
-ifneq (,$(filter at86rf%, $(filter-out at86rf215%, $(USEMODULE))))
+ifneq (,$(filter at86rf%,$(filter-out at86rf215%,$(USEMODULE))))
   USEMODULE += at86rf2xx
 endif
 
@@ -338,7 +341,7 @@ ifneq (,$(filter periph_wdt_auto_start,$(USEMODULE)))
   FEATURES_REQUIRED += periph_wdt
 endif
 
-ifneq (,$(filter-out netdev_default netdev_new_api netdev_legacy_api, $(filter netdev_%,$(USEMODULE))))
+ifneq (,$(filter netdev_%,$(filter-out netdev_default netdev_new_api netdev_legacy_api,$(USEMODULE))))
   USEMODULE += netdev
   # Don't register netdevs if there is only a single one of them
   ifeq (,$(filter gnrc_netif_single,$(USEMODULE)))

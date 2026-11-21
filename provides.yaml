@@ -1,0 +1,41 @@
+# Provided features and CPU data of the repository root. This file is the source: Makefile.features
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - comment: |-
+      Process provided FEATURES
+
+      The board/board common are responsible for defining the CPU and CPU_MODEL
+      variables in their Makefile.features.
+      This makes them available when setting features based on CPU_MODEL in the cpu
+      Makefile.features and also during dependency resolution.
+
+      Board features defined by common code in `boards/common` are processed
+      during the dependency resolution, since they depend on the USEMODULE.
+  - comment: |-
+      Transition:
+        Moving 'CPU/CPU_MODEL' to Makefile.features is an ongoing work and may not
+        reflect the state of all boards for the moment.
+  - include: {path: '${BOARDDIR}/Makefile.features'}
+  - comment: Sanity check
+    if: {equals: {CPU: ''}}
+    then:
+      - error: '${BOARD}: CPU must be defined by board / board_common Makefile.features'
+  - include: {path: '${RIOTCPU}/${CPU}/Makefile.features'}
+  - comment: Provide CPU as a feature to allow listing all boards with a CPU
+    add: {FEATURES_PROVIDED: ['cpu_${CPU}']}
+  - comment: Features that are conflicting for all architectures
+    add: {FEATURES_CONFLICT: ['picolibc:newlib']}
+  - add: {FEATURES_CONFLICT_MSG: ['"Only one standard C library can be used."']}
+  - add: {FEATURES_CONFLICT: ['periph_gpio_irq:periph_gpio_ll_irq']}
+  - add: {FEATURES_CONFLICT_MSG: ['"Only one GPIO IRQ implementation can be used."']}
+  - add: {FEATURES_CONFLICT: ['periph_usbdev:tinyusb_device', 'periph_usbdev:tinyusb_host']}
+  - add: {FEATURES_CONFLICT_MSG: ['"Package tinyUSB is not yet compatible with periph_usbdev."']}
+  - comment: Features provided implicitly
+    if: {has: {var: FEATURES_PROVIDED, match: [periph_eth]}}
+    then:
+      - add: {FEATURES_PROVIDED: [netif_ethernet]}
+  - if: {has: {var: FEATURES_PROVIDED, match: [netif_%]}}
+    then:
+      - add: {FEATURES_PROVIDED: [netif]}

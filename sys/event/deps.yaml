@@ -1,0 +1,15 @@
+# Dependency rules of sys/event. This file is the source: Makefile.dep
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - add: {USEMODULE: [core_thread_flags]}
+  - if: {has: {var: USEMODULE, match: [event_thread_%]}}
+    then:
+      - add: {USEMODULE: [event_thread]}
+  - if: {has: {var: USEMODULE, match: [event_timeout_ztimer]}}
+    then:
+      - add: {USEMODULE: [ztimer]}
+  - if: {has: {var: USEMODULE, match: [event_timeout]}}
+    then:
+      - add: {USEMODULE: [event_timeout_ztimer, ztimer_usec]}

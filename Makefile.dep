@@ -1,3 +1,6 @@
+# Generated from deps.yaml by dist/tools/config_data/config_data.py.
+# Do not edit: change deps.yaml and run `just generate-config-data`.
+
 # include board specific application dependencies
 -include $(APPDIR)/Makefile.board.dep
 -include $(APPDIR)/Makefile.$(TOOLCHAIN).dep
@@ -93,15 +96,15 @@ ifneq (,$(filter tlsf-malloc,$(USEMODULE)))
   USEPKG += tlsf
 endif
 
-ifneq (,$(filter tinydtls_sock_dtls, $(USEMODULE)))
-    USEPKG += tinydtls
+ifneq (,$(filter tinydtls_sock_dtls,$(USEMODULE)))
+  USEPKG += tinydtls
 endif
 
 ifneq (,$(filter flashdb_%,$(USEMODULE)))
   USEPKG += flashdb
 endif
 
-ifneq (,$(filter tinyusb_%, $(USEMODULE)))
+ifneq (,$(filter tinyusb_%,$(USEMODULE)))
   USEPKG += tinyusb
 endif
 
@@ -110,7 +113,7 @@ FEATURES_OPTIONAL += periph_gpio
 
 # always select power management unless building the bootloader
 # pm is not needed by the bootloader and omitting it saves some ROM
-ifneq (1, $(RIOTBOOT_BUILD))
+ifneq ($(RIOTBOOT_BUILD),1)
   FEATURES_OPTIONAL += periph_pm
 endif
 

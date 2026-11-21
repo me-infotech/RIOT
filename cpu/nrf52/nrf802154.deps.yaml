@@ -1,0 +1,10 @@
+# Dependency rules of cpu/nrf52. This file is the source: Makefile.nrf802154.dep
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - if: {has: {var: USEMODULE, match: [netdev_default]}}
+    then:
+      - if: {not: {has: {var: USEMODULE, match: [nimble_%, nrfmin, nrfble]}}}
+        then:
+          - add: {USEMODULE: [nrf802154]}

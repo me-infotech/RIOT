@@ -1,0 +1,26 @@
+# Provided features and CPU data of cpu/nrf5x_common. This file is the source: Makefile.features
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - comment: Put defined MCU peripherals here (in alphabetical order)
+    add: {FEATURES_PROVIDED: [periph_cpuid]}
+  - add: {FEATURES_PROVIDED: [periph_flashpage, periph_flashpage_in_address_space, periph_flashpage_pagewise,
+        periph_gpio, periph_gpio_irq, periph_timer_periodic, periph_timer_poll, periph_timer_query_freqs,
+        periph_uart_modecfg, periph_wdt, periph_wdt_cb]}
+  - if: {not: {has: {var: CPU_MODEL, match: [nrf5340_app]}}}
+    then:
+      - add: {FEATURES_PROVIDED: [periph_gpio_ll, periph_gpio_ll_disconnect, periph_gpio_ll_input_pull_down,
+            periph_gpio_ll_input_pull_up, periph_gpio_ll_irq, periph_gpio_ll_irq_edge_triggered_both,
+            periph_gpio_ll_irq_unmask, periph_gpio_ll_open_drain, periph_gpio_ll_open_drain_pull_up, periph_gpio_ll_open_source,
+            periph_gpio_ll_open_source_pull_down]}
+  - comment: nRF9160/nRF5340 don't support these drivers right now
+    if: {not: {has: {var: CPU_MODEL, match: [nrf9160, nrf5340_app]}}}
+    then:
+      - add: {FEATURES_PROVIDED: [periph_hwrng, periph_rtt_overflow, periph_temperature]}
+      - comment: Various other features (if any)
+        add: {FEATURES_PROVIDED: [ble_nimble]}
+      - add: {FEATURES_PROVIDED: [radio_nrfble, radio_nrfmin, netif]}
+  - add: {FEATURES_CONFLICT: ['radio_nrf802154:radio_nrfble', 'radio_nrf802154:radio_nrfmin', 'radio_nrfble:radio_nrfmin']}
+  - add: {FEATURES_CONFLICT_MSG: ['"Multiplexing the nRF radio between different radio modes is not supported."']}
+  - include: {path: '${RIOTCPU}/cortexm_common/Makefile.features'}

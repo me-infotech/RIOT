@@ -1,0 +1,22 @@
+# Dependency rules of cpu/nrf5x_common. This file is the source: Makefile.dep
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - comment: include nrf5x common periph drivers
+    add: {USEMODULE: [nrf5x_common_periph]}
+  - comment: link common cpu code
+    add: {USEMODULE: [cpu_common]}
+  - comment: |-
+      per default, enable DCDC converter if an external LC filter is provided
+      reg1 feature denotes state 1 on two-stage regulator models or the single
+      state in single-regulator models
+    add: {FEATURES_OPTIONAL: [vdd_lc_filter_reg1]}
+  - comment: reg0 feature denotes stage 0 two-stage regulator models
+    add: {FEATURES_OPTIONAL: [vdd_lc_filter_reg0]}
+  - if: {has: {var: USEPKG, match: [nimble]}}
+    then:
+      - add: {USEPKG: [nrfx]}
+  - if: {has: {var: USEMODULE, match: [nrfmin]}}
+    then:
+      - add: {USEMODULE: [netdev_legacy_api]}

@@ -1,0 +1,49 @@
+# Dependency rules of cpu/nrf52/periph. This file is the source: Makefile.dep
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - if: {has: {var: USEMODULE, match: [periph_ecc_p192r1]}}
+    then:
+      - add: {USEPKG: [driver_cryptocell_310]}
+      - add: {USEMODULE: [psa_cryptocell_310_ecc_p192]}
+  - if: {has: {var: USEMODULE, match: [periph_ecc_p256r1]}}
+    then:
+      - add: {USEPKG: [driver_cryptocell_310]}
+      - add: {USEMODULE: [psa_cryptocell_310_ecc_p256]}
+  - if: {has: {var: USEMODULE, match: [periph_ecc_ed25519]}}
+    then:
+      - add: {USEPKG: [driver_cryptocell_310]}
+      - add: {USEMODULE: [psa_cryptocell_310_ecc_ed25519]}
+  - if: {has: {var: USEMODULE, match: [periph_hash_sha_1]}}
+    then:
+      - add: {USEPKG: [driver_cryptocell_310]}
+      - add: {USEMODULE: [psa_cryptocell_310_hashes_sha1]}
+  - if: {has: {var: USEMODULE, match: [periph_hash_sha_224]}}
+    then:
+      - add: {USEPKG: [driver_cryptocell_310]}
+      - add: {USEMODULE: [psa_cryptocell_310_hashes_sha224]}
+  - if: {has: {var: USEMODULE, match: [periph_hash_sha_256]}}
+    then:
+      - add: {USEPKG: [driver_cryptocell_310]}
+      - add: {USEMODULE: [psa_cryptocell_310_hashes_sha256]}
+  - if: {has: {var: USEMODULE, match: [periph_hash_sha_512]}}
+    then:
+      - add: {USEPKG: [driver_cryptocell_310]}
+      - add: {USEMODULE: [psa_cryptocell_310_hashes_sha512]}
+  - if: {has: {var: USEMODULE, match: [periph_cipher_aes_128_cbc]}}
+    then:
+      - add: {USEPKG: [driver_cryptocell_310]}
+      - add: {USEMODULE: [psa_cryptocell_310_aes_cbc]}
+  - if: {has: {var: USEMODULE, match: [periph_cipher_chacha20]}}
+    then:
+      - add: {USEPKG: [driver_cryptocell_310]}
+      - add: {USEMODULE: [psa_cryptocell_310_cipher_chacha20]}
+  - if: {has: {var: USEMODULE, match: [periph_aead_aes_128_ccm]}}
+    then:
+      - add: {USEPKG: [driver_cryptocell_310]}
+      - add: {USEMODULE: [psa_cryptocell_310_aes_ccm]}
+  - if: {has: {var: USEMODULE, match: [periph_hmac_sha_256]}}
+    then:
+      - add: {USEPKG: [driver_cryptocell_310]}
+      - add: {USEMODULE: [psa_cryptocell_310_hmac]}

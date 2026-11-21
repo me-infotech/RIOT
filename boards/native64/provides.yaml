@@ -1,0 +1,9 @@
+# Provided features and CPU data of boards/native64. This file is the source: Makefile.features
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - set: {var: CPU, value: native}
+  - add: {FEATURES_PROVIDED: [arch_64bit]}
+  - set: {var: NATIVE_ARCH_BIT, value: '64'}
+  - include: {path: '${RIOTBOARD}/common/native/Makefile.features'}

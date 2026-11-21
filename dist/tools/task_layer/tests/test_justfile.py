@@ -79,9 +79,9 @@ class JustfileContractTest(unittest.TestCase):
         cls.parsed = dump(JUSTFILE)
 
     def test_migrated_targets_are_public_recipes(self):
-        # Later steps add recipes (e.g. `doc`, dist/tools/doccheck/tests); that
-        # every public recipe is registered with tests is checked by
-        # dist/tools/migration/tests (O2).
+        # Later steps add recipes (e.g. `doc`, `list-ttys`,
+        # `generate-config-data`); that every public recipe is registered
+        # with tests is checked by dist/tools/migration/tests (O2).
         public = {n for n, r in self.parsed["recipes"].items() if not r["private"]}
         self.assertLessEqual(set(MIGRATED), public)
 

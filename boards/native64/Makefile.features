@@ -1,6 +1,7 @@
-CPU = native
+# Generated from provides.yaml by dist/tools/config_data/config_data.py.
+# Do not edit: change provides.yaml and run `just generate-config-data`.
 
+CPU = native
 FEATURES_PROVIDED += arch_64bit
 NATIVE_ARCH_BIT = 64
-
 include $(RIOTBOARD)/common/native/Makefile.features

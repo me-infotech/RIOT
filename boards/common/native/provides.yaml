@@ -1,0 +1,11 @@
+# Provided features and CPU data of boards/common/native. This file is the source: Makefile.features
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - comment: Put defined MCU peripherals here (in alphabetical order)
+    add: {FEATURES_PROVIDED: [periph_rtc]}
+  - add: {FEATURES_PROVIDED: [periph_rtc_ms, periph_timer, periph_uart, periph_gpio, periph_pwm, periph_qdec]}
+  - comment: Put other features for this board (in alphabetical order)
+    add: {FEATURES_PROVIDED: [motor_driver]}
+  - add: {FEATURES_PROVIDED: [netif_ethernet]}
