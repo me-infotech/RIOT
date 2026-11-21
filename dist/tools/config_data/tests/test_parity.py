@@ -68,6 +68,15 @@ class GoldenFilesTest(unittest.TestCase):
         self.assertEqual(sorted(found), SCOPE["files"])
 
 
+def without_flash_adapters(result: tuple) -> tuple:
+    """MAKEFILE_LIST without the Make adapters generated from the flash data
+    (step G3-2, `*flash.inc.mk`): new files that the Make files of the base
+    commit did not include; the settings in them were in those Make files."""
+    status, lines = result
+    return status, [" ".join(w for w in line.split(" ") if not w.endswith("flash.inc.mk"))
+                    if "Makefile.include" in line else line for line in lines]
+
+
 @unittest.skipIf(MAKE is None, "GNU Make is not installed")
 class LiveMakeParityTest(unittest.TestCase):
     """C6: one live Make run per application, board and target."""
@@ -79,7 +88,8 @@ class LiveMakeParityTest(unittest.TestCase):
                 argv = sample.make_argv(app_dir, board, target)
                 with self.subTest(command=" ".join(argv)):
                     self.assertEqual(
-                        sample.mask_g003(sample.mask_version(sample.run_make(argv))),
+                        sample.mask_g003(without_flash_adapters(
+                            sample.mask_version(sample.run_make(argv)))),
                         sample.mask_g003(sample.mask_version(entries[" ".join(argv)])))
 
     def test_info_targets(self):

@@ -12,8 +12,9 @@
 
 # Rules: a recipe never calls make; inputs are repository files only; the
 # commands are no longer Make targets. The applications of step G3-1 are
-# built with `just build` (CMake + Ninja, dist/tools/cmake_gen); all others
-# are still built with make in their directory. Tested with just 1.59.0.
+# built with `just build` (CMake + Ninja, dist/tools/cmake_gen) and flashed
+# with `just flash` (dist/tools/flash); all others are still built and
+# flashed with make in their directory. Tested with just 1.59.0.
 
 # Recipe lines run with /bin/sh, as GNU Make ran them.
 set shell := ["/bin/sh", "-c"]
@@ -111,3 +112,14 @@ generate-config-data:
 # Example: just build examples/basic/hello-world nrf52840dk; VAR=VALUE as for make.
 build app board *vars:
     @./dist/tools/cmake_gen/cmake_gen.py build -C {{ quote(app) }} BOARD={{ quote(board) }} {{ vars }}
+
+# Regenerate the Make adapters (flash.inc.mk, <x>.flash.inc.mk) from the flash data
+# (maintenance of step G3-2; private: not a former Make target).
+[private]
+generate-flash-data:
+    @./dist/tools/flash/flash.py generate
+
+# Build (as `just build`) and flash an application without Make (step G3-2).
+# Example: just flash examples/basic/hello-world nrf52840dk PROGRAMMER=openocd
+flash app board *vars:
+    @./dist/tools/flash/flash.py flash -C {{ quote(app) }} BOARD={{ quote(board) }} {{ vars }}

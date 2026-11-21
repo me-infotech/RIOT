@@ -1,3 +1,6 @@
+# Programmer and flasher settings: generated from flash.yaml (step G3-2)
+include $(RIOTCPU)/nrf52/flash.inc.mk
+
 # Slot size is determined by "((total_flash_size - RIOTBOOT_LEN) / 2)".
 # If RIOTBOOT_LEN uses an uneven number of flashpages, the remainder of the
 # flash cannot be divided by two slots while staying FLASHPAGE_SIZE aligned.
@@ -6,11 +9,6 @@ ifneq (,$(filter usbus_dfu tinyusb_dfu,$(USEMODULE)))
 else
   RIOTBOOT_LEN ?= 0x2000
 endif
-
-# Set the target for the JLink programmer for flashing, JLINK expects an
-# underscore in the target, like "nrf52832_xxaa".
-# Boards that do not use a JLink ignore the flag.
-JLINK_DEVICE = $(subst xx,_xx,$(CPU_MODEL))
 
 VECTORS_O ?= $(BINDIR)/nrf52_vectors/vectors_$(CPU_MODEL).o
 

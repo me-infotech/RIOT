@@ -132,3 +132,25 @@ steps:
       pip: [pyyaml]
       tools: [just@1.59.0]
     docs: dist/tools/cmake_gen/README.md
+
+  - id: g3-02-flash
+    title: Flash an application from the programmer data, without Make
+    group: "3"
+    targets:
+      - name: flash
+        now: just flash <application> <board> [PROGRAMMER=…] [VAR=VALUE…]
+        hardware: true
+        board_test: >-
+          nRF52840 DK on USB, J-Link Commander and OpenOCD installed: for
+          hello-world, gnrc_networking and bindist run `just flash <app>
+          nrf52840dk` with PROGRAMMER=jlink and PROGRAMMER=openocd (and bmp
+          with a Black Magic Probe); the flasher must report success and the
+          application must answer on the serial port (`make term` until the
+          terminal is migrated); compare with `make flash` of the same
+          application
+    tests:
+      - dist/tools/flash/tests
+    requires:
+      pip: [pyyaml]
+      tools: [just@1.59.0]
+    docs: dist/tools/flash/README.md

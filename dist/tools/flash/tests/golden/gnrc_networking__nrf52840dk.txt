@@ -1,0 +1,202 @@
+# golden output of GNU Make for the parity tests of step G3-2 (flash without Make)
+# generator: dist/tools/flash/tests/record_golden.py
+# commit: 5f5b94ff9c94d52c5103f2fbe3b85e2cf216d60c (git archive; flasher scripts replaced only for the environment)
+# date: 2026-11-21
+# make: GNU Make 4.3
+# JLinkExe, openocd, pipx: stubs (sample.STUB); real ones: none
+# environment: env -i PATH HOME LC_ALL=C (PATH: stub directories first);
+#   stdout and stderr merged; BINDIRBASE outside the tree
+# flasher environment: BINDIR FLASH_ADDR IMAGE_OFFSET IMAGE_TYPE JLINK JLINK_DEVICE JLINK_IF JLINK_POST_FLASH JLINK_PRE_FLASH JLINK_RESET_FILE JLINK_SERIAL JLINK_SKIP_VERSION JLINK_SPEED OPENOCD OPENOCD_ADAPTER_INIT OPENOCD_CMD_RESET_HALT OPENOCD_CONFIG OPENOCD_EXTRA_INIT OPENOCD_EXTRA_RESET_INIT OPENOCD_POST_INIT_CMDS OPENOCD_PRE_FLASH_CHECK_SCRIPT OPENOCD_PRE_FLASH_CMDS OPENOCD_PRE_VERIFY_CMDS OPENOCD_RESET_USE_CONNECT_ASSERT_SRST OPENOCD_SKIP_VERIFY RIOTTOOLS
+## default: make -n -o all flash [examples/networking/gnrc/networking]
+## exit: 0
+command -v @RIOTBASE@/dist/tools/openocd/openocd.sh >/dev/null 2>&1 || { /usr/bin/env echo 'Flash program @RIOTBASE@/dist/tools/openocd/openocd.sh is required but not found in PATH.  Aborting.'; exit 1;}
+@RIOTBASE@/dist/tools/openocd/openocd.sh flash @BINDIR@/gnrc_networking.elf
+## default: flasher environment [examples/networking/gnrc/networking]
+## exit: 0
+flasher dist/tools/openocd/openocd.sh [flash] [@BINDIR@/gnrc_networking.elf]
+BINDIR=[@BINDIR@]
+FLASH_ADDR=[0x0]
+IMAGE_OFFSET unset
+IMAGE_TYPE unset
+JLINK unset
+JLINK_DEVICE unset
+JLINK_IF unset
+JLINK_POST_FLASH unset
+JLINK_PRE_FLASH unset
+JLINK_RESET_FILE unset
+JLINK_SERIAL unset
+JLINK_SKIP_VERSION unset
+JLINK_SPEED unset
+OPENOCD unset
+OPENOCD_ADAPTER_INIT=[-c 'source [find interface/jlink.cfg]' -c 'transport select swd']
+OPENOCD_CMD_RESET_HALT unset
+OPENOCD_CONFIG=[@RIOTBASE@/boards/common/nrf52/dist/openocd.cfg]
+OPENOCD_EXTRA_INIT unset
+OPENOCD_EXTRA_RESET_INIT unset
+OPENOCD_POST_INIT_CMDS=[-c 'nrf52_recover']
+OPENOCD_PRE_FLASH_CHECK_SCRIPT unset
+OPENOCD_PRE_FLASH_CMDS unset
+OPENOCD_PRE_VERIFY_CMDS=[-c 'flash fillw 0x10001200 0x00000012 2']
+OPENOCD_RESET_USE_CONNECT_ASSERT_SRST unset
+OPENOCD_SKIP_VERIFY unset
+RIOTTOOLS=[@RIOTBASE@/dist/tools]
+## default: stub calls [examples/networking/gnrc/networking]
+## exit: 0
+openocd [-c] [source [find interface/jlink.cfg]] [-c] [transport select swd] [-f] [@RIOTBASE@/boards/common/nrf52/dist/openocd.cfg] [-c] [tcl_port 0] [-c] [telnet_port 0] [-c] [gdb_port 0] [-c] [init] [-c] [nrf52_recover] [-c] [targets] [-c] [reset halt] [-c] [flash write_image erase "@BINDIR@/gnrc_networking.elf" 0 ] [-c] [flash fillw 0x10001200 0x00000012 2] [-c] [verify_image "@BINDIR@/gnrc_networking.elf" 0] [-c] [reset run] [-c] [shutdown]
+## default-jlink-found: make -n -o all flash [examples/networking/gnrc/networking]
+## exit: 0
+command -v @RIOTBASE@/dist/tools/jlink/jlink.sh >/dev/null 2>&1 || { /usr/bin/env echo 'Flash program @RIOTBASE@/dist/tools/jlink/jlink.sh is required but not found in PATH.  Aborting.'; exit 1;}
+@RIOTBASE@/dist/tools/jlink/jlink.sh flash @BINDIR@/gnrc_networking.elf
+## default-jlink-found: flasher environment [examples/networking/gnrc/networking]
+## exit: 0
+flasher dist/tools/jlink/jlink.sh [flash] [@BINDIR@/gnrc_networking.elf]
+BINDIR=[@BINDIR@]
+FLASH_ADDR=[0x0]
+IMAGE_OFFSET unset
+IMAGE_TYPE unset
+JLINK=[JLinkExe]
+JLINK_DEVICE=[nrf52840_xxaa]
+JLINK_IF unset
+JLINK_POST_FLASH=["Write4 0x10001200 00000012 00000012"]
+JLINK_PRE_FLASH unset
+JLINK_RESET_FILE unset
+JLINK_SERIAL=[]
+JLINK_SKIP_VERSION unset
+JLINK_SPEED unset
+OPENOCD unset
+OPENOCD_ADAPTER_INIT unset
+OPENOCD_CMD_RESET_HALT unset
+OPENOCD_CONFIG unset
+OPENOCD_EXTRA_INIT unset
+OPENOCD_EXTRA_RESET_INIT unset
+OPENOCD_POST_INIT_CMDS unset
+OPENOCD_PRE_FLASH_CHECK_SCRIPT unset
+OPENOCD_PRE_FLASH_CMDS unset
+OPENOCD_PRE_VERIFY_CMDS unset
+OPENOCD_RESET_USE_CONNECT_ASSERT_SRST unset
+OPENOCD_SKIP_VERIFY unset
+RIOTTOOLS=[@RIOTBASE@/dist/tools]
+## default-jlink-found: stub calls [examples/networking/gnrc/networking]
+## exit: 0
+JLinkExe [] [-nogui] [1]
+JLinkExe [-nogui] [1] [-exitonerror] [1] [-device] [nrf52840_xxaa] [-speed] [2000] [-if] [SWD] [-jtagconf] [-1,-1] [-commandfile] [@BINDIR@/burn.seg]
+  commandfile: loadfile @BINDIR@/gnrc_networking.elf
+  commandfile: Write4 0x10001200 00000012 00000012
+  commandfile: r
+  commandfile: g
+  commandfile: exit
+## jlink: make -n -o all flash [examples/networking/gnrc/networking PROGRAMMER=jlink]
+## exit: 0
+command -v @RIOTBASE@/dist/tools/jlink/jlink.sh >/dev/null 2>&1 || { /usr/bin/env echo 'Flash program @RIOTBASE@/dist/tools/jlink/jlink.sh is required but not found in PATH.  Aborting.'; exit 1;}
+@RIOTBASE@/dist/tools/jlink/jlink.sh flash @BINDIR@/gnrc_networking.elf
+## jlink: flasher environment [examples/networking/gnrc/networking PROGRAMMER=jlink]
+## exit: 0
+flasher dist/tools/jlink/jlink.sh [flash] [@BINDIR@/gnrc_networking.elf]
+BINDIR=[@BINDIR@]
+FLASH_ADDR=[0x0]
+IMAGE_OFFSET unset
+IMAGE_TYPE unset
+JLINK=[JLinkExe]
+JLINK_DEVICE=[nrf52840_xxaa]
+JLINK_IF unset
+JLINK_POST_FLASH=["Write4 0x10001200 00000012 00000012"]
+JLINK_PRE_FLASH unset
+JLINK_RESET_FILE unset
+JLINK_SERIAL=[]
+JLINK_SKIP_VERSION unset
+JLINK_SPEED unset
+OPENOCD unset
+OPENOCD_ADAPTER_INIT unset
+OPENOCD_CMD_RESET_HALT unset
+OPENOCD_CONFIG unset
+OPENOCD_EXTRA_INIT unset
+OPENOCD_EXTRA_RESET_INIT unset
+OPENOCD_POST_INIT_CMDS unset
+OPENOCD_PRE_FLASH_CHECK_SCRIPT unset
+OPENOCD_PRE_FLASH_CMDS unset
+OPENOCD_PRE_VERIFY_CMDS unset
+OPENOCD_RESET_USE_CONNECT_ASSERT_SRST unset
+OPENOCD_SKIP_VERIFY unset
+RIOTTOOLS=[@RIOTBASE@/dist/tools]
+## jlink: stub calls [examples/networking/gnrc/networking PROGRAMMER=jlink]
+## exit: 0
+JLinkExe [] [-nogui] [1]
+JLinkExe [-nogui] [1] [-exitonerror] [1] [-device] [nrf52840_xxaa] [-speed] [2000] [-if] [SWD] [-jtagconf] [-1,-1] [-commandfile] [@BINDIR@/burn.seg]
+  commandfile: loadfile @BINDIR@/gnrc_networking.elf
+  commandfile: Write4 0x10001200 00000012 00000012
+  commandfile: r
+  commandfile: g
+  commandfile: exit
+## openocd: make -n -o all flash [examples/networking/gnrc/networking PROGRAMMER=openocd]
+## exit: 0
+command -v @RIOTBASE@/dist/tools/openocd/openocd.sh >/dev/null 2>&1 || { /usr/bin/env echo 'Flash program @RIOTBASE@/dist/tools/openocd/openocd.sh is required but not found in PATH.  Aborting.'; exit 1;}
+@RIOTBASE@/dist/tools/openocd/openocd.sh flash @BINDIR@/gnrc_networking.elf
+## openocd: flasher environment [examples/networking/gnrc/networking PROGRAMMER=openocd]
+## exit: 0
+flasher dist/tools/openocd/openocd.sh [flash] [@BINDIR@/gnrc_networking.elf]
+BINDIR=[@BINDIR@]
+FLASH_ADDR=[0x0]
+IMAGE_OFFSET unset
+IMAGE_TYPE unset
+JLINK unset
+JLINK_DEVICE unset
+JLINK_IF unset
+JLINK_POST_FLASH unset
+JLINK_PRE_FLASH unset
+JLINK_RESET_FILE unset
+JLINK_SERIAL unset
+JLINK_SKIP_VERSION unset
+JLINK_SPEED unset
+OPENOCD unset
+OPENOCD_ADAPTER_INIT=[-c 'source [find interface/jlink.cfg]' -c 'transport select swd']
+OPENOCD_CMD_RESET_HALT unset
+OPENOCD_CONFIG=[@RIOTBASE@/boards/common/nrf52/dist/openocd.cfg]
+OPENOCD_EXTRA_INIT unset
+OPENOCD_EXTRA_RESET_INIT unset
+OPENOCD_POST_INIT_CMDS=[-c 'nrf52_recover']
+OPENOCD_PRE_FLASH_CHECK_SCRIPT unset
+OPENOCD_PRE_FLASH_CMDS unset
+OPENOCD_PRE_VERIFY_CMDS=[-c 'flash fillw 0x10001200 0x00000012 2']
+OPENOCD_RESET_USE_CONNECT_ASSERT_SRST unset
+OPENOCD_SKIP_VERIFY unset
+RIOTTOOLS=[@RIOTBASE@/dist/tools]
+## openocd: stub calls [examples/networking/gnrc/networking PROGRAMMER=openocd]
+## exit: 0
+openocd [-c] [source [find interface/jlink.cfg]] [-c] [transport select swd] [-f] [@RIOTBASE@/boards/common/nrf52/dist/openocd.cfg] [-c] [tcl_port 0] [-c] [telnet_port 0] [-c] [gdb_port 0] [-c] [init] [-c] [nrf52_recover] [-c] [targets] [-c] [reset halt] [-c] [flash write_image erase "@BINDIR@/gnrc_networking.elf" 0 ] [-c] [flash fillw 0x10001200 0x00000012 2] [-c] [verify_image "@BINDIR@/gnrc_networking.elf" 0] [-c] [reset run] [-c] [shutdown]
+## bmp: make -n -o all flash [examples/networking/gnrc/networking PROGRAMMER=bmp]
+## exit: 0
+command -v @RIOTBASE@/dist/tools/bmp/bmp.py >/dev/null 2>&1 || { /usr/bin/env echo 'Flash program @RIOTBASE@/dist/tools/bmp/bmp.py is required but not found in PATH.  Aborting.'; exit 1;}
+@RIOTBASE@/dist/tools/bmp/bmp.py  flash @BINDIR@/gnrc_networking.elf
+## bmp: flasher environment [examples/networking/gnrc/networking PROGRAMMER=bmp]
+## exit: 0
+flasher dist/tools/bmp/bmp.py [flash] [@BINDIR@/gnrc_networking.elf]
+BINDIR=[@BINDIR@]
+FLASH_ADDR=[0x0]
+IMAGE_OFFSET unset
+IMAGE_TYPE unset
+JLINK unset
+JLINK_DEVICE unset
+JLINK_IF unset
+JLINK_POST_FLASH unset
+JLINK_PRE_FLASH unset
+JLINK_RESET_FILE unset
+JLINK_SERIAL unset
+JLINK_SKIP_VERSION unset
+JLINK_SPEED unset
+OPENOCD unset
+OPENOCD_ADAPTER_INIT unset
+OPENOCD_CMD_RESET_HALT unset
+OPENOCD_CONFIG unset
+OPENOCD_EXTRA_INIT unset
+OPENOCD_EXTRA_RESET_INIT unset
+OPENOCD_POST_INIT_CMDS unset
+OPENOCD_PRE_FLASH_CHECK_SCRIPT unset
+OPENOCD_PRE_FLASH_CMDS unset
+OPENOCD_PRE_VERIFY_CMDS unset
+OPENOCD_RESET_USE_CONNECT_ASSERT_SRST unset
+OPENOCD_SKIP_VERIFY unset
+RIOTTOOLS=[@RIOTBASE@/dist/tools]
+## bmp: stub calls [examples/networking/gnrc/networking PROGRAMMER=bmp]
+## exit: 0
+pipx [run] [@RIOTBASE@/dist/tools/bmp/bmp.py] [flash] [@BINDIR@/gnrc_networking.elf]
+## end

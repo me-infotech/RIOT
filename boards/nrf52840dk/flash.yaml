@@ -1,0 +1,11 @@
+# Flash data of boards/nrf52840dk/Makefile.include (step G3-2): the
+# programmer settings of the board. Source of flash.inc.mk next to it
+# (`just generate-flash-data`), which the Make file includes first.
+# Format: dist/tools/flash/README.md.
+schema: 3
+rules:
+  - comment: |-
+      Set UICR.PSELRESET[0] and UICR.PSELRESET[1] registers at 0x10001200
+      to pin P0.18 (0x12), which is connected to the onboard Reset button
+    add: {JLINK_POST_FLASH: ['"Write4 0x10001200 00000012 00000012"']}
+  - set: {var: OPENOCD_PRE_VERIFY_CMDS, value: "-c 'flash fillw 0x10001200 0x00000012 2'"}

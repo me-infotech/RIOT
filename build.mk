@@ -162,6 +162,11 @@ endif
 
 ifeq (link,$(RIOT_BUILD_SECTION))
   RIOT_BUILD_SECTION :=
+  # FLASHFILE is flash data: the programmer's flash data
+  # (makefiles/tools/<programmer>.flash.yaml, step G3-2) sets it, Make reads
+  # it through the programmer's adapter. The build without Make does not
+  # read flash data, FLASHFILE is empty there (it is ELFFILE for every
+  # programmer of the flash data).
   BUILD_FILES += $(ELFFILE)
   BUILD_FILES += $(BINFILE)
   BUILD_FILES += $(FLASHFILE)

@@ -1,0 +1,8 @@
+# Flash data of makefiles/vars.inc.mk (step G3-2): the default flash address
+# (exported, read by the flasher scripts). Source of vars.flash.inc.mk
+# (`just generate-flash-data`), which vars.inc.mk includes first. Format:
+# dist/tools/flash/README.md.
+schema: 3
+rules:
+  - comment: set default values for selected global variables
+    set: {var: FLASH_ADDR, value: '0x0', flavor: conditional}

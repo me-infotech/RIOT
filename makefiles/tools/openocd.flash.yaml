@@ -1,0 +1,81 @@
+# Flash data of makefiles/tools/openocd.inc.mk (step G3-2): the flasher of
+# the programmer `openocd` (dist/tools/openocd/openocd.sh), its debug adapter
+# and configuration, and the variables the script gets. Source of
+# openocd.flash.inc.mk (`just generate-flash-data`), which openocd.inc.mk
+# includes first. Format: dist/tools/flash/README.md.
+schema: 3
+rules:
+  - set: {var: FLASHER, value: '${RIOTTOOLS}/openocd/openocd.sh', flavor: conditional}
+  - set: {var: FLASHFILE, value: '${ELFFILE}', flavor: conditional}
+  - set: {var: FFLAGS, value: 'flash ${FLASHFILE}', flavor: conditional}
+  - if: {nonempty: [OPENOCD_DEBUG_ADAPTER]}
+    then:
+      - include: {path: '${RIOTMAKE}/tools/openocd-adapters/${OPENOCD_DEBUG_ADAPTER}.inc.mk'}
+      - if: {not: {equals: {OPENOCD_TRANSPORT: default}}}
+        then:
+          - add: {OPENOCD_ADAPTER_INIT: ["-c 'transport select ${OPENOCD_TRANSPORT}'"]}
+  - comment: Add serial matching command, only if DEBUG_ADAPTER_ID was specified
+    if: {nonempty: [DEBUG_ADAPTER_ID]}
+    then:
+      - add: {OPENOCD_ADAPTER_INIT: ["-c 'adapter serial ${DEBUG_ADAPTER_ID}'"]}
+  - comment: Use the board's custom OpenOCD by default, if present in the file system.
+    set: {var: OPENOCD_CONFIG, value: {files: {match: ['${BOARDDIR}/dist/openocd.cfg']}}, flavor: conditional}
+  - comment: Still no config?
+    if: {not: {nonempty: [OPENOCD_CONFIG]}}
+    then:
+      - comment: MCU is STM32 based?
+        if: {equals: {CPU: stm32}}
+        then:
+          - comment: Then use the common OpenOCD config for the STM32 family in use
+            set: {var: OPENOCD_CONFIG, value: '${RIOTBASE}/boards/common/stm32/dist/stm32${CPU_FAM}.cfg', flavor: simple}
+        else:
+          - warning: '"Even though PROGRAMMER is openocd, no OPENOCD_CONFIG is specified. Flashing and debugging won''t work."'
+  - set: {var: OPENOCD_TARGETS, value: debug% flash% reset}
+  - comment: Export GDB_PORT_CORE_OFFSET to required targets
+    export: {targets: '${OPENOCD_TARGETS}', vars: [GDB_PORT_CORE_OFFSET]}
+  - comment: Export OPENOCD_CONFIG to required targets
+    export: {targets: '${OPENOCD_TARGETS}', vars: [OPENOCD_CONFIG]}
+  - comment: Export OPENOCD_CORE to required targets
+    export: {targets: '${OPENOCD_TARGETS}', vars: [OPENOCD_CORE]}
+  - comment: Export OPENOCD_ADAPTER_INIT to required targets
+    export: {targets: '${OPENOCD_TARGETS}', vars: [OPENOCD_ADAPTER_INIT]}
+  - comment: Export OPENOCD_EXTRA_INIT to required targets
+    export: {targets: '${OPENOCD_TARGETS}', vars: [OPENOCD_EXTRA_INIT]}
+  - comment: Export OPENOCD_EXTRA_RESET_INIT to required targets
+    export: {targets: '${OPENOCD_TARGETS}', vars: [OPENOCD_EXTRA_RESET_INIT]}
+  - comment: Export OPENOCD_RESET_USE_CONNECT_ASSERT_SRST to required targets
+    export: {targets: '${OPENOCD_TARGETS}', vars: [OPENOCD_RESET_USE_CONNECT_ASSERT_SRST]}
+  - if: {nonempty: [OPENOCD_SERVER_ADDRESS]}
+    then:
+      - comment: Export OPENOCD_SERVER_ADDRESS to required targets
+        export: {targets: '${OPENOCD_TARGETS}', vars: [OPENOCD_SERVER_ADDRESS]}
+  - if: {nonempty: [OPENOCD_CMD_RESET_HALT]}
+    then:
+      - comment: Export OPENOCD_CMD_RESET_HALT only to the flash targets
+        export: {targets: flash, vars: [OPENOCD_CMD_RESET_HALT]}
+      - export: {targets: flash-only, vars: [OPENOCD_CMD_RESET_HALT]}
+  - set: {var: OPENOCD_FLASH_TARGETS, value: flash flash-only flashr}
+  - if: {nonempty: [IMAGE_OFFSET]}
+    then:
+      - comment: Export IMAGE_OFFSET only to the flash/flash-only target
+        export: {targets: '${OPENOCD_FLASH_TARGETS}', vars: [IMAGE_OFFSET]}
+  - if: {nonempty: [OPENOCD_POST_INIT_CMDS]}
+    then:
+      - comment: Export OPENOCD_POST_INIT_CMDS only to the flash/flash-only target
+        export: {targets: '${OPENOCD_FLASH_TARGETS}', vars: [OPENOCD_POST_INIT_CMDS]}
+  - if: {nonempty: [OPENOCD_PRE_VERIFY_CMDS]}
+    then:
+      - comment: Export OPENOCD_PRE_VERIFY_CMDS only to the flash/flash-only target
+        export: {targets: '${OPENOCD_FLASH_TARGETS}', vars: [OPENOCD_PRE_VERIFY_CMDS]}
+  - if: {nonempty: [OPENOCD_SKIP_VERIFY]}
+    then:
+      - comment: Export OPENOCD_SKIP_VERIFY only to the flash/flash-only target
+        export: {targets: '${OPENOCD_FLASH_TARGETS}', vars: [OPENOCD_SKIP_VERIFY]}
+  - if: {nonempty: [OPENOCD_PRE_FLASH_CMDS]}
+    then:
+      - comment: Export OPENOCD_PRE_FLASH_CMDS only to the flash/flash-only targets
+        export: {targets: '${OPENOCD_FLASH_TARGETS}', vars: [OPENOCD_PRE_FLASH_CMDS]}
+  - if: {nonempty: [OPENOCD_PRE_FLASH_CHECK_SCRIPT]}
+    then:
+      - comment: Export OPENOCD_PRE_FLASH_CHECK_SCRIPT only to the flash/flash-only targets
+        export: {targets: '${OPENOCD_FLASH_TARGETS}', vars: [OPENOCD_PRE_FLASH_CHECK_SCRIPT]}

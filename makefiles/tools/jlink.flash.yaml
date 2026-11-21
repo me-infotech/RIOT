@@ -1,0 +1,44 @@
+# Flash data of makefiles/tools/jlink.inc.mk (step G3-2): the flasher of the
+# programmer `jlink` and the variables its script dist/tools/jlink/jlink.sh
+# gets. Source of jlink.flash.inc.mk (`just generate-flash-data`), which
+# jlink.inc.mk includes first. Format: dist/tools/flash/README.md.
+schema: 3
+rules:
+  - set: {var: FLASHER, value: '${RIOTTOOLS}/jlink/jlink.sh', flavor: conditional}
+  - set: {var: FLASHFILE, value: '${ELFFILE}', flavor: conditional}
+  - set: {var: FFLAGS, value: 'flash ${FLASHFILE}', flavor: conditional}
+  - set: {var: JLINK_SERIAL, value: '${DEBUG_ADAPTER_ID}', flavor: conditional}
+  - set: {var: JLINK_IF, value: '', flavor: conditional}
+  - set: {var: JLINK_RESET_FILE, value: '', flavor: conditional}
+  - set: {var: JLINK_PRE_FLASH, value: '', flavor: conditional}
+  - set: {var: JLINK_POST_FLASH, value: '', flavor: conditional}
+  - set: {var: JLINK_FLASH_TARGETS, value: flash flash%}
+  - set: {var: JLINK_DEBUG_TARGETS, value: debug debug-server}
+  - set: {var: JLINK_TARGETS, value: '${JLINK_DEBUG_TARGETS} ${JLINK_FLASH_TARGETS} reset term-rtt'}
+  - comment: Export JLINK_SERIAL to required targets
+    export: {targets: '${JLINK_TARGETS}', vars: [JLINK_SERIAL]}
+  - comment: Export JLINK_DEVICE to required targets
+    export: {targets: '${JLINK_TARGETS}', vars: [JLINK_DEVICE]}
+  - if: {nonempty: [JLINK]}
+    then:
+      - comment: Export JLINK to required targets if not empty
+        export: {targets: '${JLINK_TARGETS}', vars: [JLINK]}
+  - if: {nonempty: [JLINK_IF]}
+    then:
+      - comment: Export JLINK_IF to required targets if not empty
+        export: {targets: '${JLINK_TARGETS}', vars: [JLINK_IF]}
+  - if: {nonempty: [JLINK_RESET_FILE]}
+    then:
+      - comment: Export JLINK_RESET_FILE to required targets if not empty
+        export: {targets: '${JLINK_TARGETS}', vars: [JLINK_RESET_FILE]}
+  - comment: |-
+      Export JLINK_PRE_FLASH to flash targets only if not empty (the target
+      is the word JLINK_FLASH_TARGETS, as in the original Make file; GNU Make
+      exports a defined variable for every target anyway)
+    if: {nonempty: [JLINK_PRE_FLASH]}
+    then:
+      - export: {targets: JLINK_FLASH_TARGETS, vars: [JLINK_PRE_FLASH]}
+  - comment: Export JLINK_POST_FLASH to flash targets only if not empty
+    if: {nonempty: [JLINK_POST_FLASH]}
+    then:
+      - export: {targets: JLINK_FLASH_TARGETS, vars: [JLINK_POST_FLASH]}

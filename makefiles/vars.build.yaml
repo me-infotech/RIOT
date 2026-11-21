@@ -4,11 +4,14 @@
 # generated from it (`just generate-config-data`); edit this file, never the
 # Make file. The build without Make gives the modules exactly the exported
 # variables (`export` rules here and in the other build data; BUILD_EXPORTED,
-# dist/tools/cmake_gen). Format: dist/tools/config_data/README.md
+# dist/tools/cmake_gen). The default flash address FLASH_ADDR is flash data
+# (vars.flash.yaml, step G3-2): the generated Make file includes its adapter
+# first; the build without Make skips that include, dist/tools/flash reads
+# vars.flash.yaml. Format: dist/tools/config_data/README.md
 schema: 4
 rules:
-  - comment: set default values for selected global variables
-    set: {var: FLASH_ADDR, value: '0x0', flavor: conditional}
+  - comment: 'Default flash address: generated from vars.flash.yaml (step G3-2)'
+    include: {path: '${RIOTMAKE}/vars.flash.inc.mk'}
   - comment: Used in front of Makefile lines to suppress the printing of the command if user did not opt-in
       to see them.
     export:

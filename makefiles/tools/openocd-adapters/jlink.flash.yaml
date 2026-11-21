@@ -1,0 +1,10 @@
+# Flash data of makefiles/tools/openocd-adapters/jlink.inc.mk (step G3-2):
+# OpenOCD with the Segger J-Link debug adapter. Source of jlink.flash.inc.mk
+# (`just generate-flash-data`), which jlink.inc.mk includes. Format:
+# dist/tools/flash/README.md.
+schema: 3
+rules:
+  - comment: Segger J-Link debug adapter
+    set: {var: OPENOCD_ADAPTER_INIT, value: "-c 'source [find interface/jlink.cfg]'", flavor: conditional}
+  - comment: default to SWD
+    set: {var: OPENOCD_TRANSPORT, value: swd, flavor: conditional}

@@ -161,12 +161,12 @@ rules:
   - set: {var: MAPFILE, value: {select: {var: ELFFILE, pattern: {from: '%.elf', to: '%.map'}}}, flavor: conditional}
   - section: link
   - comment: |-
-      The programmer's Make file (makefiles/tools/openocd.inc.mk,
-      jlink.inc.mk) sets FLASHFILE ?= $(ELFFILE) for the boards in scope;
-      flashing is migrated in step G3-2.
-    set: {var: FLASHFILE, value: '${ELFFILE}', flavor: conditional}
-    stand_in: makefiles/tools/openocd.inc.mk
-  - add: {BUILD_FILES: ['${ELFFILE}', '${BINFILE}', '${FLASHFILE}', '${HASHFILE}']}
+      FLASHFILE is flash data: the programmer's flash data
+      (makefiles/tools/<programmer>.flash.yaml, step G3-2) sets it, Make reads
+      it through the programmer's adapter. The build without Make does not
+      read flash data, FLASHFILE is empty there (it is ELFFILE for every
+      programmer of the flash data).
+    add: {BUILD_FILES: ['${ELFFILE}', '${BINFILE}', '${FLASHFILE}', '${HASHFILE}']}
   - comment: variables used to compile and link c++
     if: {has: {var: USEMODULE, match: [cpp]}}
     then:

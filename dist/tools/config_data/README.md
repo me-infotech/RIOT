@@ -286,6 +286,21 @@ the generated part instead (e.g. `cpu/nrf52/Makefile.include`,
 `Makefile.include`); the order of everything that reads or changes a build
 variable is unchanged.
 
+Build data and flash data (step G3-2, `dist/tools/flash/README.md`) do not
+share a value. The programmer settings are flash data; a Make file with
+both includes its flash adapter (`flash.inc.mk`, `<x>.flash.inc.mk`) as
+its first statement and its build part where the build part was. Where the
+Make file is generated whole (`makefiles/vars.inc.mk`), the build data
+holds that include as its first rule; the build without Make skips the
+include of a flash adapter (`cmake_gen/buildeval.py`), the flash without
+Make reads the flash data. Two values are read by both: FLASH_ADDR (default
+`0x0`, exported to the modules) and FLASHFILE (in BUILD_FILES). Their only
+source is the flash data (`makefiles/vars.flash.yaml`,
+`makefiles/tools/<programmer>.flash.yaml`); the build without Make does not
+read flash data, so both are empty there (FLASHFILE is ELFFILE, which
+BUILD_FILES names anyway; no module reads FLASH_ADDR), while Make reads them
+through the adapters, so its values are unchanged.
+
 Schema 4 adds what the generated Make needs to say exactly what the Make
 file said (every schema 1-3 file stays valid):
 
@@ -436,5 +451,5 @@ copy; the generated files regenerated from the restored data):
   content, so the objects and the firmware are the same; only the package's
   objects are compiled again. A fresh build directory is not affected.
 * Only the 35 Make files of the scope; every other board, CPU and package
-  Make file is unchanged Make. The stand-ins (16 rules in 10 files) mark
+  Make file is unchanged Make. The stand-ins (15 rules in 9 files) mark
   what the build without Make does not cover yet; the Make file keeps it.

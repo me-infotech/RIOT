@@ -1,0 +1,19 @@
+# Flash data of makefiles/tools/programmer.inc.mk (step G3-2): the flash
+# command of every programmer, directly or through the wrapper
+# dist/tools/programmer/programmer.py. Source of programmer.flash.inc.mk
+# (`just generate-flash-data`), which programmer.inc.mk includes first.
+# Format: dist/tools/flash/README.md.
+schema: 3
+rules:
+  - comment: Configure the programmer related variables
+    set: {var: PROGRAMMER_QUIET, value: '${QUIET}', flavor: conditional}
+  - if: {equals: {PROGRAMMER_QUIET: '0'}}
+    then:
+      - set: {var: PROGRAMMER_VERBOSE_OPT, value: --verbose, flavor: conditional}
+  - comment: Don't use the programmer wrapper by default
+    set: {var: USE_PROGRAMMER_WRAPPER_SCRIPT, value: '0', flavor: conditional}
+  - if: {equals: {USE_PROGRAMMER_WRAPPER_SCRIPT: '1'}}
+    then:
+      - set: {var: PROGRAMMER_FLASH, value: '@${RIOTTOOLS}/programmer/programmer.py --action Flashing --cmd "${FLASHER} ${FFLAGS}" --programmer "${PROGRAMMER}" ${PROGRAMMER_VERBOSE_OPT}', flavor: conditional}
+    else:
+      - set: {var: PROGRAMMER_FLASH, value: '${FLASHER} ${FFLAGS}', flavor: conditional}

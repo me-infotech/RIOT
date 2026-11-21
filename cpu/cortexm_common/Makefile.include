@@ -1,3 +1,6 @@
+# Programmer and flasher settings: generated from flash.yaml (step G3-2)
+include $(RIOTCPU)/cortexm_common/flash.inc.mk
+
 # The include path and the linker symbols are build data:
 # cpu/cortexm_common/build.yaml. The file included here is generated from it
 # (`just generate-config-data`); edit the YAML, not it.
@@ -48,6 +51,3 @@ ifneq (,$(filter usbus_dfu tinyusb_dfu,$(USEMODULE)))
 else
   RIOTBOOT_LEN ?= 0x1000
 endif
-
-# JLink is able to flash any ARM CPUs
-PROGRAMMERS_SUPPORTED += jlink

@@ -1,8 +1,8 @@
 # Generated from vars.build.yaml by dist/tools/config_data/config_data.py.
 # Do not edit: change vars.build.yaml and run `just generate-config-data`.
 
-# set default values for selected global variables
-FLASH_ADDR ?= 0x0
+# Default flash address: generated from vars.flash.yaml (step G3-2)
+include $(RIOTMAKE)/vars.flash.inc.mk
 
 # Used in front of Makefile lines to suppress the printing of the command if user did not opt-in to see them.
 export Q

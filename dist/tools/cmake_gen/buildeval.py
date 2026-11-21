@@ -52,6 +52,16 @@ def build_yaml_name(make_path: str) -> str:
     raise ValueError(f"no build data name for {make_path}")
 
 
+def is_flash_adapter(make_path: str) -> bool:
+    """A Make file generated from flash data (step G3-2: `flash.inc.mk`,
+    `<x>.flash.inc.mk`, dist/tools/flash/README.md). The build data includes
+    one where its Make file is generated whole (makefiles/vars.build.yaml);
+    it is no build data: the build without Make skips the include, the flash
+    without Make reads the flash data at the include of its owner."""
+    base = os.path.basename(make_path)
+    return base == "flash.inc.mk" or base.endswith(".flash.inc.mk")
+
+
 def pkg_yaml_name(make_path: str) -> str:
     """The package data file of a package Make file: `pkg/<name>/Makefile` ->
     `pkg.yaml`, `Makefile.<x>` -> `<x>.pkg.yaml`."""
@@ -94,6 +104,8 @@ class BuildEvaluator(Evaluator):
         name = rel(path)
         if name in self.hooks:
             self.hooks[name]()
+            return
+        if is_flash_adapter(path):
             return
         for kind in (build_yaml_name, R.module_yaml_name):
             try:

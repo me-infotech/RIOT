@@ -1,0 +1,7 @@
+# Flash data of cpu/cortexm_common/Makefile.include (step G3-2). Source of
+# flash.inc.mk next to it (`just generate-flash-data`), which the Make file
+# includes first. Format: dist/tools/flash/README.md.
+schema: 3
+rules:
+  - comment: JLink is able to flash any ARM CPUs
+    add: {PROGRAMMERS_SUPPORTED: [jlink]}

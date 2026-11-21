@@ -1,0 +1,26 @@
+# Flash data of boards/common/nrf52/Makefile.include (step G3-2): the
+# programmers of the nRF52 boards and their settings. Source of flash.inc.mk
+# next to it (`just generate-flash-data`), which the Make file includes first.
+# Format: dist/tools/flash/README.md.
+schema: 3
+rules:
+  - comment: set list of supported programmers
+    add: {PROGRAMMERS_SUPPORTED: [openocd, bmp]}
+  - comment: keep name of `JLINK` in sync with script jlink.sh in $(RIOTTOOLS)/jlink
+    set: {var: JLINK, value: JLinkExe, flavor: conditional}
+  - comment: J-Link if its J-Link Commander is installed, OpenOCD otherwise
+    if: {command: {var: JLINK}}
+    then:
+      - set: {var: PROGRAMMER, value: jlink, flavor: conditional}
+    else:
+      - set: {var: PROGRAMMER, value: openocd, flavor: conditional}
+  - comment: |-
+      Setup OpenOCD for flashing. The nRF52 series is supported from OpenOCD v0.11
+      onwards.
+    set: {var: OPENOCD_DEBUG_ADAPTER, value: jlink, flavor: conditional}
+  - set: {var: OPENOCD_CONFIG, value: '${RIOTBOARD}/common/nrf52/dist/openocd.cfg'}
+  - comment: |-
+      From Build Code Fxx and later, the nRF52 device is automatically locked after
+      a power cycle and has to be recovered with a separate command after the
+      initialization. Otherwise the Flash can not be accessed.
+    set: {var: OPENOCD_POST_INIT_CMDS, value: "-c 'nrf52_recover'"}

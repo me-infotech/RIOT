@@ -1,0 +1,9 @@
+# Flash data of makefiles/tools/bmp.inc.mk (step G3-2): the flasher of the
+# programmer `bmp` (Black Magic Probe, dist/tools/bmp/bmp.py). Source of
+# bmp.flash.inc.mk (`just generate-flash-data`), which bmp.inc.mk includes
+# first. Format: dist/tools/flash/README.md.
+schema: 3
+rules:
+  - set: {var: FLASHER, value: '${RIOTTOOLS}/bmp/bmp.py', flavor: conditional}
+  - set: {var: FLASHFILE, value: '${ELFFILE}', flavor: conditional}
+  - set: {var: FFLAGS, value: '${BMP_OPTIONS} flash ${FLASHFILE}', flavor: conditional}

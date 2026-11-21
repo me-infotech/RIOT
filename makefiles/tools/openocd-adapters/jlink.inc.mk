@@ -1,5 +1,2 @@
-# Segger J-Link debug adapter
-OPENOCD_ADAPTER_INIT ?= -c 'source [find interface/jlink.cfg]'
-
-# default to SWD
-OPENOCD_TRANSPORT ?= swd
+# Segger J-Link debug adapter: generated from jlink.flash.yaml (step G3-2)
+include $(RIOTMAKE)/tools/openocd-adapters/jlink.flash.inc.mk
