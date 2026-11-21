@@ -388,10 +388,10 @@ endif
 
 The array of board serial numbers has to be edited to match your local boards.
 The serial numbers used here is the USB device serial number as reported by
-the debugger hardware. With the `make list-ttys` it is reported as the `serial`:
+the debugger hardware. With `just list-ttys` it is reported as the `serial`:
 
 ```shell
-make list-ttys
+just list-ttys
 ```
 
 ```text

@@ -186,7 +186,6 @@ function _riot {
         "info-programmers-supported:list programmers supported by the given board"
         "info-rust:list versions of the used rust toolchain"
         "info-toolchains-supported:list toolchains supported by the given board"
-        "list-ttys:list TTYs connected to the machine"
         "lstfile:dump lots of details of the build firmware in a lstfile"
         "reset:reset the given board (if supported)"
         "term:connect to the serial of the given board"

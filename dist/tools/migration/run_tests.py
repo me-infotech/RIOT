@@ -140,7 +140,7 @@ def main(argv=None):
     if args.list:
         for s in chosen:
             names = ", ".join(t["name"] for t in s["targets"])
-            print(f"{s['id']:<28} group {s['group']:<3} {names}")
+            print(f"{s['id']:<32} group {s['group']:<3} {names}")
         return 0
 
     results = [(s["id"], run_step(s, args.verbose)) for s in chosen]

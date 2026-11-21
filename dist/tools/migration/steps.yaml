@@ -57,3 +57,17 @@ steps:
       pip: [pyyaml]
       tools: [just@1.59.0]
     docs: dist/tools/task_layer/README.md
+
+  - id: p3-task-layer-group1-list-ttys
+    title: list-ttys from Makefile.include (application level) to just
+    group: "1"
+    targets:
+      - name: list-ttys
+        now: just list-ttys
+        hardware: false
+    tests:
+      - dist/tools/usb-serial/tests
+    requires:
+      pip: [pyudev]
+      tools: [just@1.59.0]
+    docs: dist/tools/task_layer/README.md
