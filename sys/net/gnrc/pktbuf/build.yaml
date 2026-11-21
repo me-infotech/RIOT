@@ -1,13 +1,11 @@
-# Build data of sys/net/gnrc/pktbuf/Makefile.include (step G3-1).
-# Format: dist/tools/config_data/README.md (schema 3).
-schema: 3
+# Build data of sys/net/gnrc/pktbuf/Makefile.include (steps G3-1, G0-3): the whole
+# file. The Make file is generated from it (`just generate-config-data`);
+# edit this file, never the Make file. Format: dist/tools/config_data/README.md
+schema: 4
 rules:
-  - set: {var: USED_PKTBUF_IMPLEMENTATIONS, value: {select: {var: USEMODULE, match: [gnrc_pktbuf_%]}}, flavor: simple}
-  - comment: exactly one word in USED_PKTBUF_IMPLEMENTATIONS
-    if: {not: {has: {var: USED_PKTBUF_IMPLEMENTATIONS, match: ['%']}}}
-    then:
-      - error: 'Only one implementation of gnrc_pktbuf should be used. Currently using: ${USED_PKTBUF_IMPLEMENTATIONS}'
-  - if: {several: {var: USED_PKTBUF_IMPLEMENTATIONS, match: ['%']}}
+  - comment: Check that only one implementation of pktbuf is used
+    set: {var: USED_PKTBUF_IMPLEMENTATIONS, value: {select: {var: USEMODULE, match: [gnrc_pktbuf_%]}}, flavor: simple}
+  - if: {not: {count: {var: USED_PKTBUF_IMPLEMENTATIONS, is: 1}}}
     then:
       - error: 'Only one implementation of gnrc_pktbuf should be used. Currently using: ${USED_PKTBUF_IMPLEMENTATIONS}'
   - set: {var: USEMODULE_INCLUDES_gnrc_pktbuf, value: '${LAST_MAKEFILEDIR}/include', flavor: simple}

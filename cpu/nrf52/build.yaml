@@ -1,9 +1,17 @@
-# Build data of cpu/nrf52/Makefile.include (step G3-1): memory sizes and the
-# includes; the bootloader, MCUboot, J-Link and SVD settings of the Make file
-# belong to flashing and debugging.
-# Format: dist/tools/config_data/README.md (schema 3).
-schema: 3
+# Build data of cpu/nrf52/Makefile.include (steps G3-1, G0-3): the MCUboot
+# values exported to the modules, the memory sizes and the includes. The
+# generated build.mk holds them as Make; Makefile.include includes it and
+# keeps the bootloader, J-Link, vector object and SVD settings (flashing,
+# debugging, riotboot).
+# Format: dist/tools/config_data/README.md
+schema: 4
 rules:
+  - comment: Export internal ROM alignment and slot sizes for bootloader support
+    set: {var: MCUBOOT_IMAGE_ALIGN, value: '8', export: true}
+  - set: {var: MCUBOOT_SLOT0_SIZE, value: '0x8000', export: true}
+  - set: {var: MCUBOOT_SLOT1_SIZE, value: '0x3C000', export: true}
+  - set: {var: MCUBOOT_SLOT2_SIZE, value: '0x3C000', export: true}
+  - comment: Set ROM and RAM lengths according to CPU model
   - if: {has: {var: CPU_MODEL, match: [nrf52805xxaa, nrf52810xxaa, nrf52811xxaa]}}
     then:
       - set: {var: ROM_LEN, value: '0x30000', flavor: conditional}

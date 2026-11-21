@@ -245,3 +245,196 @@ Limits
 - Comments are kept, the layout of the generated files is not (blank
   lines, alignment, trailing comments move above their line).
 - Board and CPU build data (`Makefile.include`) is not part of this step.
+
+Step G0-3: the build data is the only source of the build flags
+----------------------------------------------------------------
+
+Step G3-1 wrote the build data (`build.yaml`, `<x>.build.yaml`, `pkg.yaml`,
+`<x>.pkg.yaml`, see `dist/tools/cmake_gen/README.md`) next to the board,
+CPU, build system and package Make files and left those Make files
+unchanged: a second source, kept equal by parity tests. Step G0-3 removes
+it. The Make files no longer hold the build part; it is generated from the
+data by `just generate-config-data` (`config_data.py generate`), like the
+module Makefiles and the dependency files. Make reads the generated files,
+the build without Make (`just build`) reads the data: one source.
+
+`scope.yaml` `build` names, for each of the 35 data files, the Make file it
+describes and its adapter:
+
+| Adapter | Files | Generated | The Make file |
+|---|---|---|---|
+| `whole` | 19 (e.g. `sys/build.yaml`, `makefiles/cflags.build.yaml`, `makefiles/pseudomodules.build.yaml`, `makefiles/vars.build.yaml`) | the Make file itself | - |
+| `part` | 15 (e.g. `build.yaml`, `cpu/nrf52/build.yaml`, `pkg/pkg.build.yaml`, `pkg/cmsis/pkg.yaml`) | `<data name>.mk` next to the data (`build.yaml` -> `build.mk`, `nrfx.pkg.yaml` -> `nrfx.pkg.mk`) | keeps what is not data (flashing, debugging, terminal, Docker, Kconfig, riotboot, the rules of the build and of the packages) and includes the generated file where the build part was |
+| `none` | 1 (`sys/event/build.yaml`) | nothing: every rule is a `stand_in` | unchanged |
+
+A build part that is not contiguous in its Make file is split into
+sections (`- section: <name>`; `build.yaml` 8, `pkg/pkg.build.yaml` 3,
+`makefiles/libc/newlib.build.yaml` 2). The generated file has one block per
+section; the Make file includes it once per section:
+
+```make
+RIOT_BUILD_SECTION := toolchain
+include $(RIOTBASE)/build.mk
+```
+
+Each block clears `RIOT_BUILD_SECTION` (so the sections of a generated file
+included inside it are not mistaken for its own); a name without a block
+stops Make. Where the Make file had other statements between data lines
+that do not depend on them, those statements were moved before or after
+the generated part instead (e.g. `cpu/nrf52/Makefile.include`,
+`makefiles/toolchain/gnu.inc.mk`, the IoT-LAB and unzip settings of
+`Makefile.include`); the order of everything that reads or changes a build
+variable is unchanged.
+
+Schema 4 adds what the generated Make needs to say exactly what the Make
+file said (every schema 1-3 file stays valid):
+
+| Construct | Meaning | Make (generated) |
+|---|---|---|
+| `- section: NAME` | the following rules form a section (top level; all or no rules of a file) | `ifeq (NAME,$(RIOT_BUILD_SECTION))` block |
+| `stand_in: <Make file>` on any rule | read by the build without Make only: it stands for what that Make file still does itself (a recipe, Kconfig, git-cache-rs, …) | left out |
+| `export: [NAMES]`, `unexport: [NAMES]`, `set: {…, export: true}` | exported to the Make processes of modules and packages (the build without Make collects them in BUILD_EXPORTED) | `export X`, `unexport X`, `export X = …` |
+| value `{when: {test: SEL, then?, else?}}` | `then` if the selection is not empty, else `else`; evaluated when the variable is used | `$(if SEL,THEN,ELSE)` |
+| `files: {…, sort: true}` | sorted, without duplicates | `$(sort $(wildcard …))` |
+| `arith: {…, once: true}` | expanded once (only as the value of a `set`) | `$(call memoized,VAR,$(shell …))` |
+| `arith: {…, kilo: [VAR…]}` | only these variables may hold `NK`; another one with `NK` is an error (in Make the shell gets no number) | `$(VAR:%K=%*1024)` for those, `$(V)` for the others |
+| a `set` value that ends with blanks (with a one-line `comment`) | the blanks are part of the value | `VAR = value  # comment` (Make keeps the blanks before a comment) |
+| condition `defined: VAR` | the variable has a non-empty value, not expanded | `ifdef VAR` / `ifndef VAR` |
+| condition `count: {var, match?, except?, is: N}` | the selection has N words (repetitions count) | `ifeq (N,$(words SEL))` |
+
+The schema 3 constructs that were "build data only" are written as Make
+now: `arith` as `$(shell echo $$((…)))` or `printf "0x%x"` with
+`$(V:%K=%*1024)`, `unique` as `$(strip $(call uniq,…))` of `Makefile.include`
+(applied to the selected words before `replace`, `macro` and `pattern`, as
+Make did). `cpu/cortexm_common/build.yaml` reads ROM_OFFSET and FW_ROM_LEN
+with `when`, so the build without Make evaluates them lazily too.
+
+Doxygen: comment lines that start with `#` are written as `##` lines. The
+documentation of `makefiles/pseudomodules.inc.mk` (an input of
+`doc/doxygen/riot.doxyfile` and of `dist/tools/doccheck`) and of
+`drivers/netdev_ieee802154_submac/Makefile.include` is kept in the data, as
+the comments of the rules it documents, and generated with the Make file.
+Choice: the documentation stays next to the pseudomodule it documents, in
+the one file a developer edits; a separate documentation file would be a
+second list of the pseudomodules. The `##` lines are the originals, in the
+same order (B6); only blank lines between entries moved.
+
+Probes and values of the build algorithm: the data reads the answers of
+the toolchain and git as PROBE_* and two values of the algorithm as
+BUILD_RIOT_VERSION_TUPLE and BUILD_EXTDEFINES (dist/tools/cmake_gen computes
+them in Python). For Make, `makefiles/build_providers.inc.mk` defines them
+with the commands the Make files used before (recursive; memoized where the
+original was simple or memoized). It is the algorithm, not data, and goes
+away with Make.
+
+### Rules and tests
+
+```sh
+python3 -m unittest discover -s dist/tools/config_data/build_tests -v
+dist/tools/migration/run_tests.py --step g0-03-build-flags-data
+```
+
+47 tests in 4 modules (about 7 s; Make runs one at a time).
+
+| Rule | Test classes | How |
+|---|---|---|
+| B1 schema 4 validator | `test_schema4.ValidatorTest` | 14 positive, 17 negative samples; schema 4 needed |
+| B2 generator | `test_schema4.GeneratorTest` | exact Make text of each construct, sections, stand-ins left out, `##` lines |
+| B3 evaluator | `test_schema4.EvaluatorTest` | `when` lazy, `defined` unexpanded, `count` with repetitions, export/unexport, sorted files, unique before the pattern, stand-in and section rules read |
+| B4 register | `test_adapters.RegisterTest` | all 35 data files in scope.yaml `build`, Make file next to the data, `none` = only stand-ins |
+| B5 one source | `test_adapters.OneSourceTest` | `generate --check`; header; a split Make file includes its part once per section and holds none of its lines; stand-ins name Make files that are not generated; every probe defined once for Make and known to the build without Make |
+| B6 round trip | `test_adapters.RoundTripTest` | original (scope.yaml `build_base`) = generated = data for the 10 files written by the translator; Doxygen lines unchanged; a changed rule is found (skipped without the base commit) |
+| B7 Make parity | `test_make_parity.*` | live Make: value of every variable the data writes (173) and the exported environment (98) for the three applications on nrf52840dk = golden files of the base commit (`record_golden.py`); detector sample |
+| B8 stale | `test_adapters.StaleTest` | changed data, edited or missing generated file are found (on a copy) |
+| B9 exact values | `test_exact_values.*` | Make with the original text = Make with the generated file = build without Make: the branch suffix of the version (8 branch names, also names ending in `master`), SLOT_AUX_OFFSET (`NK` in ROM_LEN only; 4 accepted, 2 refused forms), PKG_VERSION of pkg/cmsis with its two trailing blanks |
+
+The second-source checks of step G3-1 became adapter checks:
+`cmake_gen/tests/test_schema3.DataFilesTest` (each data file is registered
+with its Make file), `NamesTest` (build data is no adapter source by name;
+the register names it), `GeneratorTest` (`arith` and `unique` are written as
+Make). The G0 parity tests (`tests/test_parity.py`) mask what the split
+changes by construction (`sample.mask_g003`): the generated files in
+MAKEFILE_LIST and line numbers in Make's messages about the split files.
+
+Mutation probe (each file copied before the change and restored from the
+copy; the generated files regenerated from the restored data):
+
+| Part | Deliberate defect | Failing tests |
+|---|---|---|
+| B1 | validator accepts any section name (`dist/tools/config_data/schema.py`) | g003: 1 |
+| B2a | sections do not clear RIOT_BUILD_SECTION (`dist/tools/config_data/generate.py`) | g003: 3, config_data: 2 |
+| B2b | stand-in rules written as Make (`dist/tools/config_data/generate.py`) | g003: 7 |
+| B2c | `when`: then and else swapped (`dist/tools/config_data/generate.py`) | g003: 4 |
+| B2d | `defined` written as a test of the expanded value (`dist/tools/config_data/generate.py`) | g003: 3 |
+| B2e | Doxygen lines written as `# #` (`dist/tools/config_data/generate.py`) | g003: 2 |
+| B3a | evaluator: `when` takes the other branch (`dist/tools/resolver/variables.py`) | g003: 1, cmake_gen: 8 |
+| B3b | evaluator: export ignored (`dist/tools/resolver/evaluate.py`) | g003: 1, cmake_gen: 14 |
+| B3c | evaluator: `count` without repetitions (`dist/tools/resolver/evaluate.py`) | g003: 1 |
+| B4 | register: cpu/nrf52 marked whole (`dist/tools/config_data/scope.yaml`) | g003: 2 |
+| B5a | generate/check skip the build data (`dist/tools/config_data/config_data.py`) | g003: 1 |
+| B5b | Make file keeps a line of its generated part (second source) (`boards/common/nrf52/Makefile.include`) | g003: 4, cmake_gen: 3 |
+| B5c | Make file no longer includes the toolchain section (`Makefile.include`) | g003: 4, config_data: 38, cmake_gen: 3 |
+| B5d | generated file edited by hand (`cpu/nrf52/build.mk`) | g003: 6, cmake_gen: 3 |
+| B5e | probe: -std=c11 always supported (Make) (`makefiles/build_providers.inc.mk`) | g003: 3, config_data: 1, cmake_gen: 3 |
+| B6 | pseudomodules data: one Doxygen line changed (`makefiles/pseudomodules.build.yaml`) | g003: 1 |
+| B7a | data: cortexm -Os -> -O2 (`makefiles/arch/cortexm.build.yaml`) | g003: 3, config_data: 1, cmake_gen: 10 |
+| B7b | data: export of GENSRC dropped (`build.yaml`) | g003: 6 |
+| B7c | data: ROM_OFFSET symbol added always (`cpu/cortexm_common/build.yaml`) | g003: 3, cmake_gen: 10 |
+| B9a | value with trailing blanks written without them (`dist/tools/config_data/generate.py`) | g003: 1, config_data: 2 |
+| B9b | data: branch suffix cuts a leading `master` (`makefiles/git_version.build.yaml`) | g003: 4 |
+| B9c | evaluator: `NK` accepted in every variable (`dist/tools/resolver/variables.py`) | g003: 3 |
+| B9d | generator: `kilo` ignored (`dist/tools/config_data/generate.py`) | g003: 2 |
+| B9e | data: slot_aux without `kilo` (`sys/slot_aux/build.yaml`) | g003: 3 |
+| B9f | data: cmsis PKG_VERSION without the two blanks (`pkg/cmsis/pkg.yaml`) | g003: 1, config_data: 1 |
+
+25/25 defects detected (2026-11-21; git status and the checksums of every changed file are the same before and after).
+
+### Parity (2026-11-21)
+
+* G0 goldens (`tests/`): 36/36 info outputs and 2/2 `make -n -k` lists
+  identical (after `mask_g003`; the commands byte for byte).
+* G3-1 goldens (`dist/tools/cmake_gen/tests`, P1-P4): the build without Make
+  still gives Make's commands (44, 153, 45 objects, link, objcopy, size,
+  headers), and live Make with the generated files gives the commands of
+  the base commit.
+* B7: 173 variables and 98 exported variables x 3 applications identical.
+* Beyond the scope (one-off, base commit vs. now: `make -p` with every
+  variable expanded and the environment of a recipe, 17 boards (nRF52/53, SAM, STM32,
+  Kinetis, RP2350, ESP32, AVR, RISC-V, LPC23xx, native) x 3 applications, 7 variants on nrf52840dk - DEVELHELP=0,
+  WERROR=0 LOG_LEVEL=4, LTO=1, RIOT_CI_BUILD=1, TOOLCHAIN=llvm, QUIET=0,
+  VERBOSE_ASSERT=1 - and the sub-makes of the 3 packages, 61 runs): every
+  expanded value and every exported variable identical, except MAKEFILE_LIST
+  and what is computed from it (the prerequisites of the package state
+  files: each package is patched again once after the change) and line
+  numbers in Make's messages. New variables: the probes and four helpers
+  of the data; gone: `_OBJCOPY`, `_OBJDUMP`, `USEMODULE_INCLUDES_`.
+
+### Limits
+
+* Make's text changed where the data says the same with its own
+  constructs (`ifeq ($(V),1)` for `ifeq (1,$(V))`, `$(patsubst %,-I%,…)` for
+  `$(addprefix -I,…)`, one `+=` per item, comments above instead of after a
+  line, blank lines); the values are the same (parity above, B7, B9).
+* Values first written in a simpler form are exact again (B9): the branch
+  suffix cuts a trailing `master` like `$(GIT_BRANCH:master=)` (helper
+  BUILD_GIT_BRANCH_STEM), SLOT_AUX_OFFSET takes `NK` in ROM_LEN only
+  (`kilo`; the generated line is the original one), PKG_VERSION of pkg/cmsis
+  keeps its two trailing blanks (the generated line is
+  `PKG_VERSION = <hash>  # 5.9.0`), so Make's git commands are byte for byte
+  those of the base commit (G0 `make -n -k`, compared without masking
+  blanks). The build without Make strips the version (`pkg_prepare.py`, as
+  in step G3-1) and stops at an `NK` SLOT_AUX_LEN, where Make passes an
+  empty offset to the linker.
+* New Make files in MAKEFILE_LIST: pkg/pkg.mk makes the state files of a
+  package (`.pkg-state.git-downloaded`, `-patched`) depend on MAKEFILE_LIST.
+  A package tree prepared before the change (BUILD_DIR/pkg, or the nRF
+  vendor headers) is therefore prepared once more on the next build, as
+  after any change of a Make file of the package: `git cat-file -e` finds
+  the version (no fetch), `git clean`, `git checkout -f <version>`, the same
+  patches (`git am` makes new commits in the package's own repository, with
+  the same tree), the same headers copied. The sources have the same
+  content, so the objects and the firmware are the same; only the package's
+  objects are compiled again. A fresh build directory is not affected.
+* Only the 35 Make files of the scope; every other board, CPU and package
+  Make file is unchanged Make. The stand-ins (16 rules in 10 files) mark
+  what the build without Make does not cover yet; the Make file keeps it.

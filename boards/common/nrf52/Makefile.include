@@ -1,5 +1,6 @@
-# include this module into the build
-INCLUDES += -I$(RIOTBOARD)/common/nrf52/include
+# The include path is build data: boards/common/nrf52/build.yaml. The file
+# included here is generated from it (`just generate-config-data`).
+include $(RIOTBOARD)/common/nrf52/build.mk
 
 ifeq (bmp,$(PROGRAMMER))
   # On Blackmagic Probe, the first ACM is used to connect to the gdb server,

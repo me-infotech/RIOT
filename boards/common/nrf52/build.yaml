@@ -1,7 +1,8 @@
-# Build data of boards/common/nrf52/Makefile.include (step G3-1): the include
-# path; the rest of the Make file selects and configures the programmer
-# (flashing, step G3-2).
-# Format: dist/tools/config_data/README.md (schema 3).
-schema: 3
+# Build data of boards/common/nrf52/Makefile.include (steps G3-1, G0-3): the
+# include path. The generated build.mk holds it as Make; Makefile.include
+# includes it and keeps the programmer settings (flashing, step G3-2).
+# Format: dist/tools/config_data/README.md
+schema: 1
 rules:
-  - add: {INCLUDES: ['-I${RIOTBOARD}/common/nrf52/include']}
+  - comment: include this module into the build
+    add: {INCLUDES: ['-I${RIOTBOARD}/common/nrf52/include']}

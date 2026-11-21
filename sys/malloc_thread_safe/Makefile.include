@@ -1,2 +1,8 @@
+# Generated from build.yaml by dist/tools/config_data/config_data.py.
+# Do not edit: change build.yaml and run `just generate-config-data`.
+
 # use the wrapper functions for malloc and friends to provide thread-safety
-LINKFLAGS += -Wl,-wrap=malloc -Wl,-wrap=calloc -Wl,-wrap=realloc -Wl,-wrap=free
+LINKFLAGS += -Wl,-wrap=malloc
+LINKFLAGS += -Wl,-wrap=calloc
+LINKFLAGS += -Wl,-wrap=realloc
+LINKFLAGS += -Wl,-wrap=free

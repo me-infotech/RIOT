@@ -1,7 +1,9 @@
-# Build data of cpu/Makefile.include (step G3-1).
-# Format: dist/tools/config_data/README.md (schema 3).
-schema: 3
+# Build data of cpu/Makefile.include (steps G3-1, G0-3): the whole file.
+# cpu/Makefile.include is generated from it (`just generate-config-data`);
+# edit this file, never the Make file. Format: dist/tools/config_data/README.md
+schema: 1
 rules:
-  - if: {has: {var: USEMODULE, match: [cpu_common_rp2350]}}
+  - comment: SORT THIS ALPHABETICALLY BY COMMON CPU MODULE NAME!
+    if: {has: {var: USEMODULE, match: [cpu_common_rp2350]}}
     then:
       - include: {path: '${RIOTCPU}/common/rp2350/Makefile.include'}

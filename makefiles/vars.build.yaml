@@ -1,117 +1,352 @@
-# Build data of makefiles/vars.inc.mk (step G3-1): the variables Make
-# exports to the Make processes of the modules and packages (`export` in
-# vars.inc.mk, in that order, and the other `export` lines of
-# Makefile.include, makefiles/pkg/pkg.mk and cpu/nrf52/Makefile.include that
-# the build in scope reaches). The build without Make gives the modules
-# exactly these variables (dist/tools/cmake_gen).
-# Format: dist/tools/config_data/README.md (schema 3).
-schema: 3
+# Build data of makefiles/vars.inc.mk (steps G3-1, G0-3): the whole file -
+# the variables Make exports to the Make processes of the modules and
+# packages, and the documentation of the global variables. The Make file is
+# generated from it (`just generate-config-data`); edit this file, never the
+# Make file. The build without Make gives the modules exactly the exported
+# variables (`export` rules here and in the other build data; BUILD_EXPORTED,
+# dist/tools/cmake_gen). Format: dist/tools/config_data/README.md
+schema: 4
 rules:
-  - comment: makefiles/vars.inc.mk:4-120
-    add:
-      BUILD_EXPORTED:
-        - Q
-        - QQ
-        - QUIET
-        - QUIETER
-        - OS
-        - OS_ARCH
-        - APPLICATION
-        - APPLICATION_MODULE
-        - BOARD
-        - CPU
-        - CPU_MODEL
-        - CPU_CORE
-        - CPU_ARCH
-        - CPU_FAM
-        - INCLUDES
-        - CXXINCLUDES
-        - NATIVEINCLUDES
-        - GCC_C_INCLUDES
-        - GCC_CXX_INCLUDES
-        - GCC_VERSION
-        - USEMODULE
-        - BIN_USEMODULE
-        - USEPKG
-        - DISABLE_MODULE
-        - RIOTBASE
-        - RIOTCPU
-        - RIOTBOARD
-        - EXTERNAL_BOARD_DIRS
-        - BOARDDIR
-        - RIOTPKG
-        - RIOTTOOLS
-        - RIOTPROJECT
-        - RIOTMAKE
-        - RIOTKCONFIG
-        - BINDIRBASE
-        - BINDIR
-        - RIOT_TEST_HASH_DIR
-        - CARGO_TARGET_DIR
-        - BUILD_DIR
-        - APPDIR
-        - PKG_PATHS
-        - PKGDIRBASE
-        - PYTHONPATH
-        - FEATURES_REQUIRED
-        - FEATURES_PROVIDED
-        - FEATURES_OPTIONAL
-        - FEATURES_USED
-        - TOOLCHAIN
-        - TARGET_ARCH
-        - TARGET_ARCH_LLVM
-        - PREFIX
-        - CC
-        - CXX
-        - CCAS
-        - CFLAGS
-        - CFLAGS_CPU
-        - CFLAGS_STATIC_ANALYSIS
-        - RCFLAGS_WRITE_SARIF
-        - CXXUWFLAGS
-        - CXXEXFLAGS
-        - CCASUWFLAGS
-        - CCASEXFLAGS
-        - AS
-        - ASFLAGS
-        - LINK
-        - NM
-        - RANLIB
-        - ARCHIVES
-        - LTOFLAGS
-        - OBJCOPY
-        - OFLAGS
-        - OBJDUMP
-        - OBJDUMPFLAGS
-        - SIZE
-        - SIZEFLAGS
-        - UNDEF
-        - WERROR
-        - WPEDANTIC
-        - FLASH_ADDR
-        - ELFFILE
-        - HEXFILE
-        - DEVELHELP
-        - DLCACHE
-        - DOWNLOAD_TO_FILE
-        - UNZIP_HERE
-        - LAZYSPONGE
-        - LAZYSPONGE_FLAGS
-        - FLAGS_FOR_AFL
-        - RUST_TARGET
-        - RUSTFLAGS
-  - comment: Makefile.include:210, :272, :435, :634; cpu/nrf52/Makefile.include:12-15
-    add:
-      BUILD_EXPORTED:
-        - RIOTBUILD_CONFIG_HEADER_C
-        - __RIOTBUILD_FLAG
-        - CCACHE_CPP2
-        - GENSRC
-        - MCUBOOT_IMAGE_ALIGN
-        - MCUBOOT_SLOT0_SIZE
-        - MCUBOOT_SLOT1_SIZE
-        - MCUBOOT_SLOT2_SIZE
-  - comment: Makefile.include:272
-    set: {var: __RIOTBUILD_FLAG, value: RIOT, flavor: simple}
-  - comment: Makefile.include:435
-    set: {var: CCACHE_CPP2, value: 'yes'}
+  - comment: set default values for selected global variables
+    set: {var: FLASH_ADDR, value: '0x0', flavor: conditional}
+  - comment: Used in front of Makefile lines to suppress the printing of the command if user did not opt-in
+      to see them.
+    export:
+      - Q
+  - comment: as Q, but be more quiet
+    export:
+      - QQ
+  - comment: The parameter to use whether to show verbose makefile commands or not.
+    export:
+      - QUIET
+  - comment: The parameter to use to hide most makefile output
+    export:
+      - QUIETER
+  - comment: The operating system of the build host
+    export:
+      - OS
+  - comment: The build host's hardware architecture
+    export:
+      - OS_ARCH
+  - comment: The application, set in the Makefile which is run by the user.
+    export:
+      - APPLICATION
+  - comment: The application module name.
+    export:
+      - APPLICATION_MODULE
+  - comment: The board to compile the application for.
+    export:
+      - BOARD
+  - comment: The CPU, set by the board's Makefile.features.
+    export:
+      - CPU
+  - comment: The specific identifier of the used CPU, used for some CPU implementations to differentiate
+      between different memory layouts. Set by the board's Makefile.features.
+    export:
+      - CPU_MODEL
+  - comment: The specific identifier of the core present in the CPU. Needed for depency resolution.
+    export:
+      - CPU_CORE
+  - comment: The specific identifier of the architecture of the core defined in CPU_CORE.
+    export:
+      - CPU_ARCH
+  - comment: An intermediate identifier between CPU and CPU_MODEL that represents a sub-group of a Manufacturers
+      CPU's.
+    export:
+      - CPU_FAM
+  - comment: The extra include paths, set by the various Makefile.include files.
+    export:
+      - INCLUDES
+  - comment: The extra include paths for c++, set by the various Makefile.include files.
+    export:
+      - CXXINCLUDES
+  - comment: The native include paths, set by the various native Makefile.include files.
+    export:
+      - NATIVEINCLUDES
+  - comment: system include dirs implicitly used by GCC's c compiler, only defined with TOOLCHAIN=llvm
+    export:
+      - GCC_C_INCLUDES
+  - comment: system include dirs implicitly used by GCC's c++ compiler, only defined with TOOLCHAIN=llvm
+    export:
+      - GCC_CXX_INCLUDES
+  - comment: version of GCC if GCC is used, empty otherwise
+    export:
+      - GCC_VERSION
+  - comment: Sys Module dependencies of the application. Set in the application's Makefile.
+    export:
+      - USEMODULE
+  - comment: Modules specific to bindist (see bindist.ink.mk). Set in the application's Makefile.
+    export:
+      - BIN_USEMODULE
+  - comment: Pkg dependencies (third party modules) of the application. Set in the application's Makefile.
+    export:
+      - USEPKG
+  - comment: Used in the application's Makefile to suppress DEFAULT_MODULEs.
+    export:
+      - DISABLE_MODULE
+  - comment: |-
+      APPDEPS                    # Files / Makefile targets that need to be created before the application can be build. Set in the application's Makefile.
+      BUILDDEPS                  # Files / Makefile targets that need to be created before starting to build.
+      DEBUGDEPS                  # Files / Makefile targets that need to be created before starting a debug session.
+  - comment: The root folder of RIOT. The folder where this very file lives in.
+    export:
+      - RIOTBASE
+  - comment: For third party CPUs this folder is the base of the CPUs.
+    export:
+      - RIOTCPU
+  - comment: This folder is the base of the riot boards.
+    export:
+      - RIOTBOARD
+  - comment: List of folders containing external board dirs
+    export:
+      - EXTERNAL_BOARD_DIRS
+  - comment: This folder contains the board
+    export:
+      - BOARDDIR
+  - comment: For overriding RIOT's pkg directory
+    export:
+      - RIOTPKG
+  - comment: Location of host machine tools
+    export:
+      - RIOTTOOLS
+  - comment: Top level git root of the project being built, or PWD if not a git repository
+    export:
+      - RIOTPROJECT
+  - comment: Location of all supplemental Makefiles (such as this file)
+    export:
+      - RIOTMAKE
+  - comment: Location of all supplemental Kconfig files
+    export:
+      - RIOTKCONFIG
+  - comment: This is the folder where the application should be built in. For each BOARD a different subfolder
+      is used.
+    export:
+      - BINDIRBASE
+  - comment: This is the folder where the application should be built in.
+    export:
+      - BINDIR
+  - comment: The dir to generate the test-input-hash.sha1 file for checking if a test has changed, uses
+      BINDIR by default.
+    export:
+      - RIOT_TEST_HASH_DIR
+  - comment: This is the folder where Rust parts of the application should be built in.
+    export:
+      - CARGO_TARGET_DIR
+  - comment: This is the base folder to store common build files and artifacts, e.g. test results.
+    export:
+      - BUILD_DIR
+  - comment: The base folder containing the application
+    export:
+      - APPDIR
+  - comment: List of absolute paths where packages of $(USEPKG) can be found
+    export:
+      - PKG_PATHS
+  - comment: The base folder for building packages
+    export:
+      - PKGDIRBASE
+  - comment: Python default search path for module filesi, with RIOT specific packages
+    export:
+      - PYTHONPATH
+  - comment: List of required features by the application
+    export:
+      - FEATURES_REQUIRED
+  - comment: List of provided features by the board
+    export:
+      - FEATURES_PROVIDED
+  - comment: List of nice to have features
+    export:
+      - FEATURES_OPTIONAL
+  - comment: List of features used
+    export:
+      - FEATURES_USED
+  - comment: |-
+      TOOLCHAINS_SUPPORTED       # List of supported toolchains by a CPU (gnu/llvm/...).
+      TOOLCHAINS_BLACKLISTED     # List of unspported toolchains for a module or an application.
+  - comment: Base build toolchain, i.e. GNU or LLVM
+    export:
+      - TOOLCHAIN
+  - comment: The target platform name, in GCC triple notation, e.g. "arm-none-eabi", "i686-elf", "avr"
+    export:
+      - TARGET_ARCH
+  - comment: The target platform name, in LLVM triple notation, e.g. "arm-none-eabi"
+    export:
+      - TARGET_ARCH_LLVM
+  - comment: The prefix of the toolchain commands, usually "$(TARGET_ARCH)-", e.g. "arm-none-eabi-" or
+      "msp430-".
+    export:
+      - PREFIX
+  - comment: The C compiler to use.
+    export:
+      - CC
+  - comment: The CXX compiler to use.
+    export:
+      - CXX
+  - comment: The C compiler to use for assembler files, typically the same as CC.
+    export:
+      - CCAS
+  - comment: The compiler flags. Must only ever be used with `+=`.
+    export:
+      - CFLAGS
+  - comment: recursively (late) evaluated compiler flags for target specific addition
+    unexport:
+      - RCFLAGS
+  - comment: CPU architecture specific compiler flags
+    export:
+      - CFLAGS_CPU
+  - comment: Additional CFLAGS to use when static analysis should be enabled
+    export:
+      - CFLAGS_STATIC_ANALYSIS
+  - comment: recursively evaluated CFLAG to write diagnostic messages to sarif
+    export:
+      - RCFLAGS_WRITE_SARIF
+  - comment: (Patterns of) flags in CFLAGS that should not be passed to CXX.
+    export:
+      - CXXUWFLAGS
+  - comment: Additional flags that should be passed to CXX.
+    export:
+      - CXXEXFLAGS
+  - comment: (Patterns of) flags in CFLAGS that should not be passed to CCAS.
+    export:
+      - CCASUWFLAGS
+  - comment: Additional flags that should be passed to CCAS.
+    export:
+      - CCASEXFLAGS
+  - comment: The assembler.
+    export:
+      - AS
+  - comment: Flags for the assembler.
+    export:
+      - ASFLAGS
+  - comment: The command used to link the files. Must take the same parameters as GCC, i.e. "ld" won't
+      work.
+    export:
+      - LINK
+  - comment: The command used to list symbols from objet files
+    export:
+      - NM
+  - comment: The command used to generate an index to the contents of an archive
+    export:
+      - RANLIB
+  - comment: 'LINKFLAGS                  # Flags to supply in the linking step.'
+  - comment: List of archives to add in the linking step
+    export:
+      - ARCHIVES
+  - comment: extra CFLAGS for compiling with link time optimization
+    export:
+      - LTOFLAGS
+  - comment: The command used to create the HEXFILE and BINFILE.
+    export:
+      - OBJCOPY
+  - comment: The parameter for OBJCOPY, e.g. to strip the debug information.
+    export:
+      - OFLAGS
+  - comment: The command used to create the assembly listing.
+    export:
+      - OBJDUMP
+  - comment: The parameter for OBJDUMP.
+    export:
+      - OBJDUMPFLAGS
+  - comment: The command to read to size of the ELF sections.
+    export:
+      - SIZE
+  - comment: The optional size flags.
+    export:
+      - SIZEFLAGS
+  - comment: 'Object files that the linker must include in the ELFFILE even if no call to the functions
+      or symbols (ex: interrupt vectors).'
+    export:
+      - UNDEF
+  - comment: Treat all compiler warnings as errors if set to 1 (see -Werror flag in GCC manual)
+    export:
+      - WERROR
+  - comment: Issue all (extensive) compiler warnings demanded by strict C/C++
+    export:
+      - WPEDANTIC
+  - comment: 'EEPROM_FILE                # (Native only!) file path where the content of the EEPROM is
+      stored'
+  - comment: |-
+      FLASHER                    # The command to call on "make flash".
+      PROG_DEV                   # The device to connect the FLASHER and DEBUGGER
+      FFLAGS                     # The parameters to supply to FLASHER.
+  - comment: Define an offset to flash code into ROM memory.
+    export:
+      - FLASH_ADDR
+  - comment: |-
+      TERMPROG                   # The command to call on "make term".
+      TERMFLAGS                  # Additional parameters to supply to TERMPROG.
+      TERMENV                    # Environment variables passed to TERMPROG
+      TERMLOG                    # Optional file to log "make term" output to.
+      TERMTEE                    # Optional pipe to redirect "make term" output. Default: '| tee -a ${TERMLOG}' when TERMLOG is defined else undefined.
+      PORT                       # The port to connect the TERMPROG to.
+  - comment: The unstripped result of the compilation.
+    export:
+      - ELFFILE
+  - comment: The 'intel hex' stripped result of the compilation.
+    export:
+      - HEXFILE
+  - comment: |-
+      BINFILE                    # The 'binary' stripped result of the compilation.
+      FLASHFILE                  # The output file used for flashing
+      BUILD_FILES                # The list of files to be built
+      DEBUGGER                   # The command to call on "make debug", usually a script starting the GDB front-end.
+      DEBUGGER_FLAGS             # The parameters to supply to DEBUGGER.
+      DEBUGSERVER                # The command to call on "make debug-server", usually a script starting the GDB server.
+      DEBUGSERVER_FLAGS          # The parameters to supply to DEBUGSERVER.
+      DEBUGCLIENT                # The command to call on "make debug-client", usually a script starting the GDB client.
+      DEBUGCLIENT_FLAGS          # The parameters to supply to DEBUGCLIENT.
+  - comment: Set to 1 to spend ROM, RAM and CPU time for help during development (e.g. enable asserts())
+    export:
+      - DEVELHELP
+  - comment: |-
+      RESET                      # The command to call on "make reset", this command resets/reboots the target.
+      RESET_FLAGS                # The parameters to supply to RESET.
+      PROGRAMMER                 # The programmer to use when flashing, resetting or debugging
+      PROGRAMMERS_SUPPORTED      # The list of programmers supported by a board
+      PROGRAMMER_QUIET           # Change verbosity of programmer output (only used with flash and reset targets).
+                                   # Default is 1, not verbose. Use 0 to get normal programmer output.
+      USE_PROGRAMMER_WRAPPER_SCRIPT     # Use the programmer wrapper Python script. Default is 0 (wrapper not used).
+  - comment: |-
+      Use `$(DLCACHE) $(DESTINATION) $(URL) [$(SHA512)]` to
+      download `$(URL)` to `$(DESTINATION)` but keep a copy in cache
+      with an `$(SHA512)` checksum. If no checksum is given, the
+      URL will just be downloaded, not cached.
+    export:
+      - DLCACHE
+  - comment: |-
+      Use `$(DOWNLOAD_TO_FILE) $(DESTINATION) $(URL) [$(SHA512)]` to
+      download `$(URL)` to `$(DESTINATION)`. Alias for $(DLCACHE).
+    export:
+      - DOWNLOAD_TO_FILE
+  - comment: |-
+      Use `cd $(SOME_FOLDER) && $(UNZIP_HERE) $(SOME_FILE)` to extract
+      the contents of the zip file `$(SOME_FILE)` into `$(SOME_FOLDER)`.
+    export:
+      - UNZIP_HERE
+  - comment: Command saving stdin to a file only on content update.
+    export:
+      - LAZYSPONGE
+  - comment: Parameters supplied to LAZYSPONGE.
+    export:
+      - LAZYSPONGE_FLAGS
+  - comment: Additional command-line flags passed to afl during fuzzing.
+    export:
+      - FLAGS_FOR_AFL
+  - comment: |-
+      LOG_LEVEL                  # Logging level as integer (NONE: 0, ERROR: 1, WARNING: 2, INFO: 3, DEBUG: 4, default: 3)
+      KCONFIG_ADD_CONFIG         # List of .config files to be merged used by Boards and CPUs. See kconfig.mk
+      VERBOSE_ASSERT             # Set to 1 to print the file and line of a failed assert when assertions blow
+  - comment: |-
+      Rust's own version of the target triple / quadruple.
+
+      It is set by the architecture (and thus eventually the CPU), and exported to
+      be available when building Rust modules.
+    export:
+      - RUST_TARGET
+  - comment: |-
+      Like CFLAGS but for Rust.
+
+      We influence those to set useful defaults that
+      would otherwise need to be reiterated in Cargo
+      files.
+    export:
+      - RUSTFLAGS

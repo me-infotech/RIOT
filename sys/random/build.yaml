@@ -1,19 +1,19 @@
-# Build data of sys/random/Makefile.include (step G3-1).
-# Format: dist/tools/config_data/README.md (schema 3).
-schema: 3
+# Build data of sys/random/Makefile.include (steps G3-1, G0-3): the whole
+# file. The Make file is generated from it (`just generate-config-data`);
+# edit this file, never the Make file. Format: dist/tools/config_data/README.md
+schema: 4
 rules:
   - set: {var: USED_PRNG_IMPLEMENTATIONS, value: {select: {var: USEMODULE, match: [prng_%]}}, flavor: simple}
-  - if: {has: {var: USEMODULE, match: [prng_shaxprng]}}
+  - comment: Check that prng_shaxprng is not used by itself
+    if: {has: {var: USEMODULE, match: [prng_shaxprng]}}
     then:
       - if: {not: {has: {var: USEMODULE, match: [prng_sha1prng, prng_sha256prng]}}}
         then:
           - error: 'prng_shaxprng should not be used directly. Select one of: prng_sha1prng, prng_sha256prng'
-  - comment: exactly one PRNG besides prng_shaxprng
-    if: {not: {has: {var: USED_PRNG_IMPLEMENTATIONS, match: ['%'], except: [prng_shaxprng]}}}
-    then:
-      - info: 'Currently the following prng modules are used: ${USED_PRNG_IMPLEMENTATIONS}'
-      - error: Only one implementation of PRNG should be used.
-  - if: {several: {var: USED_PRNG_IMPLEMENTATIONS, match: ['%'], except: [prng_shaxprng]}}
+  - comment: |-
+      Check that only one implementation of PRNG is used
+      NOTE: prng_shaxprng is filtered out because it is used by the specific implementations
+    if: {not: {count: {var: USED_PRNG_IMPLEMENTATIONS, except: [prng_shaxprng], is: 1}}}
     then:
       - info: 'Currently the following prng modules are used: ${USED_PRNG_IMPLEMENTATIONS}'
       - error: Only one implementation of PRNG should be used.

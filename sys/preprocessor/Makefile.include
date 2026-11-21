@@ -1,15 +1,6 @@
-RIOT_PP_SUCCESSOR_MAX ?= 9999
-
-PSEUDOMODULES += preprocessor_successor
-
-USEMODULE_INCLUDES_preprocessor := $(BINDIR)/preprocessor
-USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_preprocessor)
-
-RIOT_GENERATE_PP_HEADERS :=
-
-ifneq (,$(filter preprocessor_successor,$(USEMODULE)))
-  RIOT_GENERATE_PP_HEADERS += $(BINDIR)/preprocessor/preprocessor_successor.h
-endif
+# The variables are build data: sys/preprocessor/build.yaml. The file
+# included here is generated from it (`just generate-config-data`).
+include $(RIOTBASE)/sys/preprocessor/build.mk
 
 BUILDDEPS += $(RIOT_GENERATE_PP_HEADERS)
 

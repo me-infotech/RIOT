@@ -1,3 +1,6 @@
+# Generated from build.yaml by dist/tools/config_data/config_data.py.
+# Do not edit: change build.yaml and run `just generate-config-data`.
+
 ifneq (,$(filter bhp,$(USEMODULE)))
   include $(RIOTBASE)/sys/bhp/Makefile.include
 endif
@@ -108,14 +111,16 @@ ifneq (,$(filter printf_float,$(USEMODULE)))
     # rather not add linker flags but let the custom stdio implementation
     # (currently only mpaland-printf) handle that.
     ifeq (,$(filter mpaland-printf,$(USEPKG)))
-      LINKFLAGS += -u _printf_float
+      LINKFLAGS += -u
+      LINKFLAGS += _printf_float
     endif
   endif
 endif
 
 ifneq (,$(filter scanf_float,$(USEMODULE)))
   ifneq (,$(filter newlib_nano,$(USEMODULE)))
-    LINKFLAGS += -u _scanf_float
+    LINKFLAGS += -u
+    LINKFLAGS += _scanf_float
   endif
 endif
 
@@ -126,7 +131,7 @@ ifneq (,$(filter riotboot,$(FEATURES_USED)))
   include $(RIOTBASE)/sys/riotboot/Makefile.include
 endif
 
-ifneq (,$(filter skald, $(USEMODULE)))
+ifneq (,$(filter skald,$(USEMODULE)))
   include $(RIOTBASE)/sys/net/ble/skald/Makefile.include
 endif
 
@@ -147,11 +152,11 @@ ifneq (,$(filter ssp,$(USEMODULE)))
   include $(RIOTBASE)/sys/ssp/Makefile.include
 endif
 
-ifneq (native,$(CPU))
+ifneq ($(CPU),native)
   INCLUDES += -I$(RIOTBASE)/sys/libc/include
 endif
 
-ifneq (,$(filter clif, $(USEMODULE)))
+ifneq (,$(filter clif,$(USEMODULE)))
   INCLUDES += -I$(RIOTBASE)/sys/clif/include
 endif
 

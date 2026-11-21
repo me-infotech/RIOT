@@ -1,8 +1,10 @@
-# Build data of makefiles/toolchain/gnu.inc.mk (step G3-1). The shell probes
-# of the Make file are toolchain probes of the build algorithm
-# (dist/tools/cmake_gen/toolchain.py), read here as PROBE_* variables; they
-# run the same commands as Make.
-# Format: dist/tools/config_data/README.md (schema 3).
+# Build data of makefiles/toolchain/gnu.inc.mk (steps G3-1, G0-3): the tools
+# and flags of the GNU toolchain. The generated gnu.build.mk holds it as
+# Make; gnu.inc.mk includes it and keeps the debugger settings and the
+# SARIF flag of the static analysis. The toolchain questions are PROBE_*
+# variables (dist/tools/cmake_gen/toolchain.py; for Make
+# makefiles/build_providers.inc.mk).
+# Format: dist/tools/config_data/README.md
 schema: 3
 rules:
   - set: {var: CC, value: '${PREFIX}gcc'}
@@ -20,20 +22,28 @@ rules:
   - set: {var: LINK, value: '${PREFIX}gcc'}
   - set: {var: LINKXX, value: '${PREFIX}g++'}
   - set: {var: SIZE, value: '${PREFIX}size'}
-  - comment: 'gnu.inc.mk:22-27: the first of PREFIX-objcopy, gobjcopy, objcopy on PATH'
+  - comment: the first of PREFIX-objcopy, gobjcopy, objcopy on PATH
     set: {var: OBJCOPY, value: '${PROBE_OBJCOPY}', flavor: conditional}
   - if: {equals: {OBJCOPY: ''}}
     then:
       - warning: objcopy not found. Hex file will not be created.
       - set: {var: OBJCOPY, value: 'true'}
-  - set: {var: OBJDUMP, value: '${PROBE_OBJDUMP}', flavor: conditional}
-  - comment: 'gnu.inc.mk:33: major version of `CC -dumpversion` (empty without compiler)'
+  - comment: Default to the native (g)objdump, helps when using toolchain from docker
+    set: {var: OBJDUMP, value: '${PROBE_OBJDUMP}', flavor: conditional}
+  - comment: 'Parse only the major version of GCC (empty without compiler)'
     set: {var: GCC_VERSION, value: '${PROBE_GCC_VERSION}', flavor: simple}
-  - if: {not: {at_least: {var: GCC_VERSION, version: '8'}}}
+  - comment: -fmacro-prefix-map requires GCC 8
+    if: {not: {at_least: {var: GCC_VERSION, version: '8'}}}
     then:
       - add: {OPTIONAL_CFLAGS_BLACKLIST: ['-fmacro-prefix-map=${RIOTBASE}/=', '-fdebug-prefix-map=${RIOTBASE}/=']}
-  - add: {OPTIONAL_CFLAGS_BLACKLIST: [-Wdocumentation, -Wno-error=documentation, -Wno-documentation-deprecated-sync]}
-  - set: {var: CFLAGS_STATIC_ANALYSIS, value: -fanalyzer, flavor: simple}
-  - if: {one_of: {var: GCC_VERSION, values: ['12', '13']}}
+  - comment: GCC does not warn about documentation (yet)
+    add: {OPTIONAL_CFLAGS_BLACKLIST: [-Wdocumentation, -Wno-error=documentation, -Wno-documentation-deprecated-sync]}
+  - comment: GCC's static analysis tools can be enabled using -fanalyzer
+    set: {var: CFLAGS_STATIC_ANALYSIS, value: -fanalyzer, flavor: simple}
+  - comment: |-
+      Data address spaces starts at zero for all supported architectures. This fixes
+      compilation at least on MSP430 and AVR.
+      See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105523
+    if: {one_of: {var: GCC_VERSION, values: ['12', '13']}}
     then:
       - add: {CFLAGS: [--param=min-pagesize=0]}

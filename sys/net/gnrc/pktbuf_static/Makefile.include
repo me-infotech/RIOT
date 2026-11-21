@@ -1,2 +1,5 @@
+# Generated from build.yaml by dist/tools/config_data/config_data.py.
+# Do not edit: change build.yaml and run `just generate-config-data`.
+
 USEMODULE_INCLUDES_gnrc_pktbuf_static := $(LAST_MAKEFILEDIR)/include
 USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_gnrc_pktbuf_static)

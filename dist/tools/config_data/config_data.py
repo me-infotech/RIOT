@@ -11,7 +11,10 @@ The YAML file next to a `Makefile.dep` (`deps.yaml`), `Makefile.features`
 it and checked in, so that Make keeps working until nothing reads it any
 more. Step G3-1 adds the build description of the modules: a module
 `Makefile` is generated from `module.yaml`, a shared module rule file
-`<x>.mk` from `<x>.module.yaml` (`translate --module`).
+`<x>.mk` from `<x>.module.yaml` (`translate --module`). Step G0-3 generates
+the build part of the board, CPU, build system and package Make files from
+their build data (`build.yaml`, `<x>.build.yaml`, `pkg.yaml`,
+`<x>.pkg.yaml`; scope.yaml `build` names the Make file of each).
 
   config_data.py generate [--check] [YAML…]   write (check) the Make files
   config_data.py validate [YAML…]             check the YAML against the schema
@@ -82,8 +85,50 @@ def load_valid(path: str) -> list:
     return document["rules"]
 
 
+# --- build data (step G0-3) ---------------------------------------------------
+ADAPTERS = ("whole", "part", "none")
+
+
+def build_entries(scope: dict = None) -> dict:
+    """scope.yaml `build`: data file -> {make, adapter} (paths relative to
+    the repository root). `whole`: the Make file is generated from the data;
+    `part`: the generated file is `<data>.mk` and the Make file includes it;
+    `none`: every rule is a `stand_in`, nothing is generated."""
+    scope = scope or load_scope()
+    return scope.get("build") or {}
+
+
+def build_target(data: str, entry: dict):
+    """The generated Make file of a build data file (relative), or None."""
+    if entry["adapter"] == "whole":
+        return entry["make"]
+    if entry["adapter"] == "part":
+        return R.build_part_name(data)
+    return None
+
+
 def expected_make_text(path: str) -> str:
+    entry = build_entries().get(rel(path))
+    if entry is not None:
+        part_of = entry["make"] if entry["adapter"] == "part" else None
+        return generate.make_text(load_valid(path), os.path.basename(path), part_of)
     return generate.make_text(load_valid(path), os.path.basename(path))
+
+
+def generated_name(path: str) -> str:
+    """The Make file generated from a data file (absolute), or None."""
+    entry = build_entries().get(rel(path))
+    if entry is not None:
+        target = build_target(rel(path), entry)
+        return os.path.join(R.RIOTBASE, target) if target else None
+    return R.make_name(path)
+
+
+def all_data() -> list:
+    """Every data file with a generated Make file: the adapter sources and
+    the build data of scope.yaml `build`."""
+    build = [os.path.join(R.RIOTBASE, p) for p in build_entries()]
+    return sorted(set(all_yaml()) | set(build))
 
 
 def title(make_path: str, module: bool = False) -> str:
@@ -150,11 +195,14 @@ def cmd_translate(args) -> int:
 
 
 def cmd_generate(args) -> int:
-    files = args.files or all_yaml()
+    files = args.files or all_data()
     stale = 0
     for path in files:
-        make_path = R.make_name(path)
         try:
+            make_path = generated_name(path)
+            if make_path is None:
+                load_valid(path)
+                continue
             text = expected_make_text(path)
         except ValueError as err:
             print(f"error: {err}", file=sys.stderr)
@@ -181,7 +229,7 @@ def cmd_generate(args) -> int:
 
 def cmd_validate(args) -> int:
     failed = 0
-    for path in args.files or all_yaml():
+    for path in args.files or all_data():
         try:
             load_valid(path)
         except ValueError as err:

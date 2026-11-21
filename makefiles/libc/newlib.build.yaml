@@ -1,19 +1,25 @@
-# Build data of makefiles/libc/newlib.mk (step G3-1). The shell probes of
-# the Make file are probes of the build algorithm (same commands as Make):
+# Build data of makefiles/libc/newlib.mk (steps G3-1, G0-3): its flags and
+# include directories. The generated newlib.build.mk holds them as Make in
+# two sections; newlib.mk includes them and keeps the search patterns and the
+# LLVM part (not data: the build without Make stops with LLVM). The shell
+# questions of the Make file are probes (dist/tools/cmake_gen/toolchain.py;
+# for Make makefiles/build_providers.inc.mk, same commands as before):
 #   PROBE_LINK_NANO_SPECS          exit status of `LINK -specs=nano.specs -E -`
 #   PROBE_LINK_NANO_WCHAR_WARNING  exit status of grep for the wchar_t warning
 #                                  of a link with -specs=nano.specs (0: found)
-#   PROBE_NEWLIB_INCLUDE_DIR       newlib.mk:30-55: the directory of newlib.h
-#                                  (compiler search path, known locations,
-#                                  next to the compiler)
+#   PROBE_NEWLIB_INCLUDE_DIR       the directory of newlib.h (compiler search
+#                                  path, NEWLIB_INCLUDE_PATTERNS, next to the
+#                                  compiler)
 #   PROBE_NEWLIB_NANO_INCLUDE_DIR  the first of NEWLIB_INCLUDE_DIR/newlib-nano,
 #                                  …/newlib/nano, …/nano that exists
-# Format: dist/tools/config_data/README.md (schema 3).
-schema: 3
+# Format: dist/tools/config_data/README.md
+schema: 4
 rules:
+  - section: flags
   - if: {has: {var: USEMODULE, match: [newlib_nano]}}
     then:
-      - if: {equals: {PROBE_LINK_NANO_SPECS: '0'}}
+      - comment: Test if nano.specs is available
+        if: {equals: {PROBE_LINK_NANO_SPECS: '0'}}
         then:
           - set: {var: USE_NEWLIB_NANO, value: '1'}
           - if: {equals: {PROBE_LINK_NANO_WCHAR_WARNING: '0'}}
@@ -27,16 +33,25 @@ rules:
     then:
       - add: {LINKFLAGS: [-specs=nano.specs]}
   - add: {LINKFLAGS: [-lc]}
-  - if: {equals: {NEWLIB_INCLUDE_DIR: ''}}
+  - comment: Search for Newlib include directories
+    if: {equals: {NEWLIB_INCLUDE_DIR: ''}}
     then:
       - set: {var: NEWLIB_INCLUDE_DIR, value: '${PROBE_NEWLIB_INCLUDE_DIR}', flavor: simple}
   - if: {equals: {TOOLCHAIN: llvm}}
     then:
       - error: the llvm toolchain is outside the build data (makefiles/libc/newlib.mk)
+    stand_in: makefiles/libc/newlib.mk
+  - section: nano
   - if: {equals: {USE_NEWLIB_NANO: '1'}}
     then:
       - set: {var: NEWLIB_NANO_INCLUDE_DIR, value: '${PROBE_NEWLIB_NANO_INCLUDE_DIR}', flavor: conditional}
       - if: {nonempty: [NEWLIB_NANO_INCLUDE_DIR]}
         then:
-          - set: {var: INCLUDES, value: '-isystem ${NEWLIB_NANO_INCLUDE_DIR} ${INCLUDES}', flavor: simple}
-  - add: {LINKFLAGS: ['-Wl,-wrap=__assert_func']}
+          - comment: |-
+              newlib-nano overrides newlib.h and its include dir should therefore go before
+              the regular system include dirs.
+            set: {var: INCLUDES, value: '-isystem ${NEWLIB_NANO_INCLUDE_DIR} ${INCLUDES}', flavor: simple}
+  - comment: |-
+      In case externally compiled code gets linked in, it may use newlib's assert
+      implementation. We wrap that to RIOT's assert implementation for consistency.
+    add: {LINKFLAGS: ['-Wl,-wrap=__assert_func']}

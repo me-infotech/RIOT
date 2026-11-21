@@ -1,11 +1,16 @@
-# Build data of cpu/cortexm_common/Makefile.include (step G3-1): include
-# path and memory layout; the riotboot sizes and the programmer list are not
-# read by the build of an application.
-# Format: dist/tools/config_data/README.md (schema 3).
-schema: 3
+# Build data of cpu/cortexm_common/Makefile.include (steps G3-1, G0-3): the
+# include path and the linker symbols. The generated build.mk holds it as
+# Make; Makefile.include includes it and keeps the riotboot and programmer
+# settings (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 4
 rules:
-  - add: {INCLUDES: ['-I${RIOTCPU}/cortexm_common/include']}
-  - if: {nonempty: [ROM_START_ADDR, RAM_START_ADDR, ROM_LEN, RAM_LEN]}
+  - comment: include module specific includes
+    add: {INCLUDES: ['-I${RIOTCPU}/cortexm_common/include']}
+  - comment: |-
+      All variables must be defined in the CPU configuration when using the common
+      `ldscripts/cortexm.ld`
+    if: {nonempty: [ROM_START_ADDR, RAM_START_ADDR, ROM_LEN, RAM_LEN]}
     then:
       - if: {equals: {ROM_START_ADDR: ''}}
         then:
@@ -30,12 +35,9 @@ rules:
       - add: {CFLAGS: [-DCPU_HAS_BACKUP_RAM=1]}
   - set: {var: TOOLCHAINS_SUPPORTED, value: gnu llvm}
   - comment: |-
-      Make adds these two lazily (a conditional expression inside the
-      value); here when the file is read. ROM_OFFSET and FW_ROM_LEN are set
-      by riotboot, outside the scope.
-    if: {nonempty: [ROM_OFFSET]}
-    then:
-      - add: {LINKFLAGS: ['${LINKFLAGPREFIX}--defsym=_rom_offset=${ROM_OFFSET}']}
-  - if: {nonempty: [FW_ROM_LEN]}
-    then:
-      - add: {LINKFLAGS: ['${LINKFLAGPREFIX}--defsym=_fw_rom_length=${FW_ROM_LEN}']}
+      Only define the linker symbol if the variable is set
+      The variable can be set using target specific variable thanks to lazy evaluation
+  - comment: 'ROM_OFFSET: offset in rom to start linking, allows supporting a bootloader'
+    add: {LINKFLAGS: [{when: {test: {var: ROM_OFFSET}, then: '${LINKFLAGPREFIX}--defsym=_rom_offset=${ROM_OFFSET}'}}]}
+  - comment: 'FW_ROM_LEN: rom length to use for firmware linking. Allows linking only in a section of the rom.'
+    add: {LINKFLAGS: [{when: {test: {var: FW_ROM_LEN}, then: '${LINKFLAGPREFIX}--defsym=_fw_rom_length=${FW_ROM_LEN}'}}]}

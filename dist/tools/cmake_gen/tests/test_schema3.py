@@ -20,6 +20,9 @@ import schema  # noqa: E402
 import translate  # noqa: E402
 
 RIOTBASE = R.RIOTBASE
+with open(os.path.join(RIOTBASE, "dist", "tools", "config_data", "scope.yaml"),
+          encoding="utf-8") as _scope:
+    BUILD = yaml.safe_load(_scope)["build"]
 
 
 def doc(*rules):
@@ -51,7 +54,7 @@ class ValidatorTest(unittest.TestCase):
     INVALID = [
         (setv({"files": {"match": ["$(wildcard *.c)"]}}), "is not a file pattern"),
         (setv({"files": {}}), "missing key 'match'"),
-        (setv({"files": {"match": ["*.c"], "sort": True}}), "unknown key 'sort'"),
+        (setv({"files": {"match": ["*.c"], "sort": "yes"}}), "must be true or false"),
         (setv({"subdirs": {"select": {"var": "U"}, "file": "a/Makefile"}}),
          "must be a file name"),
         (setv({"subdirs": {"select": {"var": "U"}}}), "missing key 'file'"),
@@ -126,11 +129,12 @@ class GeneratorTest(unittest.TestCase):
                          "ifneq (1,$(call version_is_greater_or_equal,$(V),8))")
         self.assertEqual(generate.condition({"nonempty": ["A", "B"]}), "ifneq (,$(A)$(B))")
 
-    def test_build_only_constructs_are_not_written_as_make(self):
-        for value in ({"arith": {"expr": "1"}}, {"select": {"var": "A", "unique": True}}):
-            with self.subTest(value=value):
-                with self.assertRaises(generate.NotForMake):
-                    self.text(value)
+    def test_arith_and_unique_are_written_as_make(self):
+        # step G0-3: the build data is the source of generated Make files
+        self.assertEqual(self.text({"arith": {"expr": "${A}-1"}}),
+                         "$(shell echo $$(($(A:%K=%*1024)-1)))")
+        self.assertEqual(self.text({"select": {"var": "A", "unique": True}}),
+                         "$(strip $(call uniq,$(A)))")
 
 
 class TranslatorTest(unittest.TestCase):
@@ -199,12 +203,14 @@ class NamesTest(unittest.TestCase):
             with self.assertRaises(ValueError):
                 buildeval.build_yaml_name(bad)
 
-    def test_build_data_is_not_taken_for_an_adapter_source(self):
-        # build.yaml, *.build.yaml and pkg.yaml are read by the build without
-        # Make only: config_data must not generate a Make file from them
+    def test_build_data_is_no_adapter_source_by_name(self):
+        # build.yaml, *.build.yaml and pkg.yaml are not found by their name
+        # like the G0-1 data: the Make file each one describes is named in
+        # scope.yaml `build` (step G0-3, dist/tools/config_data/build_tests)
         for name in ("build.yaml", "makefiles/cflags.build.yaml", "pkg/cmsis/pkg.yaml",
                      "cpu/nrf5x_common/nrfx.pkg.yaml"):
             self.assertFalse(R.is_yaml_name(name), name)
+            self.assertTrue(R.is_build_data_name(name), name)
 
 
 def data_files() -> list:
@@ -227,7 +233,7 @@ class DataFilesTest(unittest.TestCase):
                 with open(os.path.join(RIOTBASE, path), encoding="utf-8") as file:
                     text = file.read()
                 self.assertEqual(schema.validate(yaml.safe_load(text)), [])
-                self.assertIn("step G3-1", text.split("schema:")[0])
+                self.assertIn("G3-1", text.split("schema:")[0])
 
     def test_each_build_data_file_has_its_make_file(self):
         for path in data_files():
@@ -245,6 +251,9 @@ class DataFilesTest(unittest.TestCase):
                             make[0])
             with self.subTest(path=path):
                 self.assertTrue(os.path.exists(os.path.join(RIOTBASE, make)), make)
+                # step G0-3: registered with this Make file, its adapter generated
+                # from the data (dist/tools/config_data/build_tests)
+                self.assertEqual(BUILD[path]["make"], make)
 
 
 if __name__ == "__main__":

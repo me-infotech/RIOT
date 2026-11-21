@@ -1,10 +1,14 @@
-# Build data of pkg/pkg.mk (step G3-1): the defaults and flags every package
-# shares. The recipes of pkg.mk (clone, fetch, patch, prepare) are the
-# package step of the build algorithm (dist/tools/cmake_gen/pkg_prepare.py),
-# which runs the same git commands with the values below.
-# Format: dist/tools/config_data/README.md (schema 3).
-schema: 3
+# Build data of pkg/pkg.mk (steps G3-1, G0-3): the defaults and flags every
+# package shares. The generated pkg.build.mk holds them as Make in three
+# sections; pkg.mk includes them and keeps its recipes (clone, fetch, patch,
+# prepare: the package step of the build algorithm,
+# dist/tools/cmake_gen/pkg_prepare.py, runs the same git commands with the
+# values below), git-cache-rs, PKG_SOURCE_LOCAL and the GITAMFLAGS warning
+# (not data: the build without Make stops when they are used).
+# Format: dist/tools/config_data/README.md
+schema: 4
 rules:
+  - section: checks
   - if: {equals: {PKG_NAME: ''}}
     then:
       - error: PKG_NAME not defined
@@ -30,17 +34,28 @@ rules:
       - set: {var: PKG_SOURCE_DIR, value: '${PKGDIRBASE}/${PKG_NAME}', flavor: conditional}
       - set: {var: PKG_BUILD_DIR, value: '${BINDIR}/pkg-build/${PKG_NAME}', flavor: conditional}
     else:
-      - set: {var: PKG_SOURCE_DIR, value: '${BINDIR}/pkg/${PKG_NAME}', flavor: conditional}
+      - comment: |-
+          in-source builds: packages are cloned within the application build
+          directory in a separate pkg tree
+        set: {var: PKG_SOURCE_DIR, value: '${BINDIR}/pkg/${PKG_NAME}', flavor: conditional}
       - set: {var: PKG_BUILD_DIR, value: '${PKG_SOURCE_DIR}'}
-  - comment: pkg.mk:56-62 (git-cache-rs is not part of the data)
+  - comment: |-
+      If CARGO_HOME is set, use it to search for `git-cache-rs` (git-cache),
+      otherwise try the local default directory. The git-cache can also be set
+      directly with GIT_CACHE_RS.
     set: {var: CARGO_HOME, value: '${HOME}/.cargo', flavor: conditional}
   - set: {var: BUILD_GIT_CACHE_RS, value: {files: {match: ['${CARGO_HOME}/bin/git-cache']}}}
+    stand_in: pkg/pkg.mk
   - if: {nonempty: [BUILD_GIT_CACHE_RS, GIT_CACHE_RS]}
     then:
       - error: cloning with git-cache-rs is outside the build data (pkg/pkg.mk)
+    stand_in: pkg/pkg.mk
   - if: {nonempty: [PKG_SOURCE_LOCAL]}
     then:
       - error: PKG_SOURCE_LOCAL is outside the build data (pkg/pkg.mk)
+    stand_in: pkg/pkg.mk
+  - section: git
+    comment: without PKG_SOURCE_LOCAL
   - if: {equals: {QUIET: '1'}}
     then:
       - set: {var: GIT_QUIET, value: --quiet, flavor: conditional}
@@ -48,15 +63,26 @@ rules:
   - if: {nonempty: [GITAMFLAGS]}
     then:
       - error: GITAMFLAGS is outside the build data (deprecated, pkg/pkg.mk)
-  - set: {var: GITAMFLAGS, value: '${GIT_QUIET}', flavor: conditional}
-  - add: {GITAMFLAGS: [--no-gpg-sign --ignore-whitespace --whitespace=nowarn]}
-  - set: {var: PKG_PATCHES, value: {files: {match: ['${PKG_PATCH_DIR}/*.patch']}}}
-  - comment: pkg.mk:220-232
+    stand_in: pkg/pkg.mk
+  - if: {not: {nonempty: [GITAMFLAGS]}}
+    then:
+      - comment: |-
+          These flags will be amended to the `git am` command after the deprecation
+          period has ended.
+        set: {var: GITAMFLAGS, value: '${GIT_QUIET}', flavor: conditional}
+      - add: {GITAMFLAGS: [--no-gpg-sign --ignore-whitespace --whitespace=nowarn]}
+  - set: {var: PKG_PATCHES, value: {files: {match: ['${PKG_PATCH_DIR}/*.patch'], sort: true}}}
+  - section: flags
+  - comment: 'Disabling some diagnostics: These issues needs to be fixed upstream'
     add: {CFLAGS: [-Wno-maybe-uninitialized]}
   - if: {equals: {TOOLCHAIN: llvm}}
     then:
       - add: {CFLAGS: [-Wno-documentation]}
-  - if: {at_least: {var: GCC_VERSION, version: '15'}}
+  - comment: |-
+      Disabling -Wunterminated-string-initialization on toolchains that support this
+      warning
+    if: {at_least: {var: GCC_VERSION, version: '15'}}
     then:
       - add: {CFLAGS: [-Wno-unterminated-string-initialization]}
-      - add: {CXXUWFLAGS: [-Wno-unterminated-string-initialization]}
+      - comment: 'this flag should not be passed to g++, only gcc:'
+        add: {CXXUWFLAGS: [-Wno-unterminated-string-initialization]}

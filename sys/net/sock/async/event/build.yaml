@@ -1,6 +1,7 @@
-# Build data of sys/net/sock/async/event/Makefile.include (step G3-1).
-# Format: dist/tools/config_data/README.md (schema 3).
-schema: 3
+# Build data of sys/net/sock/async/event/Makefile.include (steps G3-1, G0-3): the whole file.
+# sys/net/sock/async/event/Makefile.include is generated from it (`just generate-config-data`);
+# edit this file, never the Make file. Format: dist/tools/config_data/README.md
+schema: 1
 rules:
   - add: {USEMODULE_INCLUDES: ['${RIOTBASE}/sys/net/sock/async/event']}
-  - add: {CFLAGS: [-DSOCK_HAS_ASYNC -DSOCK_HAS_ASYNC_CTX]}
+  - add: {CFLAGS: [-DSOCK_HAS_ASYNC, -DSOCK_HAS_ASYNC_CTX]}

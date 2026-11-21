@@ -1,3 +1,6 @@
+# Generated from pseudomodules.build.yaml by dist/tools/config_data/config_data.py.
+# Do not edit: change pseudomodules.build.yaml and run `just generate-config-data`.
+
 ## @defgroup pseudomodules Generic pseudomodules
 ## @brief Modules influencing general RIOT behavior
 ##
@@ -55,9 +58,7 @@ NO_PSEUDOMODULES += auto_init_security
 NO_PSEUDOMODULES += auto_init_usbus
 NO_PSEUDOMODULES += auto_init_wdt_event
 NO_PSEUDOMODULES += auto_init_wdt_thread
-
 PSEUDOMODULES += atomic_utils
-
 PSEUDOMODULES += base64url
 
 ## @defgroup pseudomodule_board_software_reset board_software_reset
@@ -78,6 +79,7 @@ PSEUDOMODULES += board_software_reset
 ## This is a protection mechanism to catch stack overflow early before it
 ## can corrupt adjacent memory. Only available on ARMv8-M architecture.
 PSEUDOMODULES += cortexm_stack_limit
+
 ## @}
 
 PSEUDOMODULES += can_mbox
@@ -89,9 +91,9 @@ PSEUDOMODULES += ccn-lite-utils
 PSEUDOMODULES += conn_can_isotp_multi
 PSEUDOMODULES += cord_ep_standalone
 PSEUDOMODULES += core_%
+
 # core_lib is not a submodule
 NO_PSEUDOMODULES += core_lib
-
 PSEUDOMODULES += cortexm_fpu
 PSEUDOMODULES += cortexm_svc
 PSEUDOMODULES += cpp
@@ -102,11 +104,12 @@ PSEUDOMODULES += credman_load
 PSEUDOMODULES += crypto_aes_128
 PSEUDOMODULES += crypto_aes_192
 PSEUDOMODULES += crypto_aes_256
+
 # By using this pseudomodule, T tables will be precalculated.
 PSEUDOMODULES += crypto_aes_precalculated
+
 # This pseudomodule causes a loop in AES to be unrolled (more flash, less CPU)
 PSEUDOMODULES += crypto_aes_unroll
-
 PSEUDOMODULES += dbgpin
 PSEUDOMODULES += devfs_%
 PSEUDOMODULES += dhcpv6_%
@@ -117,7 +120,6 @@ PSEUDOMODULES += dhcpv6_client_mud_url
 PSEUDOMODULES += dhcpv6_relay
 PSEUDOMODULES += dns_cache
 PSEUDOMODULES += dns_msg
-
 PSEUDOMODULES += ecc_%
 PSEUDOMODULES += efm32_eth_auto
 PSEUDOMODULES += efm32_eth_link_up
@@ -126,23 +128,24 @@ PSEUDOMODULES += event_%
 PSEUDOMODULES += event_timeout
 PSEUDOMODULES += event_timeout_ztimer
 PSEUDOMODULES += evtimer_mbox
-
 PSEUDOMODULES += fatfs_vfs_format
 PSEUDOMODULES += fdcan
 PSEUDOMODULES += fido2_tests
 PSEUDOMODULES += fmt_%
 PSEUDOMODULES += fortuna_reseed
-
 PSEUDOMODULES += gcoap_dtls
 PSEUDOMODULES += gcoap_fileserver
 PSEUDOMODULES += gcoap_forward_proxy
 PSEUDOMODULES += gcoap_forward_proxy_thread
+
 ## @addtogroup net_gcoap_dns
 ## @{
 ## Enable @ref net_gcoap_dns
 PSEUDOMODULES += gcoap_dns
+
 ## Enable the @ref gcoap_dns_server_proxy_set function
 PSEUDOMODULES += gcoap_dns_proxied
+
 ## @}
 
 ## @addtogroup net_dhcpv6_client
@@ -150,14 +153,17 @@ PSEUDOMODULES += gcoap_dns_proxied
 ## @defgroup net_gnrc_dhcpv6_client	gnrc_dhcpv6_client
 ## @brief Basic DHCPv6 client implementation in GNRC
 PSEUDOMODULES += gnrc_dhcpv6_client
+
 ## @defgroup net_gnrc_dhcpv6_client_6lbr gnrc_dhcpv6_client_6lbr
 ## @brief Basic client for GNRC 6LoWPAN BRs
 PSEUDOMODULES += gnrc_dhcpv6_client_6lbr
+
 ## @}
 
 ## @addtogroup net_dhcpv6_client_simple_pd
 ## @{
 PSEUDOMODULES += gnrc_dhcpv6_client_simple_pd
+
 ## @}
 
 PSEUDOMODULES += gnrc_ipv6_auto_subnets_auto_init
@@ -187,7 +193,6 @@ PSEUDOMODULES += gnrc_netif_ipv6
 PSEUDOMODULES += gnrc_netif_single
 PSEUDOMODULES += gnrc_netif_timestamp
 
-
 ## @addtogroup 	net_gnrc_nettype
 ## @{
 
@@ -195,48 +200,56 @@ PSEUDOMODULES += gnrc_netif_timestamp
 ## @{
 ## Enables @ref GNRC_NETTYPE_CCN and @ref GNRC_NETTYPE_CCN_CHUNK
 PSEUDOMODULES += gnrc_nettype_ccn
+
 ## @}
 
 ## @defgroup 	net_gnrc_nettype_icmpv6     gnrc_nettype_icmpv6
 ## Enables @ref GNRC_NETTYPE_ICMPV6.
 ## @{
 PSEUDOMODULES += gnrc_nettype_icmpv6
+
 ## @}
 
 ## @defgroup 	net_gnrc_nettype_ipv6       gnrc_nettype_ipv6
 ## Enables @ref GNRC_NETTYPE_IPV6.
 ## @{
 PSEUDOMODULES += gnrc_nettype_ipv6
+
 ## @}
 
 ## @defgroup 	net_gnrc_nettype_ipv6_ext   gnrc_nettype_ipv6_ext
 ## @{
 ## Enables @ref GNRC_NETTYPE_IPV6_EXT.
 PSEUDOMODULES += gnrc_nettype_ipv6_ext
+
 ## @}
 
 ## @defgroup 	net_gnrc_nettype_ndn        gnrc_nettype_ndn
 ## Enables @ref GNRC_NETTYPE_NDN
 ## @{
 PSEUDOMODULES += gnrc_nettype_ndn
+
 ## @}
 
 ## @defgroup 	net_gnrc_nettype_sixlowpan  gnrc_nettype_sixlowpan
 ## Enables @ref GNRC_NETTYPE_SIXLOWPAN
 ## @{
 PSEUDOMODULES += gnrc_nettype_sixlowpan
+
 ## @}
 
 ## @defgroup 	net_gnrc_nettype_tcp        gnrc_nettype_tcp
 ## Enables @ref GNRC_NETTYPE_TCP
 ## @{
 PSEUDOMODULES += gnrc_nettype_tcp
+
 ## @}
 
 ## @defgroup 	net_gnrc_nettype_udp        gnrc_nettype_udp
 ## Enables @ref GNRC_NETTYPE_UDP
 ## @{
 PSEUDOMODULES += gnrc_nettype_udp
+
 ## @}
 ## @}
 
@@ -279,11 +292,13 @@ PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_ecn_fqueue
 PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_ecn_if_in
 PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_ecn_if_out
 PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_stats
+
 ##
 ## @addtogroup net_gnrc_sixlowpan_frag_sfr_congure
 ## @{
 ##
 PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_congure
+
 ## @defgroup net_gnrc_sixlowpan_frag_sfr_congure_abe gnrc_sixlowpan_frag_sfr_congure_abe: TCP Reno with ABE
 ## @brief  Congestion control for SFR using the
 ##         [TCP Reno congestion control algorithm with ABE](@ref sys_congure_abe)
@@ -292,18 +307,21 @@ PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_congure
 ## to TCP-Reno-based congestion control
 ## @{
 PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_congure_abe
+
 ## @}
 ## @defgroup net_gnrc_sixlowpan_frag_sfr_congure_reno gnrc_sixlowpan_frag_sfr_congure_reno: TCP Reno
 ## @brief  Congestion control for SFR using the
 ##         [TCP Reno congestion control algorithm](@ref sys_congure_reno)
 ## @{
 PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_congure_reno
+
 ## @}
 ## @defgroup net_gnrc_sixlowpan_frag_sfr_congure_quic gnrc_sixlowpan_frag_sfr_congure_quic: QUIC CC
 ## @brief  Congestion control for SFR using the
 ##         [congestion control algorithm of QUIC](@ref sys_congure_quic)
 ## @{
 PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_congure_quic
+
 ## @}
 ## @defgroup net_gnrc_sixlowpan_frag_sfr_congure_sfr gnrc_sixlowpan_frag_sfr_congure_sfr: Appendix C
 ## @brief  Basic congestion control for 6LoWPAN SFR as proposed in
@@ -311,6 +329,7 @@ PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_congure_quic
 ## @see    [RFC 8931, Appendix C](https://tools.ietf.org/html/rfc8931#section-appendix.c)
 ## @{
 PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_congure_sfr
+
 ## @}
 ## @}
 PSEUDOMODULES += gnrc_sixlowpan_iphc_nhc
@@ -319,7 +338,6 @@ PSEUDOMODULES += gnrc_sixlowpan_router_default
 PSEUDOMODULES += gnrc_sock_async
 PSEUDOMODULES += gnrc_sock_check_reuse
 PSEUDOMODULES += gnrc_txtsnd
-
 PSEUDOMODULES += ieee802154_rx_timestamp
 PSEUDOMODULES += ieee802154_security
 PSEUDOMODULES += ieee802154_submac
@@ -328,7 +346,6 @@ PSEUDOMODULES += ieee802154_submac_soft_csma_ca
 PSEUDOMODULES += ieee802154_submac_soft_frame_retrans
 PSEUDOMODULES += ipv4
 PSEUDOMODULES += ipv6
-
 PSEUDOMODULES += l2filter_blacklist
 PSEUDOMODULES += l2filter_whitelist
 
@@ -336,7 +353,6 @@ PSEUDOMODULES += l2filter_whitelist
 ## @brief Includes implementation of gettimeofday()
 ##
 PSEUDOMODULES += libc_gettimeofday
-
 PSEUDOMODULES += libstdcpp
 PSEUDOMODULES += log
 PSEUDOMODULES += lora
@@ -363,10 +379,10 @@ PSEUDOMODULES += mpu_stack_guard
 ## This is a protection mechanism which makes exploitation of buffer overflows
 ## significantly harder.
 PSEUDOMODULES += mpu_noexec_ram
+
 ## @}
 
 PSEUDOMODULES += mtd_write_page
-
 PSEUDOMODULES += nanocoap_%
 PSEUDOMODULES += nanocoap_fileserver_callback
 PSEUDOMODULES += nanocoap_fileserver_delete
@@ -407,19 +423,17 @@ PSEUDOMODULES += nrfx
 
 # print ascii representation in function od_hex_dump()
 PSEUDOMODULES += od_string
-
 PSEUDOMODULES += opendsme
 PSEUDOMODULES += openthread
 
 # declare periph submodules as pseudomodules, but exclude periph_common
 PSEUDOMODULES += periph_%
 NO_PSEUDOMODULES += periph_common
-
 PSEUDOMODULES += picolibc
 PSEUDOMODULES += picolibc_stdout_buffered
+
 # Modules to automatically start PIO programs
 PSEUDOMODULES += pio_autostart_%
-
 PSEUDOMODULES += pktqueue
 
 ## @defgroup pseudomodule_pmp_noexec_ram pmp_noexec_ram
@@ -430,15 +444,16 @@ PSEUDOMODULES += pktqueue
 ## This is a protection mechanism which makes exploitation of buffer overflows
 ## significantly harder.
 PSEUDOMODULES += pmp_noexec_ram
+
 ## @}
 
 PSEUDOMODULES += posix_headers
 PSEUDOMODULES += printf_float
 PSEUDOMODULES += printf_long_long
 PSEUDOMODULES += prng
+
 # add all pseudo random number generator variants as pseudomodules
 PSEUDOMODULES += prng_%
-
 PSEUDOMODULES += psa_riot_cipher_aes_128_cbc
 PSEUDOMODULES += psa_riot_cipher_aes_128_ecb
 PSEUDOMODULES += psa_riot_cipher_aes_192_cbc
@@ -460,7 +475,6 @@ PSEUDOMODULES += psa_riot_hashes_sha_512_256
 PSEUDOMODULES += radiolib
 PSEUDOMODULES += riotboot_%
 PSEUDOMODULES += rtt_cmd
-
 PSEUDOMODULES += saul_adc
 PSEUDOMODULES += saul_bat_voltage
 PSEUDOMODULES += saul_default
@@ -471,30 +485,36 @@ PSEUDOMODULES += saul_pwm
 PSEUDOMODULES += scanf_float
 PSEUDOMODULES += sched_cb
 PSEUDOMODULES += sched_runq_callback
+
 ## @defgroup pseudomodule_sema_deprecated sema_deprecated
 ## @ingroup sys_sema
 ## @{
 ## @deprecated  Will be removed after the 2021.07 release.
 PSEUDOMODULES += sema_deprecated
+
 ## @}
 PSEUDOMODULES += semtech_loramac_rx
 PSEUDOMODULES += senml_cbor
 PSEUDOMODULES += senml_phydat
 PSEUDOMODULES += senml_saul
+
 ## @defgroup drivers_servo_pwm PWM based servo driver
 ## @ingroup drivers_servo
 ## @{
 PSEUDOMODULES += servo_pwm
+
 ## @}
 ## @defgroup drivers_servo_timer periph_timer_periodic based servo driver
 ## @ingroup drivers_servo
 ## @{
 PSEUDOMODULES += servo_timer
+
 ## @}
 ## @defgroup drivers_servo_saul SAUL integration of the servo driver
 ## @ingroup drivers_servo
 ## @{
 PSEUDOMODULES += servo_saul
+
 ## @}
 
 PSEUDOMODULES += shell_builtin_cmd_help_json
@@ -525,12 +545,14 @@ PSEUDOMODULES += shell_cmd_gnrc_rpl
 PSEUDOMODULES += shell_cmd_gnrc_sixlowpan_ctx
 PSEUDOMODULES += shell_cmd_gnrc_sixlowpan_frag_stats
 PSEUDOMODULES += shell_cmd_gnrc_txtsnd
+
 ## @defgroup sys_shell_commands_gnrc_udp GNRC UDP shell command
 ## @ingroup sys_shell_commands
 ## @{
 ## @deprecated Use @ref sys_shell_commands_udp instead. will be removed after
 ##             the 2026.10 release.
 PSEUDOMODULES += shell_cmd_gnrc_udp
+
 ## @}
 PSEUDOMODULES += shell_cmd_heap
 PSEUDOMODULES += shell_cmd_i2c_scan
@@ -575,7 +597,6 @@ PSEUDOMODULES += shield_w5100
 # Submodules provided by Skald
 PSEUDOMODULES += skald_ibeacon
 PSEUDOMODULES += skald_eddystone
-
 PSEUDOMODULES += slipdev
 PSEUDOMODULES += slipdev_config
 PSEUDOMODULES += slipdev_l2addr
@@ -596,12 +617,14 @@ PSEUDOMODULES += soft_uart_modecfg
 PSEUDOMODULES += stdin
 PSEUDOMODULES += stdio_available
 PSEUDOMODULES += stdio_cdc_acm
+
 ## @defgroup sys_stdio_default	Default STDIO provider
 ## @ingroup sys_stdio
 ## @{
 ## This module selects the default STDIO method of a given board.
 ## It will be enabled by default if no other stdio method is selected.
 PSEUDOMODULES += stdio_default
+
 ## @}
 PSEUDOMODULES += stdio_dispatch
 PSEUDOMODULES += stdio_ethos
@@ -609,18 +632,21 @@ PSEUDOMODULES += stdio_nimble_debug
 PSEUDOMODULES += stdio_notify
 PSEUDOMODULES += stdio_slipdev
 PSEUDOMODULES += stdio_telnet
+
 ## @defgroup sys_stdio_uart_onlcr   Support for DOS line endings in STDIO-UART
 ## @ingroup sys_stdio_uart
 ## @{
 ## Enable this (pseudo-) module to emit DOS style line endings (`\r\n`) instead
 ## of UNIX style line endings (`\n`) via STDIO over UART.
 PSEUDOMODULES += stdio_uart_onlcr
+
 ## @}
 PSEUDOMODULES += stdio_uart_rx
 PSEUDOMODULES += stm32_eth
 PSEUDOMODULES += stm32_eth_auto
 PSEUDOMODULES += stm32_eth_link_up
 PSEUDOMODULES += stm32_eth_tracing
+
 # STM32 periph pseudomodules
 PSEUDOMODULES += stm32_periph_%
 PSEUDOMODULES += stm32mp1_eng_mode
@@ -631,7 +657,6 @@ PSEUDOMODULES += sys_bus_%
 # declare shell version of test_utils_interactive_sync
 PSEUDOMODULES += test_utils_interactive_sync_shell
 PSEUDOMODULES += test_utils_main_exit_cb
-
 PSEUDOMODULES += tiny_strerror_as_strerror
 PSEUDOMODULES += tiny_strerror_minimal
 
@@ -644,6 +669,7 @@ PSEUDOMODULES += unicoap_client_uri
 # An umbrella module for the unicoap_driver_rfc7252_common_pdu
 # and unicoap_driver_rfc7252_common_messaging modules
 PSEUDOMODULES += unicoap_driver_rfc7252_common
+
 # Alias for unicoap_driver_rfc7252_common_pdu, and is hence a pseudomodule
 PSEUDOMODULES += unicoap_driver_rfc7252_pdu
 
@@ -652,10 +678,9 @@ PSEUDOMODULES += unicoap_server_resource_declarations
 
 # Common sock dependencies of sock-based CoAP drivers in unicoap
 PSEUDOMODULES += unicoap_sock_support
-
 PSEUDOMODULES += usbus_urb
-
 PSEUDOMODULES += vdd_lc_filter_%
+
 ## @defgroup pseudomodule_vfs_auto_format vfs_auto_format
 ## @brief Format mount points at startup unless they can be mounted
 ##
@@ -688,7 +713,6 @@ PSEUDOMODULES += vfs_auto_mount
 ## Boards will generally mount to `/nvm` unless they have several storage
 ## backends.
 PSEUDOMODULES += vfs_default
-
 PSEUDOMODULES += wakaama_objects_%
 PSEUDOMODULES += walltime_default
 PSEUDOMODULES += walltime_impl_ds1307
@@ -698,10 +722,8 @@ PSEUDOMODULES += walltime_impl_max31343
 PSEUDOMODULES += walltime_impl_rtc
 PSEUDOMODULES += wifi_enterprise
 PSEUDOMODULES += wifi_scan_list
-
 PSEUDOMODULES += xtimer_on_ztimer
 PSEUDOMODULES += xtimer_no_ztimer_default
-
 PSEUDOMODULES += zptr
 PSEUDOMODULES += ztimer
 PSEUDOMODULES += ztimer64_%

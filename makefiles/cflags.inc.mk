@@ -1,7 +1,10 @@
+# Generated from cflags.build.yaml by dist/tools/config_data/config_data.py.
+# Do not edit: change cflags.build.yaml and run `just generate-config-data`.
+
 # Test if the input language was specified externally.
 # Otherwise test if the compiler unterstands the "-std=c11" flag, and use it if so.
-ifeq ($(filter -std=%,$(CFLAGS)),)
-  ifeq ($(shell $(CC) -std=c11 -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
+ifeq (,$(filter -std=%,$(CFLAGS)))
+  ifeq ($(PROBE_CC_STD_C11),0)
     CFLAGS += -std=c11
   endif
 endif
@@ -29,6 +32,7 @@ endif
 #               behaviour, even though this flag makes your code work. There are
 #               safe ways to check for signed integer overflow.
 CFLAGS += -fwrapv
+
 # Enable warnings for code relying on signed integers to overflow correctly
 # (see above for details).
 # Note:         This warning is sadly not reliable, thus -fwrapv cannot be
@@ -46,8 +50,8 @@ OPTIONAL_CFLAGS += -Wdocumentation -Wno-documentation-deprecated-sync
 CXXUWFLAGS += -std=%
 CXXUWFLAGS += -Wstrict-prototypes -Wold-style-definition
 
-ifeq ($(filter -std=%,$(CXXEXFLAGS)),)
-  ifeq ($(shell $(CC) -std=c++14 -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
+ifeq (,$(filter -std=%,$(CXXEXFLAGS)))
+  ifeq ($(PROBE_CC_STD_CXX14),0)
     CXXEXFLAGS += -std=c++14
   endif
 endif
@@ -61,19 +65,19 @@ endif
 # Cannot test with `BUILD_IN_DOCKER=1`, as this is only the case when the
 # actual build is done in the docker container and we are still running in the
 # host's context.
-ifeq (1,$(BUILD_IN_DOCKER))
+ifeq ($(BUILD_IN_DOCKER),1)
   LINKER_SUPPORTS_NOEXECSTACK := determine-later-inside-docker
 endif
 
 # Check if linker supports `-z noexecstack`. Handle BUILD_IN_DOCKER separately,
 # as this is run in the host environment rather than inside the container. We
 # just hardcode this in the BUILD_IN_DOCKER case for now.
-LINKER_SUPPORTS_NOEXECSTACK ?= $(shell LC_ALL=C $(LINK) $(RIOTTOOLS)/testprogs/minimal_linkable.c -o /dev/null -lc -Wall -Wextra -pedantic -z noexecstack 2> /dev/null && echo 1 || echo 0)
+LINKER_SUPPORTS_NOEXECSTACK ?= $(PROBE_LINK_NOEXECSTACK)
 
 # As we do not use nested functions or other stuff requiring trampoline code,
 # we can safely mark the stack as not executable. This avoids warnings on newer
 # toolchains.
-ifeq (1,$(LINKER_SUPPORTS_NOEXECSTACK))
+ifeq ($(LINKER_SUPPORTS_NOEXECSTACK),1)
   LINKFLAGS += -z noexecstack
 endif
 
@@ -91,6 +95,7 @@ OPTIONAL_CFLAGS += -gz
 
 # Enable all default warnings and all extra warnings
 CFLAGS += -Wall -Wextra
+
 # Enable additional checks for printf/scanf format strings
 OPTIONAL_CFLAGS += -Wformat=2
 OPTIONAL_CFLAGS += -Wformat-overflow
@@ -98,6 +103,7 @@ OPTIONAL_CFLAGS += -Wformat-truncation
 
 # Don't include absolute path in __FILE__ macro
 OPTIONAL_CFLAGS += -fmacro-prefix-map=$(RIOTBASE)/=
+
 # Same with debug info
 OPTIONAL_CFLAGS += -fdebug-prefix-map=$(RIOTBASE)/=
 
@@ -108,10 +114,11 @@ OPTIONAL_CFLAGS += -Wcast-align
 CFLAGS += -Wmissing-include-dirs
 
 ifeq (,$(filter -DDEVELHELP,$(CFLAGS)))
-  ifneq (1,$(FORCE_ASSERTS))
+  ifneq ($(FORCE_ASSERTS),1)
     CFLAGS += -DNDEBUG
   endif
 endif
+
 # Add the optional flags that are not architecture/toolchain blacklisted
 CFLAGS += $(filter-out $(OPTIONAL_CFLAGS_BLACKLIST),$(OPTIONAL_CFLAGS))
 
@@ -127,6 +134,7 @@ CXXEXFLAGS += -Wno-missing-field-initializers
 ifneq (,$(RAM_START_ADDR))
   CFLAGS += -DCPU_RAM_BASE=$(RAM_START_ADDR)
 endif
+
 ifneq (,$(RAM_LEN))
   # 'CFLAGS' is a deferred variable, so the shell call has to be memoized to
   # keep it from being run again on every expansion of 'CFLAGS'.

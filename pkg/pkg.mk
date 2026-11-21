@@ -17,43 +17,11 @@ ifneq (,$(.DEFAULT_GOAL))
   $(error $(lastword $(MAKEFILE_LIST)) must be included at the beginning of the file after defining the PKG_* variables)
 endif
 
-ifeq (,$(PKG_NAME))
-  $(error PKG_NAME not defined)
-endif
-ifeq (,$(PKG_URL))
-  $(error PKG_URL not defined)
-endif
-ifeq (,$(PKG_VERSION))
-  $(error PKG_VERSION not defined)
-endif
-ifeq (,$(PKG_LICENSE))
-  $(error PKG_LICENSE not defined)
-endif
-
-ifneq (, $(PKG_MIRROR_URL))
-  ifneq (0, $(PKG_USE_MIRROR))
-    PKG_URL = $(PKG_MIRROR_URL)
-  endif
-endif
-
-PKG_DIR ?= $(CURDIR)
-PKG_PATCH_DIR ?= $(PKG_DIR)/patches
-
-PKG_BUILD_OUT_OF_SOURCE ?= 1
-ifeq (1,$(PKG_BUILD_OUT_OF_SOURCE))
-  PKG_SOURCE_DIR ?= $(PKGDIRBASE)/$(PKG_NAME)
-  PKG_BUILD_DIR ?= $(BINDIR)/pkg-build/$(PKG_NAME)
-else
-  # in-source builds: packages are cloned within the application build
-  # directory in a separate pkg tree
-  PKG_SOURCE_DIR ?= $(BINDIR)/pkg/$(PKG_NAME)
-  PKG_BUILD_DIR = $(PKG_SOURCE_DIR)
-endif
-
-# If CARGO_HOME is set, use it to search for `git-cache-rs` (git-cache),
-# otherwise try the local default directory. The git-cache can also be set
-# directly with GIT_CACHE_RS.
-CARGO_HOME ?= $(HOME)/.cargo
+# The checks of the PKG_* variables and the directories are build data:
+# pkg/pkg.build.yaml. The file included here (three times, in sections) is
+# generated from it (`just generate-config-data`); edit the YAML, not it.
+RIOT_BUILD_SECTION := checks
+include $(RIOTBASE)/pkg/pkg.build.mk
 
 DEFAULT_GIT_CACHE_RS ?= $(CARGO_HOME)/bin/git-cache
 ifeq ($(DEFAULT_GIT_CACHE_RS),$(wildcard $(DEFAULT_GIT_CACHE_RS)))
@@ -78,26 +46,16 @@ ifneq (,$(PKG_SOURCE_LOCAL))
   include $(RIOTBASE)/pkg/local.mk
 else
 
-ifeq ($(QUIET),1)
-  GIT_QUIET ?= --quiet
-endif
-
-GITFLAGS ?= -c user.email=buildsystem@riot -c user.name="RIOT buildsystem"
-
 ifneq (,$(GITAMFLAGS))
   $(call echowarn,("Setting GITAMFLAGS is deprecated and will be removed after"\
                    "the 2027.04 Release. Modify your patch to be applicable"\
                    "with the default settings!"))
-else
-  # These flags will be amended to the `git am` command after the deprecation
-  # period has ended.
-  GITAMFLAGS ?= $(GIT_QUIET)
-  GITAMFLAGS += --no-gpg-sign --ignore-whitespace --whitespace=nowarn
 endif
 
-.PHONY: all prepare clean distclean FORCE
+RIOT_BUILD_SECTION := git
+include $(RIOTBASE)/pkg/pkg.build.mk
 
-PKG_PATCHES = $(sort $(wildcard $(PKG_PATCH_DIR)/*.patch))
+.PHONY: all prepare clean distclean FORCE
 
 PKG_STATE_FILE = .pkg-state.git
 PKG_STATE      = $(PKG_SOURCE_DIR)/$(PKG_STATE_FILE)
@@ -236,16 +194,5 @@ distclean:: clean
 .DEFAULT_GOAL =
 endif
 
-# Disabling some diagnostics: These issues needs to be fixed upstream
-CFLAGS += -Wno-maybe-uninitialized
-ifeq (llvm,$(TOOLCHAIN))
-  CFLAGS += -Wno-documentation
-endif
-
-# Disabling -Wunterminated-string-initialization on toolchains that support this
-# warning
-ifeq (1,$(call version_is_greater_or_equal,$(GCC_VERSION),15))
-  CFLAGS += -Wno-unterminated-string-initialization
-  # this flag should not be passed to g++, only gcc:
-  CXXUWFLAGS += -Wno-unterminated-string-initialization
-endif
+RIOT_BUILD_SECTION := flags
+include $(RIOTBASE)/pkg/pkg.build.mk

@@ -81,6 +81,48 @@ def mask_version(result: tuple) -> tuple:
     return status, [VERSION_RE.sub('-DRIOT_VERSION=\\"@VERSION@\\"', line) for line in lines]
 
 
+# Step G0-3: the build part of the board, CPU, build system and package Make
+# files is generated from the build data into include files (scope.yaml
+# `build`, adapter `part`) and makefiles/build_providers.inc.mk defines the
+# probes; Make reads these files in addition, and the Make files they were
+# taken from got shorter. Both are masked when the golden files (recorded
+# before) are compared: the generated files are dropped from MAKEFILE_LIST
+# and the line numbers in Make's messages about the split Make files.
+G003_SPLIT = ("Makefile.include", "pkg.mk", "Makefile.nrfx", "cflags.inc.mk", "newlib.mk",
+              "gnu.inc.mk", "cortexm.inc.mk", "bindist.inc.mk", "Makefile")
+LINE_RE = re.compile(r"((?:^|[\s/])(?:" + "|".join(re.escape(n) for n in G003_SPLIT)
+                     + r")):[0-9]+:")
+
+
+def g003_generated() -> tuple:
+    """The include files generated from build data and the providers file
+    (paths relative to the repository root)."""
+    import yaml  # pylint: disable=import-outside-toplevel
+    with open(os.path.join(RIOTBASE, "dist", "tools", "config_data", "scope.yaml"),
+              encoding="utf-8") as file:
+        build = yaml.safe_load(file).get("build") or {}
+    parts = [data[:-len(".yaml")] + ".mk" for data, entry in build.items()
+             if entry["adapter"] == "part"]
+    return tuple(sorted(parts + ["makefiles/build_providers.inc.mk"]))
+
+
+def mask_g003(result: tuple) -> tuple:
+    """(status, lines) without the G0-3 adapters in MAKEFILE_LIST and with
+    the line numbers of messages about the split Make files masked."""
+    status, lines = result
+    generated = g003_generated()
+    out = []
+    for line in lines:
+        words = line.split(" ")
+        if any(os.path.normpath(w).endswith(generated) for w in words if w.endswith(".mk")):
+            words = [w for w in words if not (w.endswith(".mk") and any(
+                os.path.normpath(w) == g or os.path.normpath(w).endswith("/" + g)
+                for g in generated))]
+            line = " ".join(words)
+        out.append(LINE_RE.sub(r"\1:@LINE@:", line))
+    return status, out
+
+
 def golden_path(app: str, board: str) -> str:
     return os.path.join(GOLDEN, f"{app}__{board}.txt")
 

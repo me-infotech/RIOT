@@ -1,0 +1,277 @@
+# commit: 8c98d25e9b0af679e288c1ad2f88e222337c7e5a
+# make: GNU Make 4.3
+# command: make -C <app> BOARD=nrf52840dk -f Makefile -f build_tests/dump.mk G003_NAMES=<names> riot-g003-env
+# paths: @RIOTBASE@; RIOT_VERSION and the git description masked
+#STATUS 0
+[APPDIR] @RIOTBASE@/examples/advanced/bindist
+[APPLICATION] bindist
+[APPLICATION_MODULE] application_bindist
+[AR] arm-none-eabi-ar
+[ARCHIVES]
+[AS] arm-none-eabi-as
+[ASFLAGS] -mcpu=cortex-m4 -mlittle-endian -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16
+[BINDIR] @RIOTBASE@/examples/advanced/bindist/bin/nrf52840dk
+[BINDIRBASE] @RIOTBASE@/examples/advanced/bindist/bin
+[BINFILE] @RIOTBASE@/examples/advanced/bindist/bin/nrf52840dk/bindist.bin
+[BIN_USEMODULE] abc application_bindist
+[BOARD] nrf52840dk
+[BOARDDEF] NRF52840DK
+[BOARDDIR] @RIOTBASE@/boards/nrf52840dk
+[BUILD_DIR] @RIOTBASE@/build
+[BUILD_FILES] @RIOTBASE@/examples/advanced/bindist/bin/nrf52840dk/bindist.elf @RIOTBASE@/examples/advanced/bindist/bin/nrf52840dk/bindist.bin @RIOTBASE@/examples/advanced/bindist/bin/nrf52840dk/bindist.elf @RIOTBASE@/examples/advanced/bindist/bin/nrf52840dk/bindist.bin
+[CARGO_HOME]
+[CARGO_TARGET_DIR] @RIOTBASE@/examples/advanced/bindist/bin/nrf52840dk/target
+[CC] arm-none-eabi-gcc
+[CCACHE_CPP2] yes
+[CCAS] arm-none-eabi-gcc
+[CCASEXFLAGS]
+[CCASUWFLAGS]
+[CFLAGS] -DDEVELHELP -Werror -DCPU_FAM_NRF52 -mno-thumb-interwork -mcpu=cortex-m4 -mlittle-endian -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -ffunction-sections -fdata-sections -fshort-enums -ggdb -g3 -Os -DCPU_MODEL_NRF52840XXAA -DCPU_CORE_CORTEX_M4F -DRIOT_APPLICATION=\"bindist\" -DBOARD_NRF52840DK=\"nrf52840dk\" -DRIOT_BOARD=BOARD_NRF52840DK -DCPU_NRF52=\"nrf52\" -DRIOT_CPU=CPU_NRF52 -fwrapv -Wstrict-overflow -fno-common -ffunction-sections -fdata-sections -Wall -Wextra -Wmissing-include-dirs -fno-delete-null-pointer-checks -fdiagnostics-color -Wstrict-prototypes -Wold-style-definition -gz -Wformat=2 -Wformat-overflow -Wformat-truncation -Wcast-align -DCPU_RAM_BASE=0x20000000 -DCPU_RAM_SIZE=0x40000 -D__int64_t_defined=1 -include '@RIOTBASE@/examples/advanced/bindist/bin/nrf52840dk/riotbuild/riotbuild.h'
+[CFLAGS_CPU] -mcpu=cortex-m4 -mlittle-endian -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16
+[CFLAGS_DBG] -ggdb -g3
+[CFLAGS_FPU] -mfloat-abi=hard -mfpu=fpv4-sp-d16
+[CFLAGS_LINK] -ffunction-sections -fdata-sections -fshort-enums
+[CFLAGS_OPT] -Os
+[CFLAGS_STATIC_ANALYSIS] -fanalyzer
+[CFLAGS_WITH_MACROS] -DDEVELHELP -Werror -DCPU_FAM_NRF52 -mno-thumb-interwork -mcpu=cortex-m4 -mlittle-endian -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -ffunction-sections -fdata-sections -fshort-enums -ggdb -g3 -Os -DCPU_MODEL_NRF52840XXAA -DCPU_CORE_CORTEX_M4F -DRIOT_APPLICATION=\"bindist\" -DBOARD_NRF52840DK=\"nrf52840dk\" -DRIOT_BOARD=BOARD_NRF52840DK -DCPU_NRF52=\"nrf52\" -DRIOT_CPU=CPU_NRF52 -fwrapv -Wstrict-overflow -fno-common -ffunction-sections -fdata-sections -Wall -Wextra -Wmissing-include-dirs -fno-delete-null-pointer-checks -fdiagnostics-color -Wstrict-prototypes -Wold-style-definition -gz -Wformat=2 -Wformat-overflow -Wformat-truncation -Wcast-align -DCPU_RAM_BASE=0x20000000 -DCPU_RAM_SIZE=0x40000 -D__int64_t_defined=1 -include '@RIOTBASE@/examples/advanced/bindist/bin/nrf52840dk/riotbuild/riotbuild.h' -DRIOT_VERSION=\"@VERSION@\" -DRIOT_VERSION_CODE=RIOT_VERSION_NUM\(2027,1,0,0\) -DRIOT_OS=1 -DMODULE_ABC -DMODULE_AUTO_INIT -DMODULE_BOARD -DMODULE_BOARD_COMMON_INIT -DMODULE_BOARDS_COMMON_NRF52XXXDK -DMODULE_CMSIS -DMODULE_CORE -DMODULE_CORE_INIT -DMODULE_CORE_LIB -DMODULE_CORE_MSG -DMODULE_CORE_PANIC -DMODULE_CORE_THREAD -DMODULE_CORTEXM_COMMON -DMODULE_CORTEXM_COMMON_PERIPH -DMODULE_CORTEXM_FPU -DMODULE_CPU -DMODULE_CPU_CHECK_ADDRESS -DMODULE_CPU_COMMON -DMODULE_DIV -DMODULE_LIBC -DMODULE_MALLOC_THREAD_SAFE -DMODULE_MPALAND_PRINTF -DMODULE_MPU_STACK_GUARD -DMODULE_NEWLIB -DMODULE_NEWLIB_NANO -DMODULE_NEWLIB_SYSCALLS_DEFAULT -DMODULE_NRF52_VECTORS -DMODULE_NRF5X_COMMON_PERIPH -DMODULE_PERIPH -DMODULE_PERIPH_COMMON -DMODULE_PERIPH_GPIO -DMODULE_PERIPH_GPIO_LL_DISCONNECT -DMODULE_PERIPH_GPIO_LL_INPUT_PULL_DOWN -DMODULE_PERIPH_GPIO_LL_INPUT_PULL_UP -DMODULE_PERIPH_GPIO_LL_IRQ_EDGE_TRIGGERED_BOTH -DMODULE_PERIPH_GPIO_LL_IRQ_UNMASK -DMODULE_PERIPH_GPIO_LL_OPEN_DRAIN -DMODULE_PERIPH_GPIO_LL_OPEN_DRAIN_PULL_UP -DMODULE_PERIPH_GPIO_LL_OPEN_SOURCE -DMODULE_PERIPH_GPIO_LL_OPEN_SOURCE_PULL_DOWN -DMODULE_PERIPH_INIT -DMODULE_PERIPH_INIT_BUTTONS -DMODULE_PERIPH_INIT_GPIO -DMODULE_PERIPH_INIT_LED0 -DMODULE_PERIPH_INIT_LED1 -DMODULE_PERIPH_INIT_LED2 -DMODULE_PERIPH_INIT_LED3 -DMODULE_PERIPH_INIT_LED4 -DMODULE_PERIPH_INIT_LED5 -DMODULE_PERIPH_INIT_LED6 -DMODULE_PERIPH_INIT_LED7 -DMODULE_PERIPH_INIT_LEDS -DMODULE_PERIPH_INIT_PM -DMODULE_PERIPH_INIT_UART -DMODULE_PERIPH_PM -DMODULE_PERIPH_UART -DMODULE_PREPROCESSOR -DMODULE_PREPROCESSOR_SUCCESSOR -DMODULE_STDIO -DMODULE_STDIO_DEFAULT -DMODULE_STDIO_UART -DMODULE_SYS -DMODULE_VDD_LC_FILTER_REG0 -DMODULE_VDD_LC_FILTER_REG1
+[CMSIS_DSP_MODULES]
+[CMSIS_DSP_MODULES_USED]
+[CMSIS_DSP_NEEDED]
+[CMSIS_MODULES_USED]
+[CMSIS_NN_MODULES]
+[CMSIS_NN_MODULES_USED]
+[CPPMIX]
+[CPU] nrf52
+[CPUDEF] NRF52
+[CPU_ARCH] armv7m
+[CPU_CORE] cortex-m4f
+[CPU_FAM] nrf52
+[CPU_MODEL] nrf52840xxaa
+[CPU_RAM_SIZE] 0x40000
+[CXX] arm-none-eabi-g++
+[CXXEXFLAGS] -Wno-missing-field-initializers
+[CXXINCLUDES]
+[CXXUWFLAGS] -std=% -Wstrict-prototypes -Wold-style-definition
+[DEVELHELP] 1
+[DIRS] abc
+[DISABLE_MODULE]
+[DLCACHE] @RIOTBASE@/dist/tools/dlcache/dlcache.sh
+[DOWNLOAD_TO_FILE] @RIOTBASE@/dist/tools/dlcache/dlcache.sh
+[ELFFILE] @RIOTBASE@/examples/advanced/bindist/bin/nrf52840dk/bindist.elf
+[EXTERNAL_BOARD_DIRS]
+[FEATURES_OPTIONAL] vdd_lc_filter_reg1 vdd_lc_filter_reg0 cortexm_fpu cortexm_mpu periph_gpio periph_pm no_idle_thread vdd_lc_filter_reg1 vdd_lc_filter_reg0 cortexm_fpu cortexm_mpu periph_gpio_ll_disconnect periph_gpio_ll_input_pull_down periph_gpio_ll_input_pull_keep periph_gpio_ll_input_pull_up periph_gpio_ll_irq_edge_triggered_both periph_gpio_ll_irq_level_triggered_high periph_gpio_ll_irq_level_triggered_low periph_gpio_ll_irq_unmask periph_gpio_ll_open_drain periph_gpio_ll_open_drain_pull_up periph_gpio_ll_open_source periph_gpio_ll_open_source_pull_down periph_gpio_ll_switch_dir periph_gpio periph_pm no_idle_thread vdd_lc_filter_reg1 vdd_lc_filter_reg0 cortexm_fpu cortexm_mpu periph_gpio_ll_disconnect periph_gpio_ll_input_pull_down periph_gpio_ll_input_pull_keep periph_gpio_ll_input_pull_up periph_gpio_ll_irq_edge_triggered_both periph_gpio_ll_irq_level_triggered_high periph_gpio_ll_irq_level_triggered_low periph_gpio_ll_irq_unmask periph_gpio_ll_open_drain periph_gpio_ll_open_drain_pull_up periph_gpio_ll_open_source periph_gpio_ll_open_source_pull_down periph_gpio_ll_switch_dir periph_gpio periph_pm no_idle_thread vdd_lc_filter_reg1 vdd_lc_filter_reg0 cortexm_fpu cortexm_mpu periph_gpio_ll_disconnect periph_gpio_ll_input_pull_down periph_gpio_ll_input_pull_keep periph_gpio_ll_input_pull_up periph_gpio_ll_irq_edge_triggered_both periph_gpio_ll_irq_level_triggered_high periph_gpio_ll_irq_level_triggered_low periph_gpio_ll_irq_unmask periph_gpio_ll_open_drain periph_gpio_ll_open_drain_pull_up periph_gpio_ll_open_source periph_gpio_ll_open_source_pull_down periph_gpio_ll_switch_dir periph_gpio periph_pm no_idle_thread
+[FEATURES_PROVIDED] periph_i2c periph_pwm periph_spi periph_uart vdd_lc_filter_reg1 periph_rtt periph_timer netif riotboot arduino_analog arduino_i2c arduino_pins arduino_shield_isp arduino_shield_mega arduino_shield_uno arduino_spi arduino_uart periph_pwm periph_usbdev tinyusb_device vdd_lc_filter_reg0 radio_nrf802154 netif_openwsn periph_hash_sha_1 periph_hash_sha_224 periph_hash_sha_256 periph_hash_sha_512 periph_hmac_sha_256 periph_cipher_aes_128_cbc periph_cipher_chacha20 periph_aead_aes_128_ccm periph_ecc_p192r1 periph_ecc_p256r1 periph_ecc_ed25519 periph_uart_nonblocking periph_adc ble_nimble_netif cortexm_mpu periph_i2c_reconfigure periph_spi_gpio_mode ble_phy_2mbit ble_phy_coded periph_cryptocell_310 ble_adv_ext periph_cpuid periph_flashpage periph_flashpage_in_address_space periph_flashpage_pagewise periph_gpio periph_gpio_irq periph_timer_periodic periph_timer_poll periph_timer_query_freqs periph_uart_modecfg periph_wdt periph_wdt_cb periph_gpio_ll periph_gpio_ll_disconnect periph_gpio_ll_input_pull_down periph_gpio_ll_input_pull_up periph_gpio_ll_irq periph_gpio_ll_irq_edge_triggered_both periph_gpio_ll_irq_unmask periph_gpio_ll_open_drain periph_gpio_ll_open_drain_pull_up periph_gpio_ll_open_source periph_gpio_ll_open_source_pull_down periph_hwrng periph_rtt_overflow periph_temperature ble_nimble radio_nrfble radio_nrfmin netif arch_32bit arch_arm bug_newlib_broken_stdio cortexm_svc cpp cpu_check_address cpu_core_cortexm dbgpin libstdcpp newlib periph_flashpage_aux periph_pm picolibc puf_sram ssp cortexm_fpu rust_target no_idle_thread cpu_nrf52 netif
+[FEATURES_REQUIRED] arch_32bit arch_arm bug_newlib_broken_stdio cpu_check_address cpu_core_cortexm cpu_nrf52 arch_32bit arch_arm bug_newlib_broken_stdio cpu_check_address cpu_core_cortexm cpu_nrf52 periph_gpio periph_pm periph_uart cpu_core_cortexm cortexm_mpu arch_32bit arch_arm bug_newlib_broken_stdio cpu_check_address cpu_core_cortexm cpu_nrf52 periph_gpio periph_pm periph_uart cpu_core_cortexm cortexm_mpu arch_32bit arch_arm bug_newlib_broken_stdio cpu_check_address cpu_core_cortexm cpu_nrf52 periph_gpio periph_pm periph_uart cpu_core_cortexm cortexm_mpu arch_32bit arch_arm bug_newlib_broken_stdio cpu_check_address cpu_core_cortexm cpu_nrf52 periph_gpio periph_pm periph_uart
+[FEATURES_USED] arch_32bit arch_arm bug_newlib_broken_stdio cortexm_fpu cortexm_mpu cpu_check_address cpu_core_cortexm cpu_nrf52 newlib no_idle_thread periph_gpio periph_gpio_ll_disconnect periph_gpio_ll_input_pull_down periph_gpio_ll_input_pull_up periph_gpio_ll_irq_edge_triggered_both periph_gpio_ll_irq_unmask periph_gpio_ll_open_drain periph_gpio_ll_open_drain_pull_up periph_gpio_ll_open_source periph_gpio_ll_open_source_pull_down periph_pm periph_uart vdd_lc_filter_reg0 vdd_lc_filter_reg1
+[FLAGS_FOR_AFL]
+[FLASH_ADDR] 0x0
+[GCC_CXX_INCLUDES]
+[GCC_C_INCLUDES]
+[GCC_VERSION]
+[GENSRC]
+[GITAMFLAGS]
+[GITFLAGS]
+[GIT_QUIET]
+[HASHFILE] @RIOTBASE@/examples/advanced/bindist/bin/nrf52840dk/bindist.bin
+[HEXFILE] @RIOTBASE@/examples/advanced/bindist/bin/nrf52840dk/bindist.hex
+[INCLUDES] -I@RIOTBASE@/examples/advanced/bindist -I@RIOTBASE@/core/lib/include -I@RIOTBASE@/core/include -I@RIOTBASE@/drivers/include -I@RIOTBASE@/sys/include -I@RIOTBASE@/boards/nrf52840dk/include -I@RIOTBASE@/cpu/nrf52/include -I@RIOTBASE@/boards/common/nrf52xxxdk/include -I@RIOTBASE@/boards/common/nrf52/include -I@RIOTBASE@/cpu/nrf5x_common/include -I@RIOTBASE@/build/nrf5x_nrfx_mdk/nrf52 -I@RIOTBASE@/cpu/cortexm_common/include -I@RIOTBASE@/sys/libc/include -isystem@RIOTBASE@/build/pkg/cmsis/CMSIS/Core/Include -I@RIOTBASE@/sys/auto_init/include -I@RIOTBASE@/examples/advanced/bindist/bin/nrf52840dk/preprocessor
+[LAZYSPONGE] @RIOTBASE@/dist/tools/lazysponge/lazysponge.py
+[LAZYSPONGE_FLAGS]
+[LINK] arm-none-eabi-gcc
+[LINKER_SCRIPT] cortexm.ld
+[LINKER_SUPPORTS_NOEXECSTACK] 0
+[LINKER_SUPPORTS_NOWARNRWX] 0
+[LINKFLAGPREFIX] -Wl,
+[LINKFLAGS] -L@RIOTBASE@/cpu/nrf52/ldscripts -L@RIOTBASE@/cpu/cortexm_common/ldscripts -Tcortexm.ld -Wl,--fatal-warnings -mcpu=cortex-m4 -mlittle-endian -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -ggdb -g3 -Os -static -lgcc -nostartfiles -Wl,--gc-sections -Wl,--defsym=_rom_start_addr=0x00000000 -Wl,--defsym=_ram_start_addr=0x20000000 -Wl,--defsym=_rom_length=0x100000 -Wl,--defsym=_ram_length=0x40000 -L@RIOTBASE@/core/ldscripts -Wl,-wrap=malloc -Wl,-wrap=calloc -Wl,-wrap=realloc -Wl,-wrap=free -lc -Wl,-wrap=__assert_func -Wl,--defsym=_slot_aux_offset=1048576 -Wl,--defsym=_slot_aux_len=0 -Wl,-wrap=printf -Wl,-wrap=fprintf -Wl,-wrap=dprintf -Wl,-wrap=sprintf -Wl,-wrap=snprintf -Wl,-wrap=vprintf -Wl,-wrap=vfprintf -Wl,-wrap=vdprintf -Wl,-wrap=vsprintf -Wl,-wrap=vsnprintf -Wl,-wrap=putchar -Wl,-wrap=putc -Wl,-wrap=fputc -Wl,-wrap=puts -Wl,-wrap=fputs -Wl,-wrap=_printf_common -Wl,-wrap=_fprintf_r -Wl,-wrap=_printf_r -Wl,-wrap=iprintf -Wl,-wrap=fiprintf
+[LINKXX] arm-none-eabi-g++
+[LTOFLAGS]
+[MAPFILE] @RIOTBASE@/examples/advanced/bindist/bin/nrf52840dk/bindist.map
+[MCPU] cortex-m4
+[MCUBOOT_IMAGE_ALIGN] 8
+[MCUBOOT_SLOT0_SIZE] 0x8000
+[MCUBOOT_SLOT1_SIZE] 0x3C000
+[MCUBOOT_SLOT2_SIZE] 0x3C000
+[MODULES_ZTIMER_ON_RTT_CONFLICT]
+[MODULES_ZTIMER_ON_RTT_CONFLICTING]
+[NATIVEINCLUDES]
+[NEWLIB_INCLUDE_DIR]
+[NEWLIB_NANO_INCLUDE_DIR]
+[NM] arm-none-eabi-nm
+[NO_PSEUDOMODULES] auto_init_can auto_init_loramac auto_init_multimedia auto_init_radiolib auto_init_screen auto_init_security auto_init_usbus auto_init_wdt_event auto_init_wdt_thread core_lib netdev_ieee802154_submac periph_common ztimer_core
+[OBJCOPY] /usr/bin/objcopy
+[OBJDUMP] objdump
+[OBJDUMPFLAGS] -S -D -h
+[OFLAGS]
+[OPTIONAL_CFLAGS] -fno-delete-null-pointer-checks -fdiagnostics-color -Wstrict-prototypes -Wold-style-definition -Wdocumentation -Wno-documentation-deprecated-sync -gz -Wformat=2 -Wformat-overflow -Wformat-truncation -fmacro-prefix-map=@RIOTBASE@/= -fdebug-prefix-map=@RIOTBASE@/= -Wcast-align
+[OPTIONAL_CFLAGS_BLACKLIST] -fmacro-prefix-map=@RIOTBASE@/= -fdebug-prefix-map=@RIOTBASE@/= -Wdocumentation -Wno-error=documentation -Wno-documentation-deprecated-sync
+[OS] Linux
+[OS_ARCH] x86_64
+[PKGDIRBASE] @RIOTBASE@/build/pkg
+[PKG_BUILD_DIR]
+[PKG_BUILD_OUT_OF_SOURCE]
+[PKG_DIR]
+[PKG_LICENSE]
+[PKG_NAME]
+[PKG_PATCHES]
+[PKG_PATCH_DIR]
+[PKG_PATHS] @RIOTBASE@/pkg/cmsis/ @RIOTBASE@/pkg/mpaland-printf/
+[PKG_SOURCE_DIR]
+[PKG_SPARSE_PATHS]
+[PKG_URL]
+[PKG_VERSION]
+[PREFIX] arm-none-eabi-
+[PSEUDOMODULES] arduino_pwm arduino_serial_stdio auto_init_% atomic_utils base64url board_software_reset cortexm_stack_limit can_mbox can_pm can_raw can_rx_mailbox cc2538_rf_obs_sig ccn-lite-utils conn_can_isotp_multi cord_ep_standalone core_% cortexm_fpu cortexm_svc cpp cpu_check_address crc16_fast crc32_fast credman_load crypto_aes_128 crypto_aes_192 crypto_aes_256 crypto_aes_precalculated crypto_aes_unroll dbgpin devfs_% dhcpv6_% dhcpv6_client_dns dhcpv6_client_ia_na dhcpv6_client_ia_pd dhcpv6_client_mud_url dhcpv6_relay dns_cache dns_msg ecc_% efm32_eth_auto efm32_eth_link_up ethos_stdio event_% event_timeout event_timeout_ztimer evtimer_mbox fatfs_vfs_format fdcan fido2_tests fmt_% fortuna_reseed gcoap_dtls gcoap_fileserver gcoap_forward_proxy gcoap_forward_proxy_thread gcoap_dns gcoap_dns_proxied gnrc_dhcpv6_client gnrc_dhcpv6_client_6lbr gnrc_dhcpv6_client_simple_pd gnrc_ipv6_auto_subnets_auto_init gnrc_ipv6_auto_subnets_eui gnrc_ipv6_auto_subnets_simple gnrc_ipv6_classic gnrc_ipv6_default gnrc_ipv6_ext_frag_stats gnrc_ipv6_nib_6lbr gnrc_ipv6_nib_6ln gnrc_ipv6_nib_6lr gnrc_ipv6_nib_dns gnrc_ipv6_nib_dyn_lladdr gnrc_ipv6_nib_rio gnrc_ipv6_nib_router gnrc_ipv6_nib_rtr_adv_pio_cb gnrc_ipv6_router gnrc_ipv6_router_default gnrc_lorawan_1_1 gnrc_netapi_callbacks gnrc_netapi_mbox gnrc_neterr gnrc_netif_6lo gnrc_netif_bus gnrc_netif_dedup gnrc_netif_ipv6 gnrc_netif_single gnrc_netif_timestamp gnrc_nettype_ccn gnrc_nettype_icmpv6 gnrc_nettype_ipv6 gnrc_nettype_ipv6_ext gnrc_nettype_ndn gnrc_nettype_sixlowpan gnrc_nettype_tcp gnrc_nettype_udp gnrc_pktshark_4in6 gnrc_pktshark_all gnrc_pktshark_coap gnrc_pktshark_default gnrc_pktshark_icmpv6 gnrc_sixloenc gnrc_sixlowpan_border_router_default gnrc_sixlowpan_default gnrc_sixlowpan_frag_hint gnrc_sixlowpan_frag_sfr_ecn gnrc_sixlowpan_frag_sfr_ecn_fqueue gnrc_sixlowpan_frag_sfr_ecn_if_in gnrc_sixlowpan_frag_sfr_ecn_if_out gnrc_sixlowpan_frag_sfr_stats gnrc_sixlowpan_frag_sfr_congure gnrc_sixlowpan_frag_sfr_congure_abe gnrc_sixlowpan_frag_sfr_congure_reno gnrc_sixlowpan_frag_sfr_congure_quic gnrc_sixlowpan_frag_sfr_congure_sfr gnrc_sixlowpan_iphc_nhc gnrc_sixlowpan_nd_border_router gnrc_sixlowpan_router_default gnrc_sock_async gnrc_sock_check_reuse gnrc_txtsnd ieee802154_rx_timestamp ieee802154_security ieee802154_submac ieee802154_submac_soft_ack ieee802154_submac_soft_csma_ca ieee802154_submac_soft_frame_retrans ipv4 ipv6 l2filter_blacklist l2filter_whitelist libc_gettimeofday libstdcpp log lora lpc1768_eth_auto lpc1768_eth_link_up lwext2_vfs lwext3_vfs lwext4_no_gpl lwext4_vfs lwext4_vfs_format mpu_stack_guard mpu_noexec_ram mtd_write_page nanocoap_% nanocoap_fileserver_callback nanocoap_fileserver_delete nanocoap_fileserver_put netdev_default netdev_ieee802154 netdev_ieee802154_% netdev_ieee802154_rx_timestamp netdev_eth netdev_layer netdev_legacy_api netdev_new_api netdev_register netstats netstats_ipv6 netstats_l2 netstats_neighbor_count netstats_neighbor_etx netstats_neighbor_lqi netstats_neighbor_rssi netstats_neighbor_tx_time netstats_rpl newlib newlib_gnu_source newlib_nano nimble nimble_adv_ext nimble_autoadv_shell nimble_autoconn_% nimble_netif_ext nimble_phy_2mbit nimble_phy_coded nimble_rpble_ext nimble_statconn_ext nrf24l01p_ng_diagnostics nrfx od_string opendsme openthread periph_% picolibc picolibc_stdout_buffered pio_autostart_% pktqueue pmp_noexec_ram posix_headers printf_float printf_long_long prng prng_% psa_riot_cipher_aes_128_cbc psa_riot_cipher_aes_128_ecb psa_riot_cipher_aes_192_cbc psa_riot_cipher_aes_256_cbc psa_riot_cipher_aes_common psa_riot_cipher_chacha20 psa_riot_hashes_hmac_sha256 psa_riot_hashes_md5 psa_riot_hashes_sha3_256 psa_riot_hashes_sha3_384 psa_riot_hashes_sha3_512 psa_riot_hashes_sha_1 psa_riot_hashes_sha_224 psa_riot_hashes_sha_256 psa_riot_hashes_sha_384 psa_riot_hashes_sha_512 psa_riot_hashes_sha_512_224 psa_riot_hashes_sha_512_256 radiolib riotboot_% rtt_cmd saul_adc saul_bat_voltage saul_default saul_gpio saul_nrf_temperature saul_nrf_vddh saul_pwm scanf_float sched_cb sched_runq_callback sema_deprecated semtech_loramac_rx senml_cbor senml_phydat senml_saul servo_pwm servo_timer servo_saul shell_builtin_cmd_help_json shell_cmd_app_metadata shell_cmd_at30tse75x shell_cmd_benchmark_udp shell_cmd_bplib shell_cmd_ccn-lite-utils shell_cmd_coap shell_cmd_conn_can shell_cmd_cord_ep shell_cmd_coreclk shell_cmd_cryptoauthlib shell_cmd_dfplayer shell_cmd_fib shell_cmd_genfile shell_cmd_gnrc_icmpv6_echo shell_cmd_gnrc_ipv6_blacklist shell_cmd_gnrc_ipv6_frag_stats shell_cmd_gnrc_ipv6_nib shell_cmd_gnrc_ipv6_whitelist shell_cmd_gnrc_netif shell_cmd_gnrc_netif_lora shell_cmd_gnrc_netif_lorawan shell_cmd_gnrc_pktbuf shell_cmd_gnrc_pktshark shell_cmd_gnrc_rpl shell_cmd_gnrc_sixlowpan_ctx shell_cmd_gnrc_sixlowpan_frag_stats shell_cmd_gnrc_txtsnd shell_cmd_gnrc_udp shell_cmd_heap shell_cmd_i2c_scan shell_cmd_iw shell_cmd_lwip_netif shell_cmd_mci shell_cmd_md5sum shell_cmd_mtd shell_cmd_nanocoap_vfs shell_cmd_netstats_neighbor shell_cmd_nice shell_cmd_nimble_netif shell_cmd_nimble_statconn shell_cmd_opendsme shell_cmd_openthread shell_cmd_openwsn shell_cmd_pm shell_cmd_ps shell_cmd_random shell_cmd_rtc shell_cmd_rtt shell_cmd_saul_reg shell_cmd_semtech-loramac shell_cmd_sha1sum shell_cmd_sha256sum shell_cmd_sht1x shell_cmd_sntp shell_cmd_suit shell_cmd_sys shell_cmd_udp shell_cmd_udp_server shell_cmd_udptty shell_cmd_vfs shell_cmd_xipfs shell_cmds_default shell_hooks shell_lock_auto_locking shield_llcc68 shield_sx1262 shield_w5100 skald_ibeacon skald_eddystone slipdev slipdev_config slipdev_l2addr slipdev_net sock sock_async sock_aux_local sock_aux_rssi sock_aux_timestamp sock_aux_ttl sock_dtls sock_dtls_verify_public_key sock_ip sock_tcp sock_udp socket_zep_hello soft_uart_modecfg stdin stdio_available stdio_cdc_acm stdio_default stdio_dispatch stdio_ethos stdio_nimble_debug stdio_notify stdio_slipdev stdio_telnet stdio_uart_onlcr stdio_uart_rx stm32_eth stm32_eth_auto stm32_eth_link_up stm32_eth_tracing stm32_periph_% stm32mp1_eng_mode suit_storage_% suit_transport_% sys_bus_% test_utils_interactive_sync_shell test_utils_main_exit_cb tiny_strerror_as_strerror tiny_strerror_minimal unicoap_client_cancellation unicoap_client_uri unicoap_driver_rfc7252_common unicoap_driver_rfc7252_pdu unicoap_server_resource_declarations unicoap_sock_support usbus_urb vdd_lc_filter_% vfs_auto_format vfs_auto_mount vfs_default wakaama_objects_% walltime_default walltime_impl_ds1307 walltime_impl_ds3231 walltime_impl_max31331 walltime_impl_max31343 walltime_impl_rtc wifi_enterprise wifi_scan_list xtimer_on_ztimer xtimer_no_ztimer_default zptr ztimer ztimer64_% ztimer_% ztimer_auto_adjust shell_democommands preprocessor_successor cmsis cmsis-dsp cmsis-nn
+[PYTHONPATH] @RIOTBASE@/dist/pythonlibs/:
+[Q] @
+[QQ]
+[QUIET] 1
+[QUIETER] 0
+[RAM_LEN] 0x40000
+[RAM_START_ADDR] 0x20000000
+[RANLIB] arm-none-eabi-ranlib
+[RCFLAGS_WRITE_SARIF] -fdiagnostics-add-output=sarif:file='$@.sarif'
+[RIOTBASE] @RIOTBASE@
+[RIOTBOARD] @RIOTBASE@/boards
+[RIOTBUILD_CONFIG_HEADER_C] @RIOTBASE@/examples/advanced/bindist/bin/nrf52840dk/riotbuild/riotbuild.h
+[RIOTCPU] @RIOTBASE@/cpu
+[RIOTKCONFIG] @RIOTBASE@/kconfigs
+[RIOTMAKE] @RIOTBASE@/makefiles
+[RIOTPKG] @RIOTBASE@/pkg
+[RIOTPROJECT] @RIOTBASE@
+[RIOTTOOLS] @RIOTBASE@/dist/tools
+[RIOT_DUMMY_VERSION] 2042.5.23
+[RIOT_EXTRAVERSION] 0
+[RIOT_GENERATE_PP_HEADERS] @RIOTBASE@/examples/advanced/bindist/bin/nrf52840dk/preprocessor/preprocessor_successor.h
+[RIOT_PP_SUCCESSOR_MAX] 9999
+[RIOT_TEST_HASH_DIR] @RIOTBASE@/examples/advanced/bindist/bin/nrf52840dk
+[RIOT_VERSION_CODE] RIOT_VERSION_NUM\(2027,1,0,0\)
+[ROM_LEN] 0x100000
+[ROM_START_ADDR] 0x00000000
+[RTT_FREQUENCY]
+[RUSTFLAGS] -Cpanic=abort
+[RUST_TARGET] thumbv7em-none-eabihf
+[SIZE] arm-none-eabi-size
+[SIZEFLAGS]
+[SLOT_AUX_LEN] 0
+[SLOT_AUX_OFFSET] 1048576
+[TARGET_ARCH] arm-none-eabi
+[TARGET_ARCH_CORTEXM] arm-none-eabi
+[TARGET_ARCH_LLVM]
+[THREAD_NAMES] 0
+[TOOLCHAIN] gnu
+[TOOLCHAINS_SUPPORTED] gnu llvm
+[UNDEF]
+[UNZIP_HERE] /usr/bin/unzip -q
+[USED_PKTBUF_IMPLEMENTATIONS]
+[USED_PRNG_IMPLEMENTATIONS]
+[USEMODULE] auto_init board board_common_init boards_common_nrf52xxxdk core core_init core_lib core_msg core_panic core_thread cortexm_common cortexm_common_periph cortexm_fpu cpu cpu_check_address cpu_common div libc malloc_thread_safe mpu_stack_guard newlib newlib_nano newlib_syscalls_default nrf52_vectors nrf5x_common_periph periph periph_common periph_gpio periph_gpio_ll_disconnect periph_gpio_ll_input_pull_down periph_gpio_ll_input_pull_up periph_gpio_ll_irq_edge_triggered_both periph_gpio_ll_irq_unmask periph_gpio_ll_open_drain periph_gpio_ll_open_drain_pull_up periph_gpio_ll_open_source periph_gpio_ll_open_source_pull_down periph_init periph_init_buttons periph_init_gpio periph_init_led0 periph_init_led1 periph_init_led2 periph_init_led3 periph_init_led4 periph_init_led5 periph_init_led6 periph_init_led7 periph_init_leds periph_init_pm periph_init_uart periph_pm periph_uart preprocessor preprocessor_successor stdio stdio_default stdio_uart sys vdd_lc_filter_reg0 vdd_lc_filter_reg1 abc
+[USEMODULE_INCLUDES] @RIOTBASE@/sys/auto_init/include @RIOTBASE@/examples/advanced/bindist/bin/nrf52840dk/preprocessor
+[USEMODULE_INCLUDES_gnrc_pktbuf]
+[USEMODULE_INCLUDES_gnrc_pktbuf_static]
+[USEMODULE_INCLUDES_preprocessor] @RIOTBASE@/examples/advanced/bindist/bin/nrf52840dk/preprocessor
+[USEPKG] cmsis mpaland-printf
+[USE_NEWLIB_NANO]
+[VENDOR_FOLDER]
+[VERBOSE_ASSERT] 0
+[WERROR] 1
+[WPEDANTIC] 0
+[__RIOTBUILD_FLAG] RIOT
+ENV APPDIR=@RIOTBASE@/examples/advanced/bindist
+ENV APPLICATION=bindist
+ENV APPLICATION_MODULE=application_bindist
+ENV ARCHIVES=
+ENV AS=arm-none-eabi-as
+ENV ASFLAGS=-mcpu=cortex-m4 -mlittle-endian -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16
+ENV BINDIR=@RIOTBASE@/examples/advanced/bindist/bin/nrf52840dk
+ENV BINDIRBASE=@RIOTBASE@/examples/advanced/bindist/bin
+ENV BIN_USEMODULE=abc application_bindist
+ENV BOARD=nrf52840dk
+ENV BOARDDIR=@RIOTBASE@/boards/nrf52840dk
+ENV BUILD_DIR=@RIOTBASE@/build
+ENV CARGO_TARGET_DIR=@RIOTBASE@/examples/advanced/bindist/bin/nrf52840dk/target
+ENV CC=arm-none-eabi-gcc
+ENV CCACHE_CPP2=yes
+ENV CCAS=arm-none-eabi-gcc
+ENV CCASEXFLAGS=
+ENV CCASUWFLAGS=
+ENV CFLAGS=-DDEVELHELP -Werror -DCPU_FAM_NRF52 -mno-thumb-interwork -mcpu=cortex-m4 -mlittle-endian -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -ffunction-sections -fdata-sections -fshort-enums -ggdb -g3 -Os -DCPU_MODEL_NRF52840XXAA -DCPU_CORE_CORTEX_M4F -DRIOT_APPLICATION=\"bindist\" -DBOARD_NRF52840DK=\"nrf52840dk\" -DRIOT_BOARD=BOARD_NRF52840DK -DCPU_NRF52=\"nrf52\" -DRIOT_CPU=CPU_NRF52 -fwrapv -Wstrict-overflow -fno-common -ffunction-sections -fdata-sections -Wall -Wextra -Wmissing-include-dirs -fno-delete-null-pointer-checks -fdiagnostics-color -Wstrict-prototypes -Wold-style-definition -gz -Wformat=2 -Wformat-overflow -Wformat-truncation -Wcast-align -DCPU_RAM_BASE=0x20000000 -DCPU_RAM_SIZE=0x40000 -D__int64_t_defined=1 -include '@RIOTBASE@/examples/advanced/bindist/bin/nrf52840dk/riotbuild/riotbuild.h'
+ENV CFLAGS_CPU=-mcpu=cortex-m4 -mlittle-endian -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16
+ENV CFLAGS_STATIC_ANALYSIS=-fanalyzer
+ENV CPU=nrf52
+ENV CPU_ARCH=armv7m
+ENV CPU_CORE=cortex-m4f
+ENV CPU_FAM=nrf52
+ENV CPU_MODEL=nrf52840xxaa
+ENV CXX=arm-none-eabi-g++
+ENV CXXEXFLAGS=-Wno-missing-field-initializers
+ENV CXXINCLUDES=
+ENV CXXUWFLAGS=-std=% -Wstrict-prototypes -Wold-style-definition
+ENV DEVELHELP=1
+ENV DISABLE_MODULE=
+ENV DLCACHE=@RIOTBASE@/dist/tools/dlcache/dlcache.sh
+ENV DOWNLOAD_TO_FILE=@RIOTBASE@/dist/tools/dlcache/dlcache.sh
+ENV ELFFILE=@RIOTBASE@/examples/advanced/bindist/bin/nrf52840dk/bindist.elf
+ENV EXTERNAL_BOARD_DIRS=
+ENV FEATURES_OPTIONAL=vdd_lc_filter_reg1 vdd_lc_filter_reg0 cortexm_fpu cortexm_mpu periph_gpio periph_pm no_idle_thread vdd_lc_filter_reg1 vdd_lc_filter_reg0 cortexm_fpu cortexm_mpu periph_gpio_ll_disconnect periph_gpio_ll_input_pull_down periph_gpio_ll_input_pull_keep periph_gpio_ll_input_pull_up periph_gpio_ll_irq_edge_triggered_both periph_gpio_ll_irq_level_triggered_high periph_gpio_ll_irq_level_triggered_low periph_gpio_ll_irq_unmask periph_gpio_ll_open_drain periph_gpio_ll_open_drain_pull_up periph_gpio_ll_open_source periph_gpio_ll_open_source_pull_down periph_gpio_ll_switch_dir periph_gpio periph_pm no_idle_thread vdd_lc_filter_reg1 vdd_lc_filter_reg0 cortexm_fpu cortexm_mpu periph_gpio_ll_disconnect periph_gpio_ll_input_pull_down periph_gpio_ll_input_pull_keep periph_gpio_ll_input_pull_up periph_gpio_ll_irq_edge_triggered_both periph_gpio_ll_irq_level_triggered_high periph_gpio_ll_irq_level_triggered_low periph_gpio_ll_irq_unmask periph_gpio_ll_open_drain periph_gpio_ll_open_drain_pull_up periph_gpio_ll_open_source periph_gpio_ll_open_source_pull_down periph_gpio_ll_switch_dir periph_gpio periph_pm no_idle_thread vdd_lc_filter_reg1 vdd_lc_filter_reg0 cortexm_fpu cortexm_mpu periph_gpio_ll_disconnect periph_gpio_ll_input_pull_down periph_gpio_ll_input_pull_keep periph_gpio_ll_input_pull_up periph_gpio_ll_irq_edge_triggered_both periph_gpio_ll_irq_level_triggered_high periph_gpio_ll_irq_level_triggered_low periph_gpio_ll_irq_unmask periph_gpio_ll_open_drain periph_gpio_ll_open_drain_pull_up periph_gpio_ll_open_source periph_gpio_ll_open_source_pull_down periph_gpio_ll_switch_dir periph_gpio periph_pm no_idle_thread
+ENV FEATURES_PROVIDED=periph_i2c periph_pwm periph_spi periph_uart vdd_lc_filter_reg1 periph_rtt periph_timer netif riotboot arduino_analog arduino_i2c arduino_pins arduino_shield_isp arduino_shield_mega arduino_shield_uno arduino_spi arduino_uart periph_pwm periph_usbdev tinyusb_device vdd_lc_filter_reg0 radio_nrf802154 netif_openwsn periph_hash_sha_1 periph_hash_sha_224 periph_hash_sha_256 periph_hash_sha_512 periph_hmac_sha_256 periph_cipher_aes_128_cbc periph_cipher_chacha20 periph_aead_aes_128_ccm periph_ecc_p192r1 periph_ecc_p256r1 periph_ecc_ed25519 periph_uart_nonblocking periph_adc ble_nimble_netif cortexm_mpu periph_i2c_reconfigure periph_spi_gpio_mode ble_phy_2mbit ble_phy_coded periph_cryptocell_310 ble_adv_ext periph_cpuid periph_flashpage periph_flashpage_in_address_space periph_flashpage_pagewise periph_gpio periph_gpio_irq periph_timer_periodic periph_timer_poll periph_timer_query_freqs periph_uart_modecfg periph_wdt periph_wdt_cb periph_gpio_ll periph_gpio_ll_disconnect periph_gpio_ll_input_pull_down periph_gpio_ll_input_pull_up periph_gpio_ll_irq periph_gpio_ll_irq_edge_triggered_both periph_gpio_ll_irq_unmask periph_gpio_ll_open_drain periph_gpio_ll_open_drain_pull_up periph_gpio_ll_open_source periph_gpio_ll_open_source_pull_down periph_hwrng periph_rtt_overflow periph_temperature ble_nimble radio_nrfble radio_nrfmin netif arch_32bit arch_arm bug_newlib_broken_stdio cortexm_svc cpp cpu_check_address cpu_core_cortexm dbgpin libstdcpp newlib periph_flashpage_aux periph_pm picolibc puf_sram ssp cortexm_fpu rust_target no_idle_thread cpu_nrf52 netif
+ENV FEATURES_REQUIRED=arch_32bit arch_arm  bug_newlib_broken_stdio  cpu_check_address cpu_core_cortexm cpu_nrf52  arch_32bit arch_arm  bug_newlib_broken_stdio  cpu_check_address cpu_core_cortexm cpu_nrf52  periph_gpio periph_pm periph_uart cpu_core_cortexm cortexm_mpu arch_32bit arch_arm  bug_newlib_broken_stdio  cpu_check_address cpu_core_cortexm cpu_nrf52  periph_gpio periph_pm periph_uart cpu_core_cortexm cortexm_mpu arch_32bit arch_arm  bug_newlib_broken_stdio  cpu_check_address cpu_core_cortexm cpu_nrf52  periph_gpio periph_pm periph_uart cpu_core_cortexm cortexm_mpu arch_32bit arch_arm  bug_newlib_broken_stdio  cpu_check_address cpu_core_cortexm cpu_nrf52  periph_gpio periph_pm periph_uart
+ENV FEATURES_USED=arch_32bit arch_arm bug_newlib_broken_stdio cortexm_fpu cortexm_mpu cpu_check_address cpu_core_cortexm cpu_nrf52 newlib no_idle_thread periph_gpio periph_gpio_ll_disconnect periph_gpio_ll_input_pull_down periph_gpio_ll_input_pull_up periph_gpio_ll_irq_edge_triggered_both periph_gpio_ll_irq_unmask periph_gpio_ll_open_drain periph_gpio_ll_open_drain_pull_up periph_gpio_ll_open_source periph_gpio_ll_open_source_pull_down periph_pm periph_uart vdd_lc_filter_reg0 vdd_lc_filter_reg1
+ENV FLAGS_FOR_AFL=
+ENV FLASH_ADDR=0x0
+ENV GCC_CXX_INCLUDES=
+ENV GCC_C_INCLUDES=
+ENV GCC_VERSION=
+ENV GENSRC=
+ENV HEXFILE=@RIOTBASE@/examples/advanced/bindist/bin/nrf52840dk/bindist.hex
+ENV INCLUDES=-I@RIOTBASE@/examples/advanced/bindist  -I@RIOTBASE@/core/lib/include -I@RIOTBASE@/core/include -I@RIOTBASE@/drivers/include -I@RIOTBASE@/sys/include -I@RIOTBASE@/boards/nrf52840dk/include -I@RIOTBASE@/cpu/nrf52/include -I@RIOTBASE@/boards/common/nrf52xxxdk/include -I@RIOTBASE@/boards/common/nrf52/include -I@RIOTBASE@/cpu/nrf5x_common/include -I@RIOTBASE@/build/nrf5x_nrfx_mdk/nrf52 -I@RIOTBASE@/cpu/cortexm_common/include -I@RIOTBASE@/sys/libc/include -isystem@RIOTBASE@/build/pkg/cmsis/CMSIS/Core/Include -I@RIOTBASE@/sys/auto_init/include -I@RIOTBASE@/examples/advanced/bindist/bin/nrf52840dk/preprocessor
+ENV LAZYSPONGE=@RIOTBASE@/dist/tools/lazysponge/lazysponge.py
+ENV LAZYSPONGE_FLAGS=
+ENV LINK=arm-none-eabi-gcc
+ENV LTOFLAGS=
+ENV MCUBOOT_IMAGE_ALIGN=8
+ENV MCUBOOT_SLOT0_SIZE=0x8000
+ENV MCUBOOT_SLOT1_SIZE=0x3C000
+ENV MCUBOOT_SLOT2_SIZE=0x3C000
+ENV NATIVEINCLUDES=
+ENV NM=arm-none-eabi-nm
+ENV OBJCOPY=/usr/bin/objcopy
+ENV OBJDUMP=objdump
+ENV OBJDUMPFLAGS=-S -D -h
+ENV OFLAGS=
+ENV OS=Linux
+ENV OS_ARCH=x86_64
+ENV PKGDIRBASE=@RIOTBASE@/build/pkg
+ENV PKG_PATHS=@RIOTBASE@/pkg/cmsis/ @RIOTBASE@/pkg/mpaland-printf/
+ENV PREFIX=arm-none-eabi-
+ENV PYTHONPATH=@RIOTBASE@/dist/pythonlibs/:
+ENV Q=@
+ENV QQ=
+ENV QUIET=1
+ENV QUIETER=0
+ENV RANLIB=arm-none-eabi-ranlib
+ENV RCFLAGS_WRITE_SARIF=-fdiagnostics-add-output=sarif:file='$@.sarif'
+ENV RIOTBASE=@RIOTBASE@
+ENV RIOTBOARD=@RIOTBASE@/boards
+ENV RIOTBUILD_CONFIG_HEADER_C=@RIOTBASE@/examples/advanced/bindist/bin/nrf52840dk/riotbuild/riotbuild.h
+ENV RIOTCPU=@RIOTBASE@/cpu
+ENV RIOTKCONFIG=@RIOTBASE@/kconfigs
+ENV RIOTMAKE=@RIOTBASE@/makefiles
+ENV RIOTPKG=@RIOTBASE@/pkg
+ENV RIOTPROJECT=@RIOTBASE@
+ENV RIOTTOOLS=@RIOTBASE@/dist/tools
+ENV RIOT_TEST_HASH_DIR=@RIOTBASE@/examples/advanced/bindist/bin/nrf52840dk
+ENV RUSTFLAGS=-Cpanic=abort
+ENV RUST_TARGET=thumbv7em-none-eabihf
+ENV SIZE=arm-none-eabi-size
+ENV SIZEFLAGS=
+ENV TARGET_ARCH=arm-none-eabi
+ENV TARGET_ARCH_LLVM=
+ENV TOOLCHAIN=gnu
+ENV UNDEF=
+ENV UNZIP_HERE=/usr/bin/unzip -q
+ENV USEMODULE=auto_init board board_common_init boards_common_nrf52xxxdk core core_init core_lib core_msg core_panic core_thread cortexm_common cortexm_common_periph cortexm_fpu cpu cpu_check_address cpu_common div libc malloc_thread_safe mpu_stack_guard newlib newlib_nano newlib_syscalls_default nrf52_vectors nrf5x_common_periph periph periph_common periph_gpio periph_gpio_ll_disconnect periph_gpio_ll_input_pull_down periph_gpio_ll_input_pull_up periph_gpio_ll_irq_edge_triggered_both periph_gpio_ll_irq_unmask periph_gpio_ll_open_drain periph_gpio_ll_open_drain_pull_up periph_gpio_ll_open_source periph_gpio_ll_open_source_pull_down periph_init periph_init_buttons periph_init_gpio periph_init_led0 periph_init_led1 periph_init_led2 periph_init_led3 periph_init_led4 periph_init_led5 periph_init_led6 periph_init_led7 periph_init_leds periph_init_pm periph_init_uart periph_pm periph_uart preprocessor preprocessor_successor stdio stdio_default stdio_uart sys vdd_lc_filter_reg0 vdd_lc_filter_reg1 abc
+ENV USEPKG=cmsis mpaland-printf
+ENV WERROR=1
+ENV WPEDANTIC=0
+ENV __RIOTBUILD_FLAG=RIOT
+## end

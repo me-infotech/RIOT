@@ -78,18 +78,19 @@ The files of the step (all new files are listed by `git status`):
 | Kind | Files | Make file | Choice |
 |---|---|---|---|
 | module data | `module.yaml` in 87 module directories, `makefiles/periph.module.yaml`, `pkg/mpaland-printf/mpaland-printf.module.yaml`, `drivers/periph_common/module.yaml`; `makefiles/application.inc.yaml`, `makefiles/auto_init.inc.yaml` | **generated** from the YAML (`just generate-config-data`) | the Make file only describes the module build: one source, Make reads the adapter |
-| build data | `build.yaml` next to 22 `Makefile.include`, `makefiles/*.build.yaml` (cflags, vars, git_version, bindist, default-radio-settings, pseudomodules, arch/cortexm, toolchain/gnu, libc/newlib), `pkg/pkg.build.yaml` | **unchanged**, Make keeps reading it | these Make files also hold what is not migrated yet (flashing, terminal, debugger, Docker, Kconfig, `$(shell)` probes in Make syntax); the build data holds the build part only. `makefiles/pseudomodules.inc.mk` is also the Doxygen source of the pseudomodule documentation, so it is not generated |
-| package data | `pkg/cmsis/pkg.yaml`, `pkg/mpaland-printf/pkg.yaml`, `cpu/nrf5x_common/nrfx.pkg.yaml` | **unchanged** | package Makefiles are recipes of `pkg/pkg.mk` (clone, patch); their values (URL, version, sparse paths, patches, build) are data |
+| build data | `build.yaml` next to 22 `Makefile.include`, `makefiles/*.build.yaml` (cflags, vars, git_version, bindist, default-radio-settings, pseudomodules, arch/cortexm, toolchain/gnu, libc/newlib), `pkg/pkg.build.yaml` | **generated** since step G0-3: the whole Make file, or its build part as `<data>.mk` that the Make file includes (scope.yaml `build`) | these Make files also hold what is not migrated yet (flashing, terminal, debugger, Docker, Kconfig); that part stays Make. The `$(shell)` probes are `makefiles/build_providers.inc.mk` for Make. The Doxygen documentation of `makefiles/pseudomodules.inc.mk` is kept in the data (`dist/tools/config_data/README.md`, step G0-3) |
+| package data | `pkg/cmsis/pkg.yaml`, `pkg/mpaland-printf/pkg.yaml`, `cpu/nrf5x_common/nrfx.pkg.yaml` | **generated** part since step G0-3 (`pkg.mk`, `nrfx.pkg.mk`) | package Makefiles are recipes of `pkg/pkg.mk` (clone, patch); their values (URL, version, sparse paths, patches, build) are data |
 
-Unchanged Make files and their data are kept in agreement by the parity
-tests (P1-P4): Make's commands are recorded in golden files and compared
+Until step G0-3 the board, CPU and package Make files stayed unchanged next
+to their data, a second source kept in agreement by the parity tests
+(P1-P4); since G0-3 they are generated from the data: Make's commands are recorded in golden files and compared
 with the commands computed from the data.
 
 Names: `Makefile.include` → `build.yaml`, `<x>.inc.mk`/`<x>.mk` →
 `<x>.build.yaml`, module `Makefile` → `module.yaml`, `<x>.mk` (module rules)
 → `<x>.module.yaml`, package `Makefile` → `pkg.yaml`, `Makefile.<x>` →
-`<x>.pkg.yaml`. Build and package data are never taken for adapter sources
-(`config_data.py generate` ignores them).
+`<x>.pkg.yaml`. Build and package data are not found by their name like the G0-1 data;
+scope.yaml `build` names the Make file of each (step G0-3).
 
 Hand-written module data (scope.yaml `restructured`): the original
 `drivers/periph_common/Makefile` and `makefiles/auto_init.inc.mk` built
@@ -273,8 +274,6 @@ Limits
   llvm, binary distributions (Makefile.distcheck), `EVENT_THREAD_*_STACKSIZE_MIN`.
 * The firmware comparison needs arm-none-eabi-gcc (P5, CI image); the
   goldens were recorded without it.
-* `ROM_OFFSET`/`FW_ROM_LEN` (riotboot) are evaluated when the file is read,
-  not lazily as in Make.
 * Make's `..compiler-check` and `..build-message` are not reproduced (a
   missing compiler fails at the first compile).
 * The link order equals `find | sort` in the C locale (as the goldens);

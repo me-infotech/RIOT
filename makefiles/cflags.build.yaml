@@ -1,23 +1,57 @@
-# Build data of makefiles/cflags.inc.mk (step G3-1). Toolchain probes are
-# PROBE_* variables of the build algorithm (same commands as Make).
-# Format: dist/tools/config_data/README.md (schema 3).
-schema: 3
+# Build data of makefiles/cflags.inc.mk (steps G3-1, G0-3): the whole file.
+# The Make file is generated from it (`just generate-config-data`); edit this
+# file, never the Make file. The compiler and linker questions are PROBE_*
+# variables (dist/tools/cmake_gen/toolchain.py; for Make
+# makefiles/build_providers.inc.mk, same commands as before).
+# Format: dist/tools/config_data/README.md
+schema: 4
 rules:
-  - comment: 'cflags.inc.mk:2-7: exit status of `CC -std=c11 -E -`'
+  - comment: |-
+      Test if the input language was specified externally.
+      Otherwise test if the compiler unterstands the "-std=c11" flag, and use it if so.
     if: {not: {has: {var: CFLAGS, match: [-std=%]}}}
     then:
       - if: {equals: {PROBE_CC_STD_C11: '0'}}
         then:
           - add: {CFLAGS: [-std=c11]}
-  - add: {OPTIONAL_CFLAGS: [-fno-delete-null-pointer-checks]}
-  - if: {not: {equals: {CC_NOCOLOR: '1'}}}
+  - comment: |-
+      Add `-fno-delete-null-pointer-checks` flag iff the compiler supports it.
+      GCC removes moves tests whether `x == NULL`, if previously `x` or even `x->y` was accessed.
+      0x0 might be a sane memory location for embedded systems, so the test must not be removed.
+      Right now clang does not use the *delete-null-pointer* optimization, and does not understand the parameter.
+      Related issues: #628, #664.
+    add: {OPTIONAL_CFLAGS: [-fno-delete-null-pointer-checks]}
+  - comment: |-
+      Use colored compiler output if the compiler supports this and if this is not
+      disabled by the user
+    if: {not: {equals: {CC_NOCOLOR: '1'}}}
     then:
       - add: {OPTIONAL_CFLAGS: [-fdiagnostics-color]}
-  - add: {CFLAGS: [-fwrapv, -Wstrict-overflow]}
-  - add: {OPTIONAL_CFLAGS: [-Wstrict-prototypes, -Wold-style-definition, -Wdocumentation, -Wno-documentation-deprecated-sync]}
-  - add: {CXXUWFLAGS: [-std=%, -Wstrict-prototypes, -Wold-style-definition]}
-  - comment: 'cflags.inc.mk:36-41: exit status of `CC -std=c++14 -E -`'
-    if: {not: {has: {var: CXXEXFLAGS, match: [-std=%]}}}
+  - comment: |-
+      Force the C compiler to not ignore signed integer overflows
+      Background:   In practise signed integers overflow consistently and wrap
+                    around to the lowest number. But this is undefined behaviour.
+                    Branches that rely on this undefined behaviour will be silently
+                    optimized out. For details, have a look at
+                    https://gcc.gnu.org/bugzilla/show_bug.cgi?id=30475
+      Note:         Please do not add new code that relies on this undefined
+                    behaviour, even though this flag makes your code work. There are
+                    safe ways to check for signed integer overflow.
+    add: {CFLAGS: [-fwrapv]}
+  - comment: |-
+      Enable warnings for code relying on signed integers to overflow correctly
+      (see above for details).
+      Note:         This warning is sadly not reliable, thus -fwrapv cannot be
+                    dropped in favor of this
+    add: {CFLAGS: [-Wstrict-overflow]}
+  - comment: |-
+      Fast-out on old style function definitions.
+      They cause unreadable error compiler errors on missing semicolons.
+      Worse yet they hide errors by accepting wildcard argument types.
+    add: {OPTIONAL_CFLAGS: [-Wstrict-prototypes, -Wold-style-definition, -Wdocumentation -Wno-documentation-deprecated-sync]}
+  - comment: Unwanted flags for c++
+    add: {CXXUWFLAGS: [-std=%, -Wstrict-prototypes -Wold-style-definition]}
+  - if: {not: {has: {var: CXXEXFLAGS, match: [-std=%]}}}
     then:
       - if: {equals: {PROBE_CC_STD_CXX14: '0'}}
         then:
@@ -26,32 +60,72 @@ rules:
     then:
       - warning: Building with Link-Time-Optimizations is currently an experimental feature. Expect broken binaries.
       - set: {var: LTOFLAGS, value: -flto}
-      - add: {LINKFLAGS: ['${LTOFLAGS}', -ffunction-sections, -fdata-sections]}
-  - if: {equals: {BUILD_IN_DOCKER: '1'}}
+      - add: {LINKFLAGS: ['${LTOFLAGS} -ffunction-sections -fdata-sections']}
+  - comment: |-
+      Cannot test with `BUILD_IN_DOCKER=1`, as this is only the case when the
+      actual build is done in the docker container and we are still running in the
+      host's context.
+    if: {equals: {BUILD_IN_DOCKER: '1'}}
     then:
       - set: {var: LINKER_SUPPORTS_NOEXECSTACK, value: determine-later-inside-docker, flavor: simple}
-  - comment: 'cflags.inc.mk:58: link test with `-z noexecstack`'
+  - comment: |-
+      Check if linker supports `-z noexecstack`. Handle BUILD_IN_DOCKER separately,
+      as this is run in the host environment rather than inside the container. We
+      just hardcode this in the BUILD_IN_DOCKER case for now.
     set: {var: LINKER_SUPPORTS_NOEXECSTACK, value: '${PROBE_LINK_NOEXECSTACK}', flavor: conditional}
-  - if: {equals: {LINKER_SUPPORTS_NOEXECSTACK: '1'}}
+  - comment: |-
+      As we do not use nested functions or other stuff requiring trampoline code,
+      we can safely mark the stack as not executable. This avoids warnings on newer
+      toolchains.
+    if: {equals: {LINKER_SUPPORTS_NOEXECSTACK: '1'}}
     then:
       - add: {LINKFLAGS: [-z noexecstack]}
-  - add: {CFLAGS: [-fno-common, -ffunction-sections -fdata-sections]}
-  - add: {OPTIONAL_CFLAGS: [-gz]}
-  - add: {CFLAGS: [-Wall -Wextra]}
-  - add: {OPTIONAL_CFLAGS: [-Wformat=2, -Wformat-overflow, -Wformat-truncation, '-fmacro-prefix-map=${RIOTBASE}/=', '-fdebug-prefix-map=${RIOTBASE}/=', -Wcast-align]}
-  - add: {CFLAGS: [-Wmissing-include-dirs]}
+  - comment: Forbid common symbols to prevent accidental aliasing.
+    add: {CFLAGS: [-fno-common]}
+  - comment: |-
+      Place data and functions into their own sections. This helps the linker
+      garbage collection to remove unused symbols when linking statically.
+    add: {CFLAGS: [-ffunction-sections -fdata-sections]}
+  - comment: |-
+      Compress debug info. This saves approximately 50% of disk usage.
+      It has no effect if debugging information is not emitted, so it can be left
+      on unconditionally.
+    add: {OPTIONAL_CFLAGS: [-gz]}
+  - comment: Enable all default warnings and all extra warnings
+    add: {CFLAGS: [-Wall -Wextra]}
+  - comment: Enable additional checks for printf/scanf format strings
+    add: {OPTIONAL_CFLAGS: [-Wformat=2, -Wformat-overflow, -Wformat-truncation]}
+  - comment: Don't include absolute path in __FILE__ macro
+    add: {OPTIONAL_CFLAGS: ['-fmacro-prefix-map=${RIOTBASE}/=']}
+  - comment: Same with debug info
+    add: {OPTIONAL_CFLAGS: ['-fdebug-prefix-map=${RIOTBASE}/=']}
+  - comment: Warn about casts that increase alignment requirements
+    add: {OPTIONAL_CFLAGS: [-Wcast-align]}
+  - comment: Warn if a user-supplied include directory does not exist.
+    add: {CFLAGS: [-Wmissing-include-dirs]}
   - if: {not: {has: {var: CFLAGS, match: [-DDEVELHELP]}}}
     then:
       - if: {not: {equals: {FORCE_ASSERTS: '1'}}}
         then:
           - add: {CFLAGS: [-DNDEBUG]}
-  - add: {CFLAGS: [{select: {var: OPTIONAL_CFLAGS, except: ['${OPTIONAL_CFLAGS_BLACKLIST}']}}]}
-  - add: {CXXEXFLAGS: [-Wno-missing-field-initializers]}
-  - if: {nonempty: [RAM_START_ADDR]}
+  - comment: Add the optional flags that are not architecture/toolchain blacklisted
+    add: {CFLAGS: [{select: {var: OPTIONAL_CFLAGS, except: ['${OPTIONAL_CFLAGS_BLACKLIST}']}}]}
+  - comment: |-
+      Improve C++ compatibility with our C headers: In C it is both valid and good
+      practise to implicitly initialize struct members with zero by omitting them
+      in a initializer list. The C++ compiler greatly frowns upon this, even within
+      `extern "C" { ... }`. The best would be to configure the C++ compiler to
+      accept good C practises within `extern "C" { ... }` while enforcing good C++
+      practises elsewhere. But in absence of this, we disable the warning for now.
+    add: {CXXEXFLAGS: [-Wno-missing-field-initializers]}
+  - comment: Reformat the RAM region for usage within code and expose them
+    if: {nonempty: [RAM_START_ADDR]}
     then:
       - add: {CFLAGS: ['-DCPU_RAM_BASE=${RAM_START_ADDR}']}
-  - comment: 'cflags.inc.mk:120-123: RAM_LEN as hexadecimal number (`NK` = N*1024)'
-    if: {nonempty: [RAM_LEN]}
+  - if: {nonempty: [RAM_LEN]}
     then:
-      - set: {var: CPU_RAM_SIZE, value: {arith: {expr: '${RAM_LEN}', format: hex}}}
+      - comment: |-
+          'CFLAGS' is a deferred variable, so the shell call has to be memoized to
+          keep it from being run again on every expansion of 'CFLAGS'.
+        set: {var: CPU_RAM_SIZE, value: {arith: {expr: '${RAM_LEN}', kilo: [RAM_LEN], format: hex, once: true}}}
       - add: {CFLAGS: ['-DCPU_RAM_SIZE=${CPU_RAM_SIZE}']}

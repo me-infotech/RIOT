@@ -1,5 +1,13 @@
-# Build data of drivers/netdev_ieee802154_submac/Makefile.include (step G3-1).
-# Format: dist/tools/config_data/README.md (schema 3).
-schema: 3
+# Build data of drivers/netdev_ieee802154_submac/Makefile.include (steps G3-1, G0-3): the whole file.
+# drivers/netdev_ieee802154_submac/Makefile.include is generated from it (`just generate-config-data`);
+# edit this file, never the Make file. Format: dist/tools/config_data/README.md
+schema: 1
 rules:
-  - add: {PSEUDOMODULES: [netdev_ieee802154_submac_soft_ack]}
+  - comment: |-
+      # @defgroup drivers_netdev_ieee802154_submac_soft_ack netdev_ieee802154_submac_soft_ack
+      # @ingroup drivers_netdev_ieee802154_submac
+      # @{
+      # @deprecated Use `ieee802154_submac_soft_ack` instead. Will be removed after
+      # the 2027.04 release.
+    add: {PSEUDOMODULES: [netdev_ieee802154_submac_soft_ack]}
+  - comment: '# @}'

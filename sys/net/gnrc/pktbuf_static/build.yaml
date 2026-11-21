@@ -1,6 +1,7 @@
-# Build data of sys/net/gnrc/pktbuf_static/Makefile.include (step G3-1).
-# Format: dist/tools/config_data/README.md (schema 3).
-schema: 3
+# Build data of sys/net/gnrc/pktbuf_static/Makefile.include (steps G3-1, G0-3): the whole file.
+# sys/net/gnrc/pktbuf_static/Makefile.include is generated from it (`just generate-config-data`);
+# edit this file, never the Make file. Format: dist/tools/config_data/README.md
+schema: 1
 rules:
   - set: {var: USEMODULE_INCLUDES_gnrc_pktbuf_static, value: '${LAST_MAKEFILEDIR}/include', flavor: simple}
   - add: {USEMODULE_INCLUDES: ['${USEMODULE_INCLUDES_gnrc_pktbuf_static}']}

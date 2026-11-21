@@ -1,20 +1,30 @@
-# Build data of makefiles/git_version.inc.mk (step G3-1). The two git calls
-# of the Make file are probes of the build algorithm (PROBE_GIT_DESCRIBE:
-# `git --git-dir=RIOTBASE/.git describe --always --abbrev=4`,
-# PROBE_GIT_BRANCH: `git --git-dir=RIOTBASE/.git rev-parse --abbrev-ref HEAD`).
-# Format: dist/tools/config_data/README.md (schema 3).
-schema: 3
+# Build data of makefiles/git_version.inc.mk (steps G3-1, G0-3): the whole
+# file. The Make file is generated from it (`just generate-config-data`);
+# edit this file, never the Make file. The two git questions are probes
+# (PROBE_GIT_DESCRIBE, PROBE_GIT_BRANCH; dist/tools/cmake_gen/toolchain.py,
+# for Make makefiles/build_providers.inc.mk, memoized as before).
+# Format: dist/tools/config_data/README.md
+schema: 4
 rules:
+  - comment: |-
+      GIT_VERSION is git description + branch name if it not master
+      Empty when not in a git repository
+
+        2019.10-devel-97-g3bcc72
+        2019.10-devel-97-g3bcc72-pr/git_version
   - set: {var: GIT_DESCRIBE, value: '${PROBE_GIT_DESCRIBE}'}
   - set: {var: GIT_BRANCH, value: '${PROBE_GIT_BRANCH}'}
-  - comment: the branch with a leading dash, nothing on master
-    set: {var: BUILD_GIT_BRANCH_SUFFIX, value: {select: {var: GIT_BRANCH, except: [master], pattern: {from: '%', to: '-%'}}}}
+  - comment: |-
+      the branch without a trailing `master` (Make: $(GIT_BRANCH:master=)),
+      then with a leading dash: nothing on master
+    set: {var: BUILD_GIT_BRANCH_STEM, value: {select: {var: GIT_BRANCH, pattern: {from: '%master', to: '%'}}}}
+  - set: {var: BUILD_GIT_BRANCH_SUFFIX, value: {select: {var: BUILD_GIT_BRANCH_STEM, pattern: {from: '%', to: '-%'}}}}
   - set: {var: _GIT_VERSION, value: '${GIT_DESCRIBE}${BUILD_GIT_BRANCH_SUFFIX}'}
-  - if: {nonempty: [GIT_DESCRIBE]}
-    then:
-      - set: {var: GIT_VERSION, value: '${_GIT_VERSION}', flavor: conditional}
-  - if: {nonempty: [GIT_VERSION]}
-    then:
-      - set: {var: RIOT_VERSION_GIT, value: '${GIT_VERSION}'}
-    else:
-      - set: {var: RIOT_VERSION_GIT, value: "'UNKNOWN (builddir: ${RIOTBASE})'"}
+  - set: {var: GIT_VERSION, value: {when: {test: {var: GIT_DESCRIBE}, then: '${_GIT_VERSION}'}}, flavor: conditional}
+  - comment: |-
+      This variable is recursively expanded on purpose. It is only expanded when
+      $(RIOT_VERSION) has not been set already. For CI builds, Makefile.include
+      sets the version to 'buildtest' before this is used, so $(GIT_VERSION) is
+      never expanded and two shell calls are saved. Outside of CI, $(GIT_VERSION)
+      is memoized and will not be re-evaluated on every expansion.
+    set: {var: RIOT_VERSION_GIT, value: {when: {test: {var: GIT_VERSION}, then: '${GIT_VERSION}', else: "'UNKNOWN (builddir: ${RIOTBASE})'"}}}

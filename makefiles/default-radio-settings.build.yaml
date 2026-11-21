@@ -1,21 +1,30 @@
-# Build data of makefiles/default-radio-settings.inc.mk (step G3-1).
-# `ifndef CONFIG_KCONFIG_MODULE_IEEE802154`: Kconfig is not part of the data.
-# Format: dist/tools/config_data/README.md (schema 3).
-schema: 3
+# Build data of makefiles/default-radio-settings.inc.mk (steps G3-1, G0-3):
+# the whole file. The Make file is generated from it (`just
+# generate-config-data`); edit this file, never the Make file. Kconfig is
+# not data: the build without Make stops when it is used.
+# Format: dist/tools/config_data/README.md
+schema: 4
 rules:
-  - if: {nonempty: [CONFIG_KCONFIG_MODULE_IEEE802154]}
+  - if: {defined: CONFIG_KCONFIG_MODULE_IEEE802154}
     then:
       - error: Kconfig (CONFIG_KCONFIG_MODULE_IEEE802154) is outside the build data
-  - if: {nonempty: [DEFAULT_CHANNEL]}
+    stand_in: makefiles/kconfig.mk
+  - comment: Set a custom channel if needed
+    if: {not: {defined: CONFIG_KCONFIG_MODULE_IEEE802154}}
     then:
-      - if: {has: {var: USEMODULE, match: [cc110x]}}
+      - if: {nonempty: [DEFAULT_CHANNEL]}
         then:
-          - add: {CFLAGS: ['-DCONFIG_CC110X_DEFAULT_CHANNEL=${DEFAULT_CHANNEL}']}
-      - if: {has: {var: USEMODULE, match: [at86rf212b]}}
+          - comment: radio is cc110x sub-GHz
+            if: {has: {var: USEMODULE, match: [cc110x]}}
+            then:
+              - add: {CFLAGS: ['-DCONFIG_CC110X_DEFAULT_CHANNEL=${DEFAULT_CHANNEL}']}
+          - comment: radio is IEEE 802.15.4 sub-GHz, else 2.4 GHz
+            if: {has: {var: USEMODULE, match: [at86rf212b]}}
+            then:
+              - add: {CFLAGS: ['-DCONFIG_IEEE802154_DEFAULT_SUBGHZ_CHANNEL=${DEFAULT_CHANNEL}']}
+            else:
+              - add: {CFLAGS: ['-DCONFIG_IEEE802154_DEFAULT_CHANNEL=${DEFAULT_CHANNEL}']}
+      - comment: Set a custom PAN ID if needed
+        if: {nonempty: [DEFAULT_PAN_ID]}
         then:
-          - add: {CFLAGS: ['-DCONFIG_IEEE802154_DEFAULT_SUBGHZ_CHANNEL=${DEFAULT_CHANNEL}']}
-        else:
-          - add: {CFLAGS: ['-DCONFIG_IEEE802154_DEFAULT_CHANNEL=${DEFAULT_CHANNEL}']}
-  - if: {nonempty: [DEFAULT_PAN_ID]}
-    then:
-      - add: {CFLAGS: ['-DCONFIG_IEEE802154_DEFAULT_PANID=${DEFAULT_PAN_ID}']}
+          - add: {CFLAGS: ['-DCONFIG_IEEE802154_DEFAULT_PANID=${DEFAULT_PAN_ID}']}

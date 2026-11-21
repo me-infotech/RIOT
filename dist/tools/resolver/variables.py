@@ -12,7 +12,8 @@ them, so the order of evaluation is the same in Make and here.
 
 A recursive value is a list of terms: a text with `${NAME}` references or
 a `{select: …}` (schema 2); schema 3 (step G3-1) adds `{files: …}`,
-`{subdirs: …}` and `{arith: …}`. Nothing here knows Make syntax.
+`{subdirs: …}` and `{arith: …}`, schema 4 (step G0-3) `{when: …}` and `sort`
+of `files`. Nothing here knows Make syntax.
 
 `files` and `subdirs` look at the file system relative to the directory
 named by the variable CURDIR (the directory of the module, as Make's
@@ -77,6 +78,7 @@ def unique(words: list) -> list:
     return out
 
 
+KILO_RE = re.compile(r"[0-9]K\b")
 ARITH_TOKEN_RE = re.compile(r"\s*(0[xX][0-9a-fA-F]+|[0-9]+K?|[-+*()])")
 
 
@@ -164,6 +166,15 @@ class Variables:
             return value
         return " ".join(t for t in (self.term(x) for x in value) if t)
 
+    def has_value(self, name: str) -> bool:
+        """Make's `ifdef`: the variable has a non-empty value, not expanded."""
+        if name not in self._vars:
+            return False
+        flavor, value, _ = self._vars[name]
+        if flavor == "simple":
+            return bool(value)
+        return any(isinstance(t, dict) or t for t in value)
+
     def words(self, name: str) -> list:
         return self.get(name).split()
 
@@ -190,6 +201,9 @@ class Variables:
             words = drop(self.patterns(sel["except"]), words)
         if sel.get("match"):
             words = keep(self.patterns(sel["match"]), words)
+        if sel.get("unique"):
+            # before the word changes, as `uniq` of Makefile.include (schema 4)
+            words = unique(words)
         if "replace" in sel:
             old, new = sel["replace"]["from"], sel["replace"]["to"]
             words = [w.replace(old, new) for w in words]
@@ -198,8 +212,6 @@ class Variables:
         if "pattern" in sel:
             old, new = self.text(sel["pattern"]["from"]), self.text(sel["pattern"]["to"])
             words = [patsubst(old, new, w) for w in words]
-        if sel.get("unique"):
-            words = unique(words)
         return [w for w in words if w]
 
     def _base(self) -> str:
@@ -222,6 +234,8 @@ class Variables:
                               for p in glob.glob(os.path.join(glob.escape(base), pattern)))
         if spec.get("except"):
             out = drop(self.patterns(spec["except"]), out)
+        if spec.get("sort"):
+            out = sort(out)
         return out
 
     def subdirs(self, spec: dict) -> list:
@@ -231,6 +245,20 @@ class Variables:
         return [w + "/" for w in self.select(spec["select"])
                 if os.path.exists(os.path.join(base, w, spec["file"]))]
 
+    def arith_text(self, spec: dict) -> str:
+        """The expression with the values of its variables. With `kilo`
+        (schema 4) only the variables named there may hold `NK`: in Make the
+        others reach the shell as they are, and `NK` is no number there."""
+        kilo = spec.get("kilo")
+
+        def value(match):
+            text = self.get(match.group(1))
+            if kilo is not None and match.group(1) not in kilo and KILO_RE.search(text):
+                raise ValueError(f"{match.group(1)}={text.strip()!r}: `NK` is only accepted in "
+                                 f"{', '.join(kilo)}")
+            return text
+        return REF_RE.sub(value, spec["expr"])
+
     def term(self, term) -> str:
         if isinstance(term, dict):
             if "files" in term:
@@ -238,8 +266,13 @@ class Variables:
             if "subdirs" in term:
                 return " ".join(self.subdirs(term["subdirs"]))
             if "arith" in term:
-                value = arith(self.text(term["arith"]["expr"]))
+                value = arith(self.arith_text(term["arith"]))
                 return hex(value) if term["arith"].get("format") == "hex" else str(value)
+            if "when" in term:
+                # Make's `$(if …)`: `then` if the selection is not empty
+                when = term["when"]
+                branch = "then" if self.select(when["test"]) else "else"
+                return self.text(when.get(branch, ""))
             return " ".join(self.select(term["select"]))
         return self.text(term)
 

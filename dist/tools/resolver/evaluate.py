@@ -33,6 +33,7 @@ import schema  # noqa: E402
 from variables import keep  # noqa: E402
 
 RIOTBASE = R.RIOTBASE
+EXPORTED = "BUILD_EXPORTED"
 
 # Make files included by the data that only add compiler flags (group 3,
 # build): they change no module, package, feature or CPU variable.
@@ -121,6 +122,11 @@ class Evaluator:
             return version_at_least(v.get(value["var"]), value["version"])
         if key == "nonempty":
             return any(v.get(name).strip() for name in value)
+        if key == "defined":
+            return v.has_value(value)
+        if key == "count":
+            # Make's `$(words …)`: repetitions count
+            return len(v.select(value)) == value["is"]
         raise ResolveError(f"unknown condition {key}")
 
     # -- rules --------------------------------------------------------------------------
@@ -135,6 +141,13 @@ class Evaluator:
             elif "set" in rule:
                 s = rule["set"]
                 self.v.set(s["var"], s["value"], s.get("flavor", "recursive"))
+                if s.get("export"):
+                    self.export([s["var"]])
+            elif "export" in rule:
+                self.export(rule["export"])
+            elif "unexport" in rule:
+                self.v.set_words(EXPORTED, [n for n in self.v.words(EXPORTED)
+                                            if n not in rule["unexport"]])
             elif "include" in rule:
                 self.include(rule["include"], where)
             elif "error" in rule:
@@ -142,6 +155,13 @@ class Evaluator:
             elif "warning" in rule or "info" in rule:
                 level = "warning" if "warning" in rule else "info"
                 self.messages.append((level, self.v.text(rule[level])))
+
+    def export(self, names: list):
+        """`export` (schema 4): the names are collected in BUILD_EXPORTED,
+        the variables the Make processes of modules and packages get."""
+        for name in names:
+            if name not in self.v.words(EXPORTED):
+                self.v.add(EXPORTED, name)
 
     def _branch(self, rule: dict) -> list:
         if self.condition(rule["if"]):

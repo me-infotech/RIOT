@@ -1,10 +1,10 @@
-# Build data of boards/Makefile.include (step G3-1): the Make files of common
-# board code, included when its module is used. They are not converted yet:
-# using one of them stops the build without Make (outside the data).
-# Format: dist/tools/config_data/README.md (schema 3).
-schema: 3
+# Build data of boards/Makefile.include (steps G3-1, G0-3): the whole file.
+# boards/Makefile.include is generated from it (`just generate-config-data`);
+# edit this file, never the Make file. Format: dist/tools/config_data/README.md
+schema: 1
 rules:
-  - if: {has: {var: USEMODULE, match: [boards_common_adafruit-nrf52-bootloader]}}
+  - comment: SORT THIS ALPHABETICALLY BY COMMON BOARD NAME!
+    if: {has: {var: USEMODULE, match: [boards_common_adafruit-nrf52-bootloader]}}
     then:
       - include: {path: '${RIOTBOARD}/common/adafruit-nrf52-bootloader/Makefile.include'}
   - if: {has: {var: USEMODULE, match: [boards_common_esp32]}}

@@ -22,9 +22,13 @@ RIOTBASE = os.path.normpath(os.path.join(HERE, "..", "..", ".."))
 # constructs of the module Makefiles and of the build data: `files` and
 # `subdirs` values, `pattern`, `macro` and `unique` in a selection, `arith`
 # values and the conditions `at_least` and `nonempty`. A file declares the
-# lowest schema it needs.
-SCHEMA = 3
-SCHEMAS = (1, 2, 3)
+# lowest schema it needs. Schema 4 (step G0-3: the build data is the only
+# source of the build flags, Make reads adapters generated from it) adds
+# what the generated Make needs to say exactly what the Make file said:
+# `section` and `stand_in` rules, `export`, `unexport`, the value `when`, `sort` of
+# `files`, `once` of `arith` and the conditions `defined` and `count`.
+SCHEMA = 4
+SCHEMAS = (1, 2, 3, 4)
 
 # `${NAME}` in a text: the value of the variable NAME. It is the only
 # reference the data format knows; Make functions are not allowed.
@@ -95,6 +99,27 @@ def make_name(yaml_path: str) -> str:
             middle = base[:-len(data) - 1]
             return os.path.join(directory, f"Makefile.{middle}{make[len('Makefile'):]}")
     raise ValueError(f"not a configuration data file: {yaml_path}")
+
+
+# Step G0-3: build data (`build.yaml`, `<x>.build.yaml`) and package data
+# (`pkg.yaml`, `<x>.pkg.yaml`) of step G3-1. The Make file each one describes
+# is named in scope.yaml (`build`); the generated Make is that Make file
+# (`whole`) or `<data name>.mk` next to the data, which the Make file includes.
+BUILD_DATA, PKG_DATA = "build.yaml", "pkg.yaml"
+
+
+def is_build_data_name(path: str) -> bool:
+    base = os.path.basename(path)
+    return base in (BUILD_DATA, PKG_DATA) or (
+        base.endswith(("." + BUILD_DATA, "." + PKG_DATA)) and len(base) > len(PKG_DATA) + 1)
+
+
+def build_part_name(yaml_path: str) -> str:
+    """The generated include of build data that describes part of a Make
+    file: the data name with `.mk` (`build.yaml` -> `build.mk`)."""
+    if not is_build_data_name(yaml_path):
+        raise ValueError(f"not a build or package data file: {yaml_path}")
+    return yaml_path[:-len(".yaml")] + ".mk"
 
 
 def is_yaml_name(path: str) -> bool:
@@ -185,6 +210,8 @@ def _schema2_selection(sel) -> bool:
 
 
 SCHEMA3_VALUES = ("files", "subdirs", "arith")
+SCHEMA4_RULES = ("section", "stand_in", "export", "unexport")
+SCHEMA4_CONDITIONS = ("defined", "count")
 SCHEMA3_SELECT = ("pattern", "macro", "unique")
 SCHEMA3_CONDITIONS = ("at_least", "nonempty")
 
@@ -210,8 +237,25 @@ def _schema3(rules: list) -> bool:
     return False
 
 
+def _schema4(rules: list) -> bool:
+    if any(k in rule for rule in walk(rules) for k in SCHEMA4_RULES):
+        return True
+    if any("export" in rule["set"] for rule in walk(rules) if "set" in rule):
+        return True
+    if any(next(iter(cond)) in SCHEMA4_CONDITIONS for cond in conditions(rules)):
+        return True
+    for value in _values(rules):
+        if isinstance(value, dict) and ("when" in value or value.get("files", {}).get("sort")
+                                        or "once" in value.get("arith", {})
+                                        or "kilo" in value.get("arith", {})):
+            return True
+    return False
+
+
 def needed_schema(rules: list) -> int:
-    """1 unless the rules use a construct of schema 2 or 3."""
+    """1 unless the rules use a construct of schema 2, 3 or 4."""
+    if _schema4(rules):
+        return 4
     if _schema3(rules):
         return 3
     for cond in conditions(rules):

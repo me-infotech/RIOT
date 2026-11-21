@@ -1,10 +1,11 @@
-# Build data of sys/event/Makefile.include (step G3-1). The stack size
-# settings (EVENT_THREAD_*_STACKSIZE_MIN, which need the `max_number` helper
-# of makefiles/utils/strings.mk) are not converted: setting one stops the
-# build without Make (outside the data).
-# Format: dist/tools/config_data/README.md (schema 3).
-schema: 3
+# Build data of sys/event/Makefile.include (steps G3-1, G0-3): the stack
+# sizes of the event threads (EVENT_THREAD_*_STACKSIZE_MIN) are not data yet;
+# the Make file keeps them, the build without Make stops when they are set.
+# Nothing is generated from this file (scope.yaml: adapter none).
+# Format: dist/tools/config_data/README.md
+schema: 4
 rules:
   - if: {nonempty: [EVENT_THREAD_STACKSIZE_MIN, EVENT_THREAD_HIGHEST_STACKSIZE_MIN, EVENT_THREAD_MEDIUM_STACKSIZE_MIN, EVENT_THREAD_LOWEST_STACKSIZE_MIN]}
     then:
       - error: EVENT_THREAD_*_STACKSIZE_MIN is outside the build data (sys/event/Makefile.include)
+    stand_in: sys/event/Makefile.include

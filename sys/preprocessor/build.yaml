@@ -1,8 +1,9 @@
-# Build data of sys/preprocessor/Makefile.include (step G3-1): the generated
-# header preprocessor_successor.h is a step of the build (BUILD_HEADERS;
-# command of the Make recipe: generate_pp_successor_header.sh).
-# Format: dist/tools/config_data/README.md (schema 3).
-schema: 3
+# Build data of sys/preprocessor/Makefile.include (steps G3-1, G0-3): its
+# variables. The generated build.mk holds them as Make; Makefile.include
+# includes it and keeps the rule that writes the header (a build step:
+# BUILD_HEADERS stands for it, dist/tools/cmake_gen/plan.py).
+# Format: dist/tools/config_data/README.md
+schema: 4
 rules:
   - set: {var: RIOT_PP_SUCCESSOR_MAX, value: '9999', flavor: conditional}
   - add: {PSEUDOMODULES: [preprocessor_successor]}
@@ -12,4 +13,6 @@ rules:
   - if: {has: {var: USEMODULE, match: [preprocessor_successor]}}
     then:
       - add: {RIOT_GENERATE_PP_HEADERS: ['${BINDIR}/preprocessor/preprocessor_successor.h']}
-  - add: {BUILD_HEADERS: ['${RIOT_GENERATE_PP_HEADERS}']}
+  - comment: 'Makefile.include: BUILDDEPS += $(RIOT_GENERATE_PP_HEADERS) and the rule'
+    add: {BUILD_HEADERS: ['${RIOT_GENERATE_PP_HEADERS}']}
+    stand_in: sys/preprocessor/Makefile.include

@@ -1,14 +1,19 @@
-# Build data of pkg/cmsis/Makefile.include (step G3-1).
-# Format: dist/tools/config_data/README.md (schema 3).
-schema: 3
+# Build data of pkg/cmsis/Makefile.include (steps G3-1, G0-3): the whole file.
+# pkg/cmsis/Makefile.include is generated from it (`just generate-config-data`);
+# edit this file, never the Make file. Format: dist/tools/config_data/README.md
+schema: 1
 rules:
-  - add: {INCLUDES: ['-isystem${PKGDIRBASE}/cmsis/CMSIS/Core/Include']}
+  - comment: Using -isystem instead of -I to prevent warnings for the following headers
+    add: {INCLUDES: ['-isystem${PKGDIRBASE}/cmsis/CMSIS/Core/Include']}
   - if: {has: {var: USEMODULE, match: [cmsis-dsp]}}
     then:
       - add: {INCLUDES: ['-isystem${PKGDIRBASE}/cmsis/CMSIS/DSP/Include', '-isystem${PKGDIRBASE}/cmsis/CMSIS/DSP/PrivateInclude']}
-      - add: {CFLAGS: ['-DARM_CPU="cortex-m4"']}
+      - add: {CFLAGS: [-DARM_CPU="cortex-m4"]}
   - if: {has: {var: USEMODULE, match: [cmsis-nn]}}
     then:
       - add: {INCLUDES: ['-isystem${PKGDIRBASE}/cmsis/CMSIS/DSP/Include', '-isystem${PKGDIRBASE}/cmsis/CMSIS/NN/Include']}
-      - add: {CFLAGS: [-Wno-sign-compare]}
-  - add: {PSEUDOMODULES: [cmsis, cmsis-dsp, cmsis-nn]}
+      - comment: Required for some basic math functions
+        add: {CFLAGS: [-Wno-sign-compare]}
+  - comment: cmsis* modules are not concrete modules, so declare them as pseudomodules
+    add: {PSEUDOMODULES: [cmsis]}
+  - add: {PSEUDOMODULES: [cmsis-dsp, cmsis-nn]}

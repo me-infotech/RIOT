@@ -1,15 +1,14 @@
-# Package data of pkg/cmsis/Makefile (step G3-1): source and version of the
-# package. Make keeps reading its Makefile (recipes of pkg/pkg.mk). The
-# CMSIS-DSP and CMSIS-NN modules (built with Makefile.cmsis-dsp and
-# Makefile.cmsis-nn) are not converted: using one stops the build without
-# Make (outside the data).
-# Format: dist/tools/config_data/README.md (schema 3).
-schema: 3
+# Package data of pkg/cmsis/Makefile (steps G3-1, G0-3): name, URL,
+# version, sparse paths and flags. The generated pkg.mk holds them as Make;
+# the Makefile includes it and keeps the rules that build CMSIS-DSP and
+# CMSIS-NN (not data: the build without Make stops when they are used).
+# Format: dist/tools/config_data/README.md
+schema: 4
 rules:
   - set: {var: PKG_NAME, value: cmsis}
   - set: {var: PKG_URL, value: 'https://github.com/ARM-software/CMSIS_5'}
-  - comment: 5.9.0 (Make keeps two blanks after the hash, before its comment)
-    set: {var: PKG_VERSION, value: 2b7495b8535bdcb306dac29b9ded4cfb679d7e5c}
+  - comment: 5.9.0
+    set: {var: PKG_VERSION, value: '2b7495b8535bdcb306dac29b9ded4cfb679d7e5c  '}
   - set: {var: PKG_LICENSE, value: Apache-2.0}
   - set: {var: CMSIS_NN_MODULES, value: cmsis-nn_activationfunctions cmsis-nn_convolutionfunctions cmsis-nn_fullyconnectedfunctions cmsis-nn_nnsupportfunctions cmsis-nn_poolingfunctions cmsis-nn_softmaxfunctions}
   - set: {var: CMSIS_DSP_MODULES, value: cmsis-dsp_basicmathfunctions cmsis-dsp_commontables cmsis-dsp_complexmathfunctions cmsis-dsp_controllerfunctions cmsis-dsp_fastmathfunctions cmsis-dsp_filteringfunctions cmsis-dsp_matrixfunctions cmsis-dsp_statisticsfunctions cmsis-dsp_supportfunctions cmsis-dsp_transformfunctions}
@@ -29,3 +28,4 @@ rules:
   - if: {nonempty: [CMSIS_MODULES_USED]}
     then:
       - error: the CMSIS-DSP and CMSIS-NN modules are outside the build data (pkg/cmsis/Makefile)
+    stand_in: pkg/cmsis/Makefile

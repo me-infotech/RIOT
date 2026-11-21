@@ -174,3 +174,47 @@ modules:
 restructured:
 - drivers/periph_common/Makefile
 - makefiles/auto_init.inc.mk
+# Step G0-3: the build data (step G3-1) is the only source of the build part
+# of these Make files. For each data file: the Make file it describes and
+# what is generated from it - `whole`: the Make file itself; `part`: the
+# data name with `.mk` (build.yaml -> build.mk), which the Make file includes
+# where the build part was (once per `section`); `none`: every rule is a
+# `stand_in` (the Make file keeps that logic), nothing is generated.
+# build_base: the commit the Make files were split from (G3-1 on master).
+build_base: 8c98d25e9b0af679e288c1ad2f88e222337c7e5a
+build:
+  build.yaml: {make: Makefile.include, adapter: part}
+  boards/build.yaml: {make: boards/Makefile.include, adapter: whole}
+  boards/common/nrf52/build.yaml: {make: boards/common/nrf52/Makefile.include, adapter: part}
+  boards/common/nrf52xxxdk/build.yaml: {make: boards/common/nrf52xxxdk/Makefile.include, adapter: whole}
+  boards/nrf52840dk/build.yaml: {make: boards/nrf52840dk/Makefile.include, adapter: part}
+  cpu/build.yaml: {make: cpu/Makefile.include, adapter: whole}
+  cpu/cortexm_common/build.yaml: {make: cpu/cortexm_common/Makefile.include, adapter: part}
+  cpu/nrf52/build.yaml: {make: cpu/nrf52/Makefile.include, adapter: part}
+  cpu/nrf5x_common/build.yaml: {make: cpu/nrf5x_common/Makefile.include, adapter: part}
+  cpu/nrf5x_common/nrfx.pkg.yaml: {make: cpu/nrf5x_common/Makefile.nrfx, adapter: part}
+  drivers/netdev_ieee802154_submac/build.yaml: {make: drivers/netdev_ieee802154_submac/Makefile.include, adapter: whole}
+  makefiles/arch/cortexm.build.yaml: {make: makefiles/arch/cortexm.inc.mk, adapter: part}
+  makefiles/bindist.build.yaml: {make: makefiles/bindist.inc.mk, adapter: part}
+  makefiles/cflags.build.yaml: {make: makefiles/cflags.inc.mk, adapter: whole}
+  makefiles/default-radio-settings.build.yaml: {make: makefiles/default-radio-settings.inc.mk, adapter: whole}
+  makefiles/git_version.build.yaml: {make: makefiles/git_version.inc.mk, adapter: whole}
+  makefiles/libc/newlib.build.yaml: {make: makefiles/libc/newlib.mk, adapter: part}
+  makefiles/pseudomodules.build.yaml: {make: makefiles/pseudomodules.inc.mk, adapter: whole}
+  makefiles/toolchain/gnu.build.yaml: {make: makefiles/toolchain/gnu.inc.mk, adapter: part}
+  makefiles/vars.build.yaml: {make: makefiles/vars.inc.mk, adapter: whole}
+  pkg/cmsis/build.yaml: {make: pkg/cmsis/Makefile.include, adapter: whole}
+  pkg/cmsis/pkg.yaml: {make: pkg/cmsis/Makefile, adapter: part}
+  pkg/mpaland-printf/build.yaml: {make: pkg/mpaland-printf/Makefile.include, adapter: whole}
+  pkg/mpaland-printf/pkg.yaml: {make: pkg/mpaland-printf/Makefile, adapter: part}
+  pkg/pkg.build.yaml: {make: pkg/pkg.mk, adapter: part}
+  sys/build.yaml: {make: sys/Makefile.include, adapter: whole}
+  sys/event/build.yaml: {make: sys/event/Makefile.include, adapter: none}
+  sys/malloc_thread_safe/build.yaml: {make: sys/malloc_thread_safe/Makefile.include, adapter: whole}
+  sys/net/gnrc/pktbuf/build.yaml: {make: sys/net/gnrc/pktbuf/Makefile.include, adapter: whole}
+  sys/net/gnrc/pktbuf_static/build.yaml: {make: sys/net/gnrc/pktbuf_static/Makefile.include, adapter: whole}
+  sys/net/sock/async/event/build.yaml: {make: sys/net/sock/async/event/Makefile.include, adapter: whole}
+  sys/preprocessor/build.yaml: {make: sys/preprocessor/Makefile.include, adapter: part}
+  sys/random/build.yaml: {make: sys/random/Makefile.include, adapter: whole}
+  sys/slot_aux/build.yaml: {make: sys/slot_aux/Makefile.include, adapter: whole}
+  sys/ztimer/build.yaml: {make: sys/ztimer/Makefile.include, adapter: whole}

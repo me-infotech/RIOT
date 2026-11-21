@@ -1,17 +1,25 @@
-# Build data of makefiles/arch/cortexm.inc.mk (step G3-1).
-# Format: dist/tools/config_data/README.md (schema 3).
+# Build data of makefiles/arch/cortexm.inc.mk (steps G3-1, G0-3): everything
+# but the two rules at its end. The generated makefiles/arch/cortexm.build.mk
+# holds it as Make; cortexm.inc.mk includes it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
 schema: 3
 rules:
   - if: {equals: {CPU_MODEL: ''}}
     then:
       - error: CPU_MODEL must have been defined by the board/cpu Makefile.features
-  - set: {var: TARGET_ARCH_CORTEXM, value: arm-none-eabi, flavor: conditional}
+  - comment: Target triple for the build. Use arm-none-eabi if you are unsure.
+    set: {var: TARGET_ARCH_CORTEXM, value: arm-none-eabi, flavor: conditional}
   - set: {var: TARGET_ARCH, value: '${TARGET_ARCH_CORTEXM}', flavor: conditional}
-  - set: {var: CFLAGS_CPU, value: '-mcpu=${MCPU} -mlittle-endian -mthumb ${CFLAGS_FPU}'}
+  - comment: define build specific options
+    set: {var: CFLAGS_CPU, value: '-mcpu=${MCPU} -mlittle-endian -mthumb ${CFLAGS_FPU}'}
   - if: {not: {equals: {TOOLCHAIN: llvm}}}
     then:
-      - add: {CFLAGS: [-mno-thumb-interwork]}
-      - if: {equals: {CPU_ARCH: armv6m}}
+      - comment: |-
+          Clang (observed with v3.7) does not understand  -mno-thumb-interwork, only add if
+          not building with LLVM
+        add: {CFLAGS: [-mno-thumb-interwork]}
+      - comment: work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=85606
+        if: {equals: {CPU_ARCH: armv6m}}
         then:
           - add: {CFLAGS_CPU: [-march=armv6s-m]}
   - set: {var: CFLAGS_LINK, value: -ffunction-sections -fdata-sections -fshort-enums}
@@ -26,7 +34,8 @@ rules:
   - add: {LINKFLAGS: ['-Wl,--gc-sections']}
   - add: {CFLAGS: [{select: {var: CPU_MODEL, macro: true, pattern: {from: '%', to: '-DCPU_MODEL_%'}}}]}
   - add: {CFLAGS: [{select: {var: CPU_CORE, macro: true, pattern: {from: '%', to: '-DCPU_CORE_%'}}}]}
-  - if: {has: {var: USEMODULE, match: [cortexm_fpu]}}
+  - comment: Add soft or hard FPU CFLAGS depending on the module
+    if: {has: {var: USEMODULE, match: [cortexm_fpu]}}
     then:
       - if: {one_of: {var: CPU_CORE, values: [cortex-m33, cortex-m7]}}
         then:
@@ -40,9 +49,11 @@ rules:
       - set: {var: MCPU, value: cortex-m4}
     else:
       - set: {var: MCPU, value: '${CPU_CORE}', flavor: conditional}
-  - if: {has: {var: USEPKG, match: [cmsis-dsp]}}
+  - comment: CMSIS DSP needs to know about the CPU core
+    if: {has: {var: USEPKG, match: [cmsis-dsp]}}
     then:
-      - if: {equals: {CPU_CORE: cortex-m0}}
+      - comment: definition needed to use cmsis-dsp headers
+        if: {equals: {CPU_CORE: cortex-m0}}
         then:
           - add: {CFLAGS: [-DARM_MATH_CM0]}
         elif:
@@ -67,4 +78,5 @@ rules:
           - if: {equals: {CPU_CORE: cortex-m7}}
             then:
               - add: {CFLAGS: [-DARM_MATH_CM7]}
-  - include: {path: '${RIOTCPU}/cortexm_common/Makefile.include'}
+  - comment: 'CPU depends on the cortex-m common module, so include it:'
+    include: {path: '${RIOTCPU}/cortexm_common/Makefile.include'}

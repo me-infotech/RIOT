@@ -10,16 +10,24 @@ function or other Make syntax is accepted. Schema 2 adds `select` values,
 `${NAME}` as a whole pattern word and the `several` condition. Schema 3
 (step G3-1) adds the values `files`, `subdirs` and `arith`, `pattern`,
 `macro` and `unique` in a selection and the conditions `at_least` and
-`nonempty`.
+`nonempty`. Schema 4 (step G0-3) adds the `section` and `stand_in` rules,
+`export` (a rule, and a flag of `set`), `unexport`, the value `when`, `sort` of `files`,
+`once` and `kilo` of `arith` and the conditions `defined` and `count`.
 """
 
 import re
 
 from rules import NAME_RE, REF_RE, SCHEMAS, needed_schema
 
-ACTIONS = ("if", "add", "set", "include", "error", "warning", "info")
+ACTIONS = ("if", "add", "set", "include", "error", "warning", "info", "export", "unexport",
+           "section")
 CONDITIONS = ("has", "selection_equals", "one_of", "equals", "several", "at_least",
-              "nonempty", "not")
+              "nonempty", "defined", "count", "not")
+# schema 4: a key of any rule - the rule is read by the build without Make
+# only; it stands for what the named Make file still does itself (the
+# generated Make leaves it out)
+STAND_IN = "stand_in"
+STAND_IN_RE = re.compile(r"^[A-Za-z0-9_.+-]+(?:/[A-Za-z0-9_.+-]+)*$")
 BRANCHES = ("then", "elif", "else")
 FLAVORS = ("recursive", "simple", "conditional")
 # a word of a filter pattern: no blank, no `$`, `,`, `(`, `)`, `#`, at most one `%`
@@ -37,6 +45,7 @@ PATSUBST_RE = re.compile(r"^(?:[^\s$(),#%]|\$\{[A-Za-z_][A-Za-z0-9_]*\})*"
 GLOB_RE = re.compile(r"^(?:[^\s$(),#%]|\$\{[A-Za-z_][A-Za-z0-9_]*\})+$")
 # schema 3: an arithmetic expression of `arith`: integers, `${NAME}`, + - * ( ), `K`
 ARITH_RE = re.compile(r"^(?:[0-9a-fA-FxK+\-* ()]|\$\{[A-Za-z_][A-Za-z0-9_]*\})+$")
+NAME_WORD_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 VERSION_RE = re.compile(r"^[0-9]+(?:\.[0-9]+){0,2}$")
 
 
@@ -155,8 +164,10 @@ def value_problems(value, where):
         return select_problems(value, where)
     here = f"{where}.{key}"
     if key == "files":
-        problems = _keys_problems(body, here, ("match",), ("except",))
+        problems = _keys_problems(body, here, ("match",), ("except", "sort"))
         if not problems:
+            if "sort" in body and not isinstance(body["sort"], bool):
+                problems.append(f"{here}.sort: must be true or false")
             problems += _words_problems(body["match"], f"{here}.match", GLOB_RE, "file pattern")
             if "except" in body:
                 problems += _words_problems(body["except"], f"{here}.except", PATTERN2_RE,
@@ -171,14 +182,40 @@ def value_problems(value, where):
                 problems.append(f"{here}.file: must be a file name")
         return problems
     if key == "arith":
-        problems = _keys_problems(body, here, ("expr",), ("format",))
+        problems = _keys_problems(body, here, ("expr",), ("format", "once", "kilo"))
         if not problems:
+            if "kilo" in body:
+                problems += _words_problems(body["kilo"], f"{here}.kilo", NAME_WORD_RE,
+                                            "variable name")
+                refs = REF_RE.findall(body["expr"]) if isinstance(body["expr"], str) else []
+                problems += [f"{here}.kilo: {n!r} is not used in expr"
+                             for n in body["kilo"] if isinstance(n, str) and n not in refs]
+            if "once" in body and not isinstance(body["once"], bool):
+                problems.append(f"{here}.once: must be true or false")
             if not isinstance(body["expr"], str) or not ARITH_RE.match(body["expr"]):
                 problems.append(f"{here}.expr: {body['expr']!r} is not an expression")
             if body.get("format", "dec") not in ("dec", "hex"):
                 problems.append(f"{here}.format: dec or hex")
         return problems
-    return [f"{where}: unknown value {key!r} (select, files, subdirs, arith)"]
+    if key == "when":
+        problems = _keys_problems(body, here, ("test",), ("then", "else"))
+        if not problems:
+            problems += _keys_problems(body["test"], f"{here}.test", ("var",),
+                                       ("match", "except"))
+        if not problems:
+            sel = body["test"]
+            problems += _name_problems(sel["var"], f"{here}.test.var")
+            for key2 in ("match", "except"):
+                if key2 in sel:
+                    problems += _words_problems(sel[key2], f"{here}.test.{key2}", PATTERN2_RE,
+                                                "pattern")
+            for branch in ("then", "else"):
+                if branch in body:
+                    problems += _text_problems(body[branch], f"{here}.{branch}", balanced=True)
+                    if isinstance(body[branch], str) and "," in body[branch]:
+                        problems.append(f"{here}.{branch}: `,` is not allowed")
+        return problems
+    return [f"{where}: unknown value {key!r} (select, files, subdirs, arith, when)"]
 
 
 def condition_problems(cond, where, negated=False):
@@ -203,6 +240,20 @@ def condition_problems(cond, where, negated=False):
             problems += _name_problems(value["var"], f"{where}.var")
             if not isinstance(value["version"], str) or not VERSION_RE.match(value["version"]):
                 problems.append(f"{where}.version: a version like 8 or 4.2.1")
+        return problems
+    if key == "defined":
+        return _name_problems(value, where)
+    if key == "count":
+        problems = _keys_problems(value, where, ("var", "is"), ("match", "except"))
+        if not problems:
+            problems += _name_problems(value["var"], f"{where}.var")
+            for key2 in ("match", "except"):
+                if key2 in value:
+                    problems += _words_problems(value[key2], f"{where}.{key2}", PATTERN2_RE,
+                                                "pattern")
+            if not isinstance(value["is"], int) or isinstance(value["is"], bool) \
+                    or value["is"] < 0:
+                problems.append(f"{where}.is: must be a number of words (0, 1, …)")
         return problems
     if key == "nonempty":
         if not isinstance(value, list) or not value:
@@ -253,9 +304,11 @@ def _action_problems(rule, key, where):
                 problems.append(f"{where}.{var}[{i}]: must not be empty")
         return problems
     if key == "set":
-        problems = _keys_problems(value, where, ("var", "value"), ("flavor",))
+        problems = _keys_problems(value, where, ("var", "value"), ("flavor", "export"))
         if problems:
             return problems
+        if "export" in value and value["export"] is not True:
+            problems.append(f"{where}.export: must be true")
         problems += _name_problems(value["var"], f"{where}.var")
         if isinstance(value["value"], dict):
             problems += value_problems(value["value"], f"{where}.value")
@@ -283,6 +336,17 @@ def _action_problems(rule, key, where):
             if isinstance(path, str) and "%" in path:
                 problems.append(f"{where}.path: `%` only with for_each")
         return problems
+    if key in ("export", "unexport"):
+        if not isinstance(value, list) or not value:
+            return [f"{where}: must be a non-empty list of variable names"]
+        problems = []
+        for i, name in enumerate(value):
+            problems += _name_problems(name, f"{where}[{i}]")
+        return problems
+    if key == "section":
+        if not isinstance(value, str) or not re.match(r"^[a-z][a-z0-9_]*$", value):
+            return [f"{where}: {value!r} is not a section name (a-z, 0-9, _)"]
+        return []
     # error, warning, info
     problems = _text_problems(value, where, balanced=True)
     if isinstance(value, str) and not value.strip():
@@ -299,16 +363,31 @@ def _elif_problems(branches, where):
         problems += _keys_problems(branch, here, ("if", "then"), ("comment",))
         if isinstance(branch, dict) and "if" in branch and "then" in branch:
             problems += condition_problems(branch["if"], f"{here}.if")
-            problems += rules_problems(branch["then"], f"{here}.then")
+            problems += rules_problems(branch["then"], f"{here}.then", top=False)
             if "comment" in branch and not isinstance(branch["comment"], str):
                 problems.append(f"{here}.comment: must be a string")
     return problems
 
 
-def rules_problems(rules, where="rules"):
+def _sections_problems(rules) -> list:
+    """`section` rules: only at the top level; once a file uses them, every
+    rule follows one (only comments may stand before the first), and no
+    name is used twice."""
+    marks = [i for i, r in enumerate(rules) if isinstance(r, dict) and "section" in r]
+    if not marks:
+        return []
+    problems = [f"rules[{i}]: before the first section" for i, r in enumerate(rules[:marks[0]])
+                if not isinstance(r, dict) or set(r) != {"comment"}]
+    names = [rules[i]["section"] for i in marks]
+    problems += [f"rules[{i}].section: {rules[i]['section']!r} is used twice"
+                 for n, i in enumerate(marks) if rules[i]["section"] in names[:n]]
+    return problems
+
+
+def rules_problems(rules, where="rules", top=True):
     if not isinstance(rules, list):
         return [f"{where}: must be a list"]
-    problems = []
+    problems = _sections_problems(rules) if top else []
     for i, rule in enumerate(rules):
         here = f"{where}[{i}]"
         if not isinstance(rule, dict):
@@ -316,8 +395,15 @@ def rules_problems(rules, where="rules"):
             continue
         if "comment" in rule and not isinstance(rule["comment"], str):
             problems.append(f"{here}.comment: must be a string")
+        if STAND_IN in rule and (not isinstance(rule[STAND_IN], str)
+                                 or not STAND_IN_RE.match(rule[STAND_IN])):
+            problems.append(f"{here}.{STAND_IN}: must be the path of a Make file")
+        if "section" in rule and not top:
+            problems.append(f"{here}: a section only at the top level")
+        if "section" in rule and set(rule) - {"section", "comment"}:
+            problems.append(f"{here}: a section rule has only `section` and `comment`")
         actions = [k for k in rule if k in ACTIONS]
-        unknown = [k for k in rule if k not in ACTIONS + ("comment",) + BRANCHES]
+        unknown = [k for k in rule if k not in ACTIONS + ("comment", STAND_IN) + BRANCHES]
         problems += [f"{here}: unknown key {k!r}" for k in unknown]
         if len(actions) > 1:
             problems.append(f"{here}: more than one action ({', '.join(actions)})")
@@ -335,7 +421,7 @@ def rules_problems(rules, where="rules"):
                 problems.append(f"{here}: if without then")
             for branch in ("then", "else"):
                 if branch in rule:
-                    problems += rules_problems(rule[branch], f"{here}.{branch}")
+                    problems += rules_problems(rule[branch], f"{here}.{branch}", top=False)
             if "elif" in rule:
                 problems += _elif_problems(rule["elif"], f"{here}.elif")
         else:

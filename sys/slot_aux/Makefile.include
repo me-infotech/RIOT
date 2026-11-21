@@ -1,15 +1,19 @@
+# Generated from build.yaml by dist/tools/config_data/config_data.py.
+# Do not edit: change build.yaml and run `just generate-config-data`.
+
 # This adds an optional AUX slot to flash that can be used to store persistent data.
 # It will work with and without riotboot, but the size of the slot must remain fixed across
 # firmware versions.
 
 # Size of the AUX slot in Bytes - must align with flash page size
 SLOT_AUX_LEN ?= 0
-SLOT_AUX_OFFSET ?= $(shell echo $$(($(ROM_LEN:%K=%*1024)-$(SLOT_AUX_LEN))))
 
+# ROM_LEN (may be `NK` = N*1024) minus SLOT_AUX_LEN (a number)
+SLOT_AUX_OFFSET ?= $(shell echo $$(($(ROM_LEN:%K=%*1024)-$(SLOT_AUX_LEN))))
 LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_slot_aux_offset=$(SLOT_AUX_OFFSET)
 LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_slot_aux_len=$(SLOT_AUX_LEN)
 
-ifneq (0, $(SLOT_AUX_LEN))
+ifneq ($(SLOT_AUX_LEN),0)
   CFLAGS += -DCONFIG_SLOT_AUX_OFFSET=$(SLOT_AUX_OFFSET)
   CFLAGS += -DCONFIG_SLOT_AUX_LEN=$(SLOT_AUX_LEN)
 endif

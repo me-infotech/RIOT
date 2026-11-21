@@ -1,8 +1,10 @@
+# Generated from build.yaml by dist/tools/config_data/config_data.py.
+# Do not edit: change build.yaml and run `just generate-config-data`.
+
 # Convert xtimer into a pseudo module if its API is already implemented by
 # ztimer's compatibility wrapper
 ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
   PSEUDOMODULES += xtimer
-
   ifeq (,$(filter ztimer_usec,$(USEMODULE)))
     $(info $(COLOR_YELLOW)WARNING! xtimer_compat without ztimer_usec may be inaccurate$(COLOR_RESET))
   endif
@@ -18,7 +20,6 @@ ifneq (,$(filter ztimer_periph_rtt,$(USEMODULE)))
     RTT_FREQUENCY ?= RTT_MAX_FREQUENCY
     CFLAGS += -DRTT_FREQUENCY=$(RTT_FREQUENCY)
   endif
-
   MODULES_ZTIMER_ON_RTT_CONFLICTING = $(filter $(MODULES_ZTIMER_ON_RTT_CONFLICT),$(USEMODULE))
   ifneq (0,$(words $(MODULES_ZTIMER_ON_RTT_CONFLICTING)))
     $(info $(COLOR_YELLOW)WARNING! The following modules conflict with 'ztimer_periph_rtt': '$(MODULES_ZTIMER_ON_RTT_CONFLICTING)')

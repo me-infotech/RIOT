@@ -1,2 +1,6 @@
+# Generated from build.yaml by dist/tools/config_data/config_data.py.
+# Do not edit: change build.yaml and run `just generate-config-data`.
+
 USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/sock/async/event
-CFLAGS += -DSOCK_HAS_ASYNC -DSOCK_HAS_ASYNC_CTX
+CFLAGS += -DSOCK_HAS_ASYNC
+CFLAGS += -DSOCK_HAS_ASYNC_CTX

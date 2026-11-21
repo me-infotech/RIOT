@@ -120,6 +120,9 @@ CLEAN = $(filter clean, $(MAKECMDGOALS))
 include $(RIOTMAKE)/utils/variables.mk
 include $(RIOTMAKE)/utils/strings.mk
 
+# values the build data reads but does not define (probes, build algorithm)
+include $(RIOTMAKE)/build_providers.inc.mk
+
 # include nimble makefile tools
 include $(RIOTMAKE)/pkg/nimble.adv.mk
 
@@ -207,69 +210,11 @@ include $(RIOTMAKE)/info.inc.mk
 # Static code analysis tools provided by LLVM
 include $(RIOTMAKE)/scan-build.inc.mk
 
-export RIOTBUILD_CONFIG_HEADER_C = $(BINDIR)/riotbuild/riotbuild.h
-
 ifeq ($(OS),Darwin)
   OPEN   := open
 else
   OPEN   := xdg-open
 endif
-
-QUIET ?= 1
-QUIETER ?= 0
-
-ifeq ($(QUIET),1)
-  Q=@
-  MAKEFLAGS += --no-print-directory
-else
-  Q=
-endif
-
-# Set this to 1 to enable pretty-printing the assert location in addition
-# to the address of the failing assert.
-# This saves you to resolve the address manually with addr2line at the cost
-# of greater ROM consumption.
-VERBOSE_ASSERT ?= 0
-ifeq ($(VERBOSE_ASSERT),1)
-  CFLAGS += -DDEBUG_ASSERT_VERBOSE
-  DEVELHELP := 1
-endif
-
-# Set this to 1 to enable code in RIOT that does safety checking
-# which is not needed in a production environment but helps in the
-# development process:
-DEVELHELP ?= 0
-ifeq ($(DEVELHELP),1)
-  CFLAGS += -DDEVELHELP
-endif
-
-# Set this to 1 to enable thread names
-THREAD_NAMES ?= 0
-ifeq ($(THREAD_NAMES),1)
-  CFLAGS += -DCONFIG_THREAD_NAMES
-endif
-
-# Override LOG_LEVEL if variable is set and if CFLAGS doesn't already contain
-# a LOG_LEVEL config
-ifdef LOG_LEVEL
-  ifeq (,$(filter -DLOG_LEVEL=%,$(CFLAGS)))
-    CFLAGS += -DLOG_LEVEL=$(LOG_LEVEL)
-  endif
-endif
-
-# Fail on warnings. Can be overridden by `make WERROR=0`.
-WERROR ?= 1
-ifeq ($(WERROR),1)
-  CFLAGS += -Werror
-endif
-
-WPEDANTIC ?= 0
-ifeq ($(WPEDANTIC),1)
-  CFLAGS += -Wpedantic
-endif
-
-# Provide a shallow sanity check. You cannot call `make` in a module directory.
-export __RIOTBUILD_FLAG := RIOT
 
 BOARD := $(strip $(BOARD))
 APPLICATION := $(strip $(APPLICATION))
@@ -293,18 +238,9 @@ ifeq (,$(UNZIP_HERE))
   endif
 endif
 
-# Tool saving stdin to a file only on content update.
-# It keeps the file timestamp if it would end up the same.
-LAZYSPONGE ?= $(RIOTTOOLS)/lazysponge/lazysponge.py
-LAZYSPONGE_FLAGS ?= $(if $(filter 1,$(QUIET)),,--verbose)
-
 ifeq (, $(APPLICATION))
     $(error An application name must be specified as APPLICATION.)
 endif
-
-# default toolchain prefix, defaults to target triple followed by a dash, you
-# will most likely not need to touch this.
-export PREFIX ?= $(if $(TARGET_ARCH),$(TARGET_ARCH)-)
 
 # set default PROGRAMMER value if flashing a board on IoT-LAB
 # This must be done before parsing the Makefile.include of the board and cannot
@@ -321,13 +257,19 @@ ifneq (,$(IOTLAB_NODE))
   endif
 endif
 
-# Add standard include directories
-INCLUDES += -I$(APPDIR)
-INCLUDES += $(addprefix -I,$(wildcard $(APPDIR)/include))
-INCLUDES += -I$(RIOTBASE)/core/lib/include
-INCLUDES += -I$(RIOTBASE)/core/include
-INCLUDES += -I$(RIOTBASE)/drivers/include
-INCLUDES += -I$(RIOTBASE)/sys/include
+# Build flags, standard include directories, toolchain prefix: build data
+# (build.yaml). build.mk is generated from it (`just generate-config-data`).
+RIOT_BUILD_SECTION := flags
+include $(RIOTBASE)/build.mk
+
+QUIETER ?= 0
+
+ifeq ($(QUIET),1)
+  Q=@
+  MAKEFLAGS += --no-print-directory
+else
+  Q=
+endif
 
 # process provided features
 include $(RIOTBASE)/Makefile.features
@@ -362,16 +304,9 @@ include $(RIOTMAKE)/dependency_resolution.inc.mk
 # configuration for other DFU bootloaders in use.
 include $(RIOTMAKE)/boot/riotboot_dfu-util.mk
 
-# Include Board and CPU configuration
-INCLUDES += $(addprefix -I,$(wildcard $(BOARDDIR)/include))
-INCLUDES += -I$(RIOTCPU)/$(CPU)/include
-
-# Include the Makefile.include for common boards after the specific board,
-# likewise proceed with the CPU Makefile.includes.
-include $(BOARDDIR)/Makefile.include
-include $(RIOTBASE)/boards/Makefile.include
-include $(RIOTCPU)/Makefile.include
-include $(RIOTCPU)/$(CPU)/Makefile.include
+# Include Board and CPU configuration (build data, build.yaml)
+RIOT_BUILD_SECTION := board
+include $(RIOTBASE)/build.mk
 
 # Include common programmer logic if available
 -include $(RIOTMAKE)/tools/$(PROGRAMMER).inc.mk
@@ -402,41 +337,15 @@ ifneq ($(RIOT_CI_BUILD),1)
   endif
 endif
 
-# Assume GCC/GNU as supported toolchain if CPU's Makefile.include doesn't
-# provide this macro
-TOOLCHAINS_SUPPORTED ?= gnu
-# Import all toolchain settings
-include $(RIOTMAKE)/toolchain/$(TOOLCHAIN).inc.mk
-
-# Other than on native, RWX segments in ROM are not actually RWX, as regular
-# store instructions won't write to flash.
-ifeq (,$(filter native native32 native64,$(BOARD)))
-  LINKER_SUPPORTS_NOWARNRWX ?= $(shell LC_ALL=C $(LINK) $(RIOTTOOLS)/testprogs/minimal_linkable.c -o /dev/null -lc -Wall -Wextra -pedantic -Wl,--no-warn-rwx-segments 2> /dev/null && echo 1 || echo 0)
-  ifeq (1,$(LINKER_SUPPORTS_NOWARNRWX))
-    LINKFLAGS += -Wl,--no-warn-rwx-segments
-  endif
-endif
-
-# Append ldscript path after importing CPU and board makefiles to allow
-# overriding the core ldscripts
-LINKFLAGS += -L$(RIOTBASE)/core/ldscripts
+# Toolchain settings and linker flags (build data, build.yaml)
+RIOT_BUILD_SECTION := toolchain
+include $(RIOTBASE)/build.mk
 
 # include undefined behaviour sanitizer (UBSAN) support
 include $(RIOTMAKE)/ubsan.inc.mk
 
-# Tell ccache to pass the original file to the compiler, instead of passing the
-# preprocessed code. Without this setting, the compilation will fail with
-# -Wimplicit-fallthrough warnings even when the fall through case is properly
-# commented because the preprocessor has stripped the comments from the code.
-# This also fixes some other false warnings when compiling with LLVM/Clang.
-# The environment variable only affects builds with ccache (e.g. on CI/Murdock).
-# Non cached builds are not affected in any way.
-# For more information, see http://petereisentraut.blogspot.com/2011/09/ccache-and-clang-part-2.html
-export CCACHE_CPP2=yes
-
 # set some settings useful for continuous integration builds
 ifeq ($(RIOT_CI_BUILD),1)
-    RIOT_VERSION ?= buildtest
     ifneq ($(filter $(BOARD_INSUFFICIENT_MEMORY), $(BOARD)),)
         RIOTNOLINK:=1
     endif
@@ -466,31 +375,6 @@ else
   QQ=
 endif
 
-# if you want to publish the board into the sources as an uppercase #define
-BOARDDEF = $(call uppercase_and_underscore,$(BOARD))
-CPUDEF = $(call uppercase_and_underscore,$(CPU))
-CFLAGS += -DRIOT_APPLICATION=\"$(APPLICATION)\"
-CFLAGS += -DBOARD_$(BOARDDEF)=\"$(BOARD)\" -DRIOT_BOARD=BOARD_$(BOARDDEF)
-CFLAGS += -DCPU_$(CPUDEF)=\"$(CPU)\" -DRIOT_CPU=CPU_$(CPUDEF)
-
-# Feature test default CFLAGS and LINKFLAGS for the set compiled.
-include $(RIOTMAKE)/cflags.inc.mk
-
-# Include VERSION for releases
--include $(RIOTBASE)/VERSION
--include $(RIOTBASE)/EXTRAVERSION
-
-include $(RIOTMAKE)/git_version.inc.mk
-RIOT_VERSION ?= $(RIOT_VERSION_GIT)
-RIOT_DUMMY_VERSION ?= 2042.5.23
-RIOT_EXTRAVERSION ?= 0
-
-# Generate machine readable RIOT_VERSION macro. This will fall-back to
-# RIOT_DUMMY_VERSION if RIOT_VERSION is invalid (e.g. during CI builds).
-RIOT_VERSION_CODE ?= RIOT_VERSION_NUM\($(or \
-  $(call version_tuple,$(RIOT_VERSION)), \
-  $(call version_tuple,$(RIOT_DUMMY_VERSION))),$(RIOT_EXTRAVERSION)\)
-
 # Set module by prepending APPLICATION name with 'application_'.
 # It prevents conflict with application and modules with the same name.
 APPLICATION_MODULE ?= application_$(APPLICATION)
@@ -500,21 +384,6 @@ BASELIBS += $(APPLICATION_MODULE).module
 BASELIBS += $(APPDEPS)
 
 
-# add extra include paths for packages in $(USEMODULE)
-USEMODULE_INCLUDES =
-
-# include global Makefile.include for `sys` modules
-include $(RIOTBASE)/sys/Makefile.include
-
-# include Makefile.includes of each driver modules if they exist
--include $(USEMODULE:%=$(RIOTBASE)/drivers/%/Makefile.include)
-
-# include Makefile.includes for packages in $(PKG_PATHS)
--include $(PKG_PATHS:%=%Makefile.include)
-
-# include external modules configuration
--include $(EXTERNAL_MODULE_PATHS:%=%Makefile.include)
-
 # Deduplicate includes without sorting them
 # see https://stackoverflow.com/questions/16144115/makefile-remove-duplicate-words-without-sorting
 define uniq
@@ -523,13 +392,10 @@ define uniq
   $(seen)
 endef
 
-USEMODULE_INCLUDES_ = $(strip $(call uniq,$(USEMODULE_INCLUDES)))
-
-INCLUDES += $(USEMODULE_INCLUDES_:%=-I%)
-
-
-# include bindist target
-include $(RIOTMAKE)/bindist.inc.mk
+# CI version, board/CPU defines, CFLAGS, version, include paths of
+# modules and packages, bindist (build data, build.yaml)
+RIOT_BUILD_SECTION := version
+include $(RIOTBASE)/build.mk
 
 # Add all USEMODULE modules to CFLAGS and populate BASELIBS
 include $(RIOTMAKE)/modules.inc.mk
@@ -565,11 +431,9 @@ ifneq (,$(IOTLAB_NODE))
   endif
 endif
 
-ELFFILE ?= $(BINDIR)/$(APPLICATION).elf
-HEXFILE ?= $(ELFFILE:.elf=.hex)
-BINFILE ?= $(ELFFILE:.elf=.bin)
-HASHFILE ?= $(BINFILE)
-MAPFILE ?= $(ELFFILE:.elf=.map)
+# The files of the build (build data, build.yaml)
+RIOT_BUILD_SECTION := files
+include $(RIOTBASE)/build.mk
 LSTFILE ?= $(ELFFILE:.elf=.lst)
 
 ifneq (,$(filter suit,$(USEMODULE)))
@@ -603,18 +467,10 @@ ifeq (,$(FLASHFILE))
   $(error FLASHFILE is not defined for this board: $(BOARD))
 endif
 
-BUILD_FILES += $(ELFFILE) $(BINFILE) $(FLASHFILE) $(HASHFILE)
-
-# variables used to compile and link c++
-ifneq (,$(filter cpp,$(USEMODULE)))
-  CPPMIX ?= 1
-endif
-
-# We assume $(LINK) to be gcc-like. Use `LINKFLAGPREFIX :=` for ld-like linker options.
-LINKFLAGPREFIX ?= -Wl,
-
-# Also build external modules
-DIRS += $(EXTERNAL_MODULE_PATHS)
+# Files to build, C++, linker flag prefix, external module directories,
+# export of GENSRC (build data, build.yaml)
+RIOT_BUILD_SECTION := link
+include $(RIOTBASE)/build.mk
 
 # Define dependencies required for building (headers, downloading source files,)
 BUILDDEPS += $(RIOTBUILD_CONFIG_HEADER_C)
@@ -631,7 +487,6 @@ $(BUILDDEPS): $(CLEAN)
 -include $(PKG_PATHS:%=%Makefile.gensrc)
 # remove duplicates & make accessible to subprocesses
 GENSRC := $(sort $(GENSRC))
-export GENSRC
 
 # Save value to verify it is not modified later
 _BASELIBS_VALUE_BEFORE_USAGE := $(BASELIBS)
@@ -892,8 +747,9 @@ include $(RIOTMAKE)/clang_tidy.inc.mk
 # Support Eclipse IDE.
 include $(RIOTMAKE)/eclipse.inc.mk
 
-# Export variables used throughout the whole make system:
-include $(RIOTMAKE)/vars.inc.mk
+# Export variables used throughout the whole make system (build data)
+RIOT_BUILD_SECTION := vars
+include $(RIOTBASE)/build.mk
 
 # Include build targets for selected tools
 include $(RIOTMAKE)/tools/targets.inc.mk
@@ -1030,18 +886,9 @@ $(RIOTBUILD_CONFIG_HEADER_C).in: FORCE | $(CLEAN)
 	$(Q)'$(RIOTTOOLS)/genconfigheader/genconfigheader.sh' $(CFLAGS_WITH_MACROS) \
 		| '$(LAZYSPONGE)' $(LAZYSPONGE_FLAGS) '$@'
 
-CFLAGS_WITH_MACROS += $(CFLAGS)
-CFLAGS_WITH_MACROS += -DRIOT_VERSION=\"$(RIOT_VERSION)\"
-CFLAGS_WITH_MACROS += -DRIOT_VERSION_CODE=$(RIOT_VERSION_CODE)
-# To allow package code easily check if compiled against RIOT or not:
-CFLAGS_WITH_MACROS += -DRIOT_OS=1
-ifneq (,$(RIOT_VERSION_EXTRA))
-  CFLAGS_WITH_MACROS += -DCONFIG_RIOT_VERSION_EXTRA=\""$(RIOT_VERSION_EXTRA)"\"
-endif
-# MODULE_NAME defines. Declared in 'makefiles/modules.inc.mk'
-CFLAGS_WITH_MACROS += $(EXTDEFINES)
-
-CFLAGS += -include '$(RIOTBUILD_CONFIG_HEADER_C)'
+# Macros of the configuration header riotbuild.h (build data, build.yaml)
+RIOT_BUILD_SECTION := header
+include $(RIOTBASE)/build.mk
 
 # include mcuboot support
 include $(RIOTMAKE)/mcuboot.mk

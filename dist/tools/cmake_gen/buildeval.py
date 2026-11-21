@@ -7,11 +7,14 @@ dist/tools/config_data/README.md) in YAML files next to the Make files
 whose build part they describe:
 
   Make file                         build data
-  Makefile.include                  build.yaml           (Make keeps its file)
-  <x>.inc.mk, <x>.mk (makefiles/)   <x>.build.yaml       (Make keeps its file)
+  Makefile.include                  build.yaml
+  <x>.inc.mk, <x>.mk (makefiles/)   <x>.build.yaml
   module Makefile, <x>.mk           module.yaml, <x>.module.yaml
                                     (the Make file is generated from it)
-  package Makefile, Makefile.<x>    pkg.yaml, <x>.pkg.yaml (Make keeps its file)
+  package Makefile, Makefile.<x>    pkg.yaml, <x>.pkg.yaml
+
+Since step G0-3 the build part of these Make files (or the whole file) is
+generated from the data (dist/tools/config_data, scope.yaml `build`).
 
 An `include` of a Make file reads its build data; if there is none, the
 include falls back to the resolver's data (deps.yaml, …, `.inc.yaml`). A Make

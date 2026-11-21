@@ -105,6 +105,20 @@ steps:
       pip: [pyyaml]
     docs: dist/tools/resolver/README.md
 
+  - id: g0-03-build-flags-data
+    title: Build data as the only source of the build flags, Make reads adapters generated from it
+    group: G0
+    targets: []
+    provides:
+      - name: build-data-adapters
+        now: just generate-config-data (writes the build parts of the board, CPU, build system and package Make files from the build data)
+        hardware: false
+    tests:
+      - dist/tools/config_data/build_tests
+    requires:
+      pip: [pyyaml]
+    docs: dist/tools/config_data/README.md
+
   - id: g3-01-all
     title: Build an application with CMake and Ninja from the data, without Make
     group: "3"

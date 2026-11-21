@@ -1,5 +1,7 @@
-# Build data of sys/malloc_thread_safe/Makefile.include (step G3-1).
-# Format: dist/tools/config_data/README.md (schema 3).
-schema: 3
+# Build data of sys/malloc_thread_safe/Makefile.include (steps G3-1, G0-3): the whole file.
+# sys/malloc_thread_safe/Makefile.include is generated from it (`just generate-config-data`);
+# edit this file, never the Make file. Format: dist/tools/config_data/README.md
+schema: 1
 rules:
-  - add: {LINKFLAGS: ['-Wl,-wrap=malloc -Wl,-wrap=calloc -Wl,-wrap=realloc -Wl,-wrap=free']}
+  - comment: use the wrapper functions for malloc and friends to provide thread-safety
+    add: {LINKFLAGS: ['-Wl,-wrap=malloc', '-Wl,-wrap=calloc', '-Wl,-wrap=realloc', '-Wl,-wrap=free']}

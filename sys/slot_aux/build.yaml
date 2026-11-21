@@ -1,10 +1,16 @@
-# Build data of sys/slot_aux/Makefile.include (step G3-1).
-# Format: dist/tools/config_data/README.md (schema 3).
-schema: 3
+# Build data of sys/slot_aux/Makefile.include (steps G3-1, G0-3): the whole
+# file. The Make file is generated from it (`just generate-config-data`);
+# edit this file, never the Make file. Format: dist/tools/config_data/README.md
+schema: 4
 rules:
-  - set: {var: SLOT_AUX_LEN, value: '0', flavor: conditional}
-  - comment: 'slot_aux/Makefile.include:6: ROM_LEN (`NK` = N*1024) minus SLOT_AUX_LEN'
-    set: {var: SLOT_AUX_OFFSET, value: {arith: {expr: '${ROM_LEN}-${SLOT_AUX_LEN}', format: dec}}, flavor: conditional}
+  - comment: |-
+      This adds an optional AUX slot to flash that can be used to store persistent data.
+      It will work with and without riotboot, but the size of the slot must remain fixed across
+      firmware versions.
+  - comment: Size of the AUX slot in Bytes - must align with flash page size
+    set: {var: SLOT_AUX_LEN, value: '0', flavor: conditional}
+  - comment: 'ROM_LEN (may be `NK` = N*1024) minus SLOT_AUX_LEN (a number)'
+    set: {var: SLOT_AUX_OFFSET, value: {arith: {expr: '${ROM_LEN}-${SLOT_AUX_LEN}', kilo: [ROM_LEN], format: dec}}, flavor: conditional}
   - add: {LINKFLAGS: ['${LINKFLAGPREFIX}--defsym=_slot_aux_offset=${SLOT_AUX_OFFSET}']}
   - add: {LINKFLAGS: ['${LINKFLAGPREFIX}--defsym=_slot_aux_len=${SLOT_AUX_LEN}']}
   - if: {not: {equals: {SLOT_AUX_LEN: '0'}}}

@@ -1,7 +1,11 @@
+# Generated from build.yaml by dist/tools/config_data/config_data.py.
+# Do not edit: change build.yaml and run `just generate-config-data`.
+
 ## @defgroup drivers_netdev_ieee802154_submac_soft_ack netdev_ieee802154_submac_soft_ack
 ## @ingroup drivers_netdev_ieee802154_submac
 ## @{
 ## @deprecated Use `ieee802154_submac_soft_ack` instead. Will be removed after
 ## the 2027.04 release.
 PSEUDOMODULES += netdev_ieee802154_submac_soft_ack
+
 ## @}
