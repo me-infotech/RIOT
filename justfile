@@ -99,6 +99,41 @@ _doc-doxygen-version:
             "and (if required) compiled locally.${reset}"
     fi
 
+# Moved from the root Makefile (step G2C-3). Repository-global, like Make:
+# always <repository>/build/pkg, whatever the calling directory, BUILD_DIR or
+# PKGDIRBASE; no arguments.
+# Remove the package sources of all applications (build/pkg).
+pkg-clean: (_pkg-clean justfile_directory() "echo")
+
+# The steps of `pkg-clean`, in <dir>. The root `make distclean` runs them with
+# Make's CURDIR (as `make -f <repository>/Makefile distclean` did) and a mode
+# for Make's options: echo (default), silent (`make -s`: the command line is
+# not shown, as Make hid it) or dry-run (`make -n`: print the commands Make
+# printed, change nothing). Only <dir>/build/pkg is ever removed.
+[private]
+_pkg-clean dir mode:
+    #!/bin/sh
+    set -e
+    dir={{ quote(dir) }} mode={{ quote(mode) }}
+    case "$dir" in
+        /*) ;;
+        *) echo "pkg-clean: not an absolute directory: $dir" >&2; exit 1 ;;
+    esac
+    case "$mode" in
+        echo|silent|dry-run) ;;
+        *) echo "pkg-clean: unknown mode: $mode" >&2; exit 1 ;;
+    esac
+    cd "$dir"
+    msg="Cleaning all package sources" pkg=build/pkg
+    if [ "$mode" = dry-run ]; then
+        echo "echo \"$msg\""
+        echo "rm -rf $pkg"
+        exit 0
+    fi
+    echo "$msg"
+    [ "$mode" = silent ] || echo "rm -rf $pkg"
+    rm -rf "$pkg"
+
 # Moved from Makefile.include (application level). Runs in the calling
 # directory, without arguments and with the absolute path, as Make did.
 # List the serial TTYs connected to this host.

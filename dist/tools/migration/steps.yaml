@@ -182,3 +182,16 @@ steps:
       pip: [pyyaml]
       tools: [just@1.59.0]
     docs: dist/tools/clean/README.md
+
+  - id: g2c-03-pkg-clean
+    title: Remove the package sources (pkg-clean) with just instead of the root Makefile
+    group: "2C"
+    targets:
+      - name: pkg-clean
+        now: just pkg-clean
+        hardware: false
+    tests:
+      - dist/tools/pkg_clean/tests
+    requires:
+      tools: [just@1.59.0]
+    docs: dist/tools/task_layer/README.md

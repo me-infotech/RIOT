@@ -25,9 +25,9 @@ docclean:
 	"$(MAKE)" -BC doc/doxygen clean
 	"$(MAKE)" -C doc/starlight clean
 
-pkg-clean:
-	@echo "Cleaning all package sources"
-	rm -rf build/pkg
+# Directory of this Makefile (with a trailing slash), also with `make -f`:
+# `distclean` finds the justfile there.
+_riot_root := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 include makefiles/boards.inc.mk
 include makefiles/app_dirs.inc.mk
@@ -43,7 +43,7 @@ CLEAN_DIRS := $(APPLICATION_DIRS) $(TOOLS_DIRS)
 clean: $(CLEAN_DIRS:%=CLEAN--%)
 	@echo "Cleaned all build products."
 
-distclean: docclean pkg-clean $(CLEAN_DIRS:%=DISTCLEAN--%)
+distclean: docclean _pkg-clean $(CLEAN_DIRS:%=DISTCLEAN--%)
 	@echo "Cleaned everything."
 
 $(CLEAN_DIRS:%=CLEAN--%):
@@ -67,11 +67,11 @@ define welcome_message
 	@echo "Available targets for the RIOT base directory include:"
 	@echo " generate-{board,driver,example,module,pkg,test}"
 	@echo " info-{applications,boards,emulated-boards} info-applications-supported-boards"
-	@echo " clean distclean docclean pkg-clean"
+	@echo " clean distclean docclean"
 	@echo " doc-{starlight,man,latex,ci}"
 	@echo ""
 	@echo "Repository commands that moved to just (run 'just --list'):"
-	@echo " doc generate-features print-versions"
+	@echo " doc generate-features pkg-clean print-versions"
 	@echo ""
 	@echo "==> tl;dr Try running:"
 	@echo "    cd examples/basic/default"
@@ -89,3 +89,22 @@ welcome:
 	@echo ""
 	$(call welcome_message)
 	@exit 1
+
+# Prerequisite of `distclean` (kept at the end, so that Make's messages keep
+# their line numbers). `pkg-clean` moved to just (`just pkg-clean`);
+# `distclean` runs its steps (`_pkg-clean` in the justfile next to this
+# Makefile) at the place of the former prerequisite, so the cleaning exists
+# only in the justfile (Make may call just, a just recipe never calls make).
+# As before, they act in CURDIR, and Make's options keep their effect: with
+# -s the command line is hidden; with -n just only prints the commands
+# (dry-run) and Make shows them in place of the recipe, changing nothing.
+_pkg_clean_flags = $(firstword -$(MAKEFLAGS))
+_pkg_clean_mode = $(strip \
+  $(if $(findstring n,$(_pkg_clean_flags)),dry-run,\
+  $(if $(findstring s,$(_pkg_clean_flags)),silent,echo)))
+_pkg_clean_run = "$(JUST)" --justfile "$(_riot_root)justfile" _pkg-clean "$(CURDIR)" $(_pkg_clean_mode)
+_pkg_clean_dry_run = $(if $(filter dry-run,$(_pkg_clean_mode)),$(shell $(_pkg_clean_run) | sed -n $(1)p))
+.PHONY: _pkg-clean
+_pkg-clean:
+	$(if $(filter dry-run,$(_pkg_clean_mode)),$(call _pkg_clean_dry_run,1),@$(_pkg_clean_run))
+	$(call _pkg_clean_dry_run,2)

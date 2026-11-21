@@ -10,6 +10,7 @@ built with `make` in their directory.
 | `p3-task-layer-group1` | `migration/g1-01-print-versions-generate-features` | `print-versions`, `generate-features` | `tests/`, `../features_yaml2mx/tests/` |
 | `p3-task-layer-group1-doc` | `migration/g1-02-doc` | `doc` | `../doccheck/tests/` |
 | `p3-task-layer-group1-list-ttys` | `migration/g1-03-list-ttys` | `list-ttys` | `../usb-serial/tests/` |
+| `g2c-03-pkg-clean` | `migration/g2c-03-pkg-clean` | `pkg-clean` | `../pkg_clean/tests/` |
 
 just searches the root `justfile` upwards from the current directory, so
 every recipe can also be called from an application directory (rule R6).
@@ -209,3 +210,112 @@ from the copy):
 | R4   | zsh completion offers `list-ttys` again | 1 |
 | R5   | `serial.inc.mk` drops the `serial` output format | 1 |
 | –    | step removed from `steps.yaml` | 1 (+1 register test O2) |
+
+### `pkg-clean` (step `g2c-03-pkg-clean`, group 2C)
+
+`make pkg-clean` (root `Makefile`) printed `Cleaning all package sources`
+and ran `rm -rf build/pkg` in the repository root. `just pkg-clean` does the
+same, with the same two lines on stdout and nothing on stderr:
+
+- the directory is fixed: `<repository>/build/pkg`. The root Makefile never
+  read `BUILD_DIR` or `PKGDIRBASE` (they belong to `Makefile.include`), so
+  `make pkg-clean PKGDIRBASE=…` removed `build/pkg` as well; the recipe
+  ignores both too. An application built with another `PKGDIRBASE` cleans
+  its packages with `make clean-pkg`/`distclean` in its directory, as before;
+- `pkg-clean` has no parameters; it runs the private steps
+  `_pkg-clean <dir> <mode>` with `justfile_directory()` and mode `echo`;
+- the steps are a `/bin/sh` script without make or Make file: check that
+  `<dir>` is absolute and the mode is `echo`, `silent` or `dry-run`, `cd`
+  to `<dir>` (`set -e`), then `rm -rf build/pkg`. The path is a shell
+  variable, so just cannot override it;
+- exit status: 0, also when `build/pkg` does not exist; if `rm` fails, the
+  same `rm:` message and status 1 (Make reported 2).
+
+Root `distclean` (stays in Make): its prerequisite `pkg-clean` is replaced by
+`_pkg-clean`, at the same place, which runs the steps from the justfile next
+to the Makefile: `just --justfile <Makefile directory>/justfile _pkg-clean
+"$(CURDIR)" <mode>`. Make may call just, a just recipe never calls make, and
+the cleaning exists only in the justfile. `make distclean` now needs just.
+Its behaviour is unchanged (compared live with the base commit
+`74a0fb9743`, GNU Make 4.3):
+
+| Call | Before and now |
+|---|---|
+| `make distclean`, with or without `--no-print-directory`, `-k` | same lines, same order, same effect |
+| `make -s distclean` | silent: mode `silent` prints only `Cleaning all package sources`, as Make hid the command line |
+| `make -n distclean` (also `-ns`) | prints `echo "Cleaning all package sources"` and `rm -rf build/pkg` and changes nothing: Make expands the recipe with `$(shell just … dry-run)`, which only prints the commands |
+| `make -q distclean` | same output and status 1 |
+| `make -f <repository>/Makefile distclean` in another directory | as before, the build/pkg of CURDIR is cleaned (Make passes CURDIR; the justfile is found next to the Makefile). Without `makefiles/` and `doc/` there, Make already failed in `docclean` (with `-k` it went on and removed `<CURDIR>/build/pkg`, and still does); from a second RIOT tree, that tree is cleaned |
+
+The mode comes from the single-letter options in `MAKEFLAGS` (`n` →
+`dry-run`, `s` → `silent`, otherwise `echo`). The new Make parts are at the
+end of the Makefile and the removed lines are balanced, so Make's messages
+keep their line numbers. Only remaining difference: `make -t distclean`
+(touch mode) used to create an empty file `pkg-clean` in the root, because
+the old target was not `.PHONY`; `_pkg-clean` is phony and creates nothing.
+A non-phony Make target named `pkg-clean` would contradict R3.
+
+Reachability (R6): reachable from every directory. C1: same output, exit
+status and effect from the root, an application, `doc/doxygen`,
+`makefiles` and `build/other` (a `build/pkg` below the calling directory is
+not touched). C2: the package sources are shared by all applications and
+boards (`nrf52840dk` included), the command takes no application or board.
+C3: it only removes `<repository>/build/pkg`, idempotently. Note: in an
+application `just pkg-clean` removes the packages of all applications; the
+application-level `make clean-pkg` (only its packages) is a different
+target and is unchanged.
+
+Safety: `just pkg-clean` deletes nothing outside `<repository>/build/pkg`.
+Arguments (`just pkg-clean /`) and variable overrides
+(`just BUILD_DIR=… pkg-clean`, `--set`) are refused by just;
+`BUILD_DIR`/`PKGDIRBASE` in the environment and `--working-directory` are
+ignored; a symlink `build/pkg` loses only the link, not its target. The
+private steps, which Make calls, remove exactly `<dir>/build/pkg` (as
+`make -f` did for CURDIR); they refuse a relative or empty `<dir>` and an
+unknown mode, and stop (`set -e`) if `<dir>` cannot be entered. As with
+Make, a symlinked `build` directory is followed.
+
+```sh
+python3 -m unittest discover -s dist/tools/pkg_clean/tests -v
+```
+
+| Rule | Test class (`../pkg_clean/tests/test_pkg_clean.py`) | How |
+|---|---|---|
+| R1 | `RecipeContractTest`, `EffectTest`, `MakeParityTest` | `just --dump`: public, no parameters, steps with the repository directory and mode `echo`, one fixed `rm`; real run in a temporary tree: stdout, stderr, exit status, exactly `build/pkg` removed, idempotent, failure output; live comparison with `make pkg-clean` of the base commit (also with `BUILD_DIR`/`PKGDIRBASE` set) |
+| R2 | `RecipeContractTest`, `NoMakeTest` | make detector (with samples) on both recipes, no Make file or `$(`; real run with a recording `make`/`gmake` first on `PATH` |
+| R3 | `MakefileTest` | no rule/`.PHONY` entry; `make pkg-clean` (temporary tree): `unrecognized target`, exit 2, nothing removed; welcome text lists it under just |
+| R4 | `CallerTest`, `MakefileTest` | `git grep` for `make … pkg-clean` (with detector samples); `_pkg-clean` only runs the just steps, no `rm` in the Makefile |
+| R5 | `DistcleanTest` | `make distclean` in a temporary tree (stub Makefiles for `doc/` and an application), live against the base commit: default, `-s`, `-n`, `-ns`, `-k`, `-sk`, `-q`, `-n -k`, `--silent`, `--just-print`, with and without `--no-print-directory`; `-f` from a non-RIOT directory and from a second tree (with `-k`, `-s -k`, `-n -k`); recorded output; `-t` difference; fails without just |
+| R6 | `ReachabilityTest` | real run from five directories of a temporary tree; same `--dry-run` from five repository directories |
+| S | `SafetyTest` | refused arguments and overrides, ignored environment and `--working-directory`, symlinked `build/pkg`, failing `cd`; steps: relative directory and unknown mode refused, only `<dir>/build/pkg` removed, `dry-run` changes nothing |
+| – | `RegisterTest` | step in `steps.yaml` (group 2C, hardware: false) |
+
+Mutation probe (2026-11-22; each file copied before the change and restored
+from the copy; every defect detected; counts include subtests):
+
+| Rule | Defect | Failing tests |
+|---|---|---|
+| R1 | message changed | 36 |
+| R1 | `pkg=build` (removes all of `build/`) | 36 |
+| R1 | `rm -rf build/pkg/*` (hidden entries stay) | 29 |
+| R2 | steps call `make` | 3 |
+| R3 | rule `pkg-clean` back in the root Makefile | 7 |
+| R3 | welcome text lists `pkg-clean` under Make | 1 |
+| R4 | `_pkg-clean` cleans itself (logic duplicated) | 8 |
+| R5 | `_pkg-clean` after the applications | 19 |
+| R5 | `_pkg-clean` dropped from `distclean` | 24 |
+| R5 `-s` | `-s` not passed on (always `echo`) | 7 |
+| R5 `-s` | mode `silent` also hides the message | 8 |
+| R5 `-n` | `-n` not detected (just call shown) | 7 |
+| R5 `-n` | mode `dry-run` removes `build/pkg` | 8 |
+| R5 `-f` | repository root instead of CURDIR | 7 |
+| R5 `-f` | justfile taken from CURDIR again | 9 |
+| R5 `-f` | extra line before the includes (line numbers) | 4 |
+| R6 | `pkg-clean` acts in the calling directory | 8 |
+| S | no `cd` (acts in the working directory) | 11 |
+| S | no `set -e` (failed `cd` falls through) | 2 |
+| S | `rm -rf build/pkg/` (follows a symlink) | 2 |
+| S | directory from `PKGDIRBASE` | 2 |
+| S | relative directory accepted | 6 |
+| S | unknown mode accepted | 4 |
+| – | step removed from `steps.yaml` | 1 error (+2 failures, 2 errors in `../migration/tests`) |
