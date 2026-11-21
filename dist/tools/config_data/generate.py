@@ -6,9 +6,15 @@ The output is plain Make that GNU Make reads exactly like the original
 file; it is checked in next to the YAML and must never be edited by hand.
 Layout: two spaces per nesting level, `elif` as `else ifeq`, one
 `VAR += item` line per item (RIOT's style).
+
+The `several` condition is written with `_is_greater` of RIOT's string
+helpers, so a file that uses it starts with the include of
+`makefiles/utils/strings.mk` (as the original `stdio.inc.mk` did).
 """
 
-from rules import to_make_text
+from rules import to_make_text, uses_several
+
+STRING_HELPERS = "include $(RIOTMAKE)/utils/strings.mk"
 
 def header(yaml_base: str) -> list:
     return [f"# Generated from {yaml_base} by dist/tools/config_data/config_data.py.",
@@ -16,11 +22,28 @@ def header(yaml_base: str) -> list:
             ""]
 
 
+def _patterns(words: list) -> str:
+    return " ".join(to_make_text(w) for w in words)
+
+
 def _selection(sel: dict) -> str:
     words = f"$({sel['var']})"
     if sel.get("except"):
-        words = f"$(filter-out {' '.join(sel['except'])},{words})"
-    return f"$(filter {' '.join(sel['match'])},{words})"
+        words = f"$(filter-out {_patterns(sel['except'])},{words})"
+    if sel.get("match"):
+        words = f"$(filter {_patterns(sel['match'])},{words})"
+    return words
+
+
+def value_text(value) -> str:
+    """Make text of a value: a text or `{select: …}` (schema 2)."""
+    if not isinstance(value, dict):
+        return to_make_text(value)
+    sel = value["select"]
+    text = _selection(sel)
+    if "replace" in sel:
+        text = f"$(subst {sel['replace']['from']},{sel['replace']['to']},{text})"
+    return text
 
 
 def condition(cond: dict) -> str:
@@ -35,6 +58,8 @@ def condition(cond: dict) -> str:
         kind, args = "ifneq", f",$(filter $({value['var']}),{' '.join(value['values'])})"
     elif key == "selection_equals":
         kind, args = "ifeq", f"{' '.join(value['words'])},{_selection(value)}"
+    elif key == "several":
+        kind, args = "ifeq", f"1,$(call _is_greater,$(words $(sort {_selection(value)})),1)"
     elif key == "equals":
         refs = " ".join(f"$({var})" for var in value)
         kind, args = "ifeq", f"{refs},{' '.join(value.values())}"
@@ -58,11 +83,11 @@ def _action(rule: dict, pad: str) -> list:
     if "add" in rule:
         (var, items), = rule["add"].items()
         # one line per item, as RIOT writes them
-        return [f"{pad}{var} += {to_make_text(item)}" for item in items]
+        return [f"{pad}{var} += {value_text(item)}" for item in items]
     if "set" in rule:
         op = {"recursive": "=", "simple": ":=", "conditional": "?="}[
             rule["set"].get("flavor", "recursive")]
-        return [f"{pad}{rule['set']['var']} {op} {to_make_text(rule['set']['value'])}".rstrip()]
+        return [f"{pad}{rule['set']['var']} {op} {value_text(rule['set']['value'])}".rstrip()]
     if "include" in rule:
         return [pad + _include(rule["include"])]
     for level in ("error", "warning", "info"):
@@ -117,4 +142,5 @@ def lines(rules: list, depth: int = 0) -> list:
 
 def make_text(rules: list, yaml_base: str) -> str:
     """The whole generated Make file."""
-    return "\n".join(header(yaml_base) + lines(rules)) + "\n"
+    helpers = [STRING_HELPERS, ""] if uses_several(rules) else []
+    return "\n".join(header(yaml_base) + helpers + lines(rules)) + "\n"

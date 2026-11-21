@@ -78,7 +78,8 @@ class LiveMakeParityTest(unittest.TestCase):
             for target in filter(target_filter, sample.targets(app)):
                 argv = sample.make_argv(app_dir, board, target)
                 with self.subTest(command=" ".join(argv)):
-                    self.assertEqual(sample.run_make(argv), entries[" ".join(argv)])
+                    self.assertEqual(sample.mask_version(sample.run_make(argv)),
+                                     sample.mask_version(entries[" ".join(argv)]))
 
     def test_info_targets(self):
         self.compare(lambda t: t != sample.BUILD_LIST)

@@ -58,3 +58,14 @@ files:
 - sys/trickle/Makefile.dep
 - sys/xtimer/Makefile.dep
 - sys/ztimer/Makefile.dep
+# Step G0-2: the rule files of the build system pipeline that hold
+# configuration (default modules, stdio backends, features -> modules,
+# deprecated modules). Their YAML is `<name>.inc.yaml`; the application
+# Makefiles of `applications` are generated from `riot-app.yaml`.
+pipeline:
+- makefiles/defaultmodules_deps.inc.mk
+- makefiles/defaultmodules_no_recursive_deps.inc.mk
+- makefiles/defaultmodules_regular.inc.mk
+- makefiles/deprecated_modules.inc.mk
+- makefiles/features_modules.inc.mk
+- makefiles/stdio.inc.mk

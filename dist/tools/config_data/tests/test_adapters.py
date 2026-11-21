@@ -43,11 +43,12 @@ class UpToDateTest(unittest.TestCase):
 
     def test_yaml_files_are_exactly_the_scope(self):
         scope = config_data.load_scope()
-        expected = sorted(os.path.join(R.RIOTBASE, R.yaml_name(p)) for p in scope["files"])
+        expected = sorted(os.path.join(R.RIOTBASE, R.yaml_name(p))
+                          for p in config_data.converted_files(scope))
         self.assertEqual(config_data.all_yaml(), expected)
 
     def test_generated_files_carry_the_header(self):
-        for path in config_data.load_scope()["files"]:
+        for path in config_data.converted_files(config_data.load_scope()):
             with self.subTest(path=path):
                 with open(os.path.join(R.RIOTBASE, path), encoding="utf-8") as file:
                     first = file.readline()
@@ -111,14 +112,18 @@ class FileNameTest(unittest.TestCase):
         for make, data in (("sys/Makefile.dep", "sys/deps.yaml"),
                            ("cpu/nrf52/Makefile.nrf802154.dep", "cpu/nrf52/nrf802154.deps.yaml"),
                            ("Makefile.features", "provides.yaml"),
-                           ("boards/x/Makefile.board.features", "boards/x/board.provides.yaml")):
+                           ("boards/x/Makefile.board.features", "boards/x/board.provides.yaml"),
+                           ("boards/x/Makefile.default", "boards/x/default.yaml"),
+                           ("makefiles/stdio.inc.mk", "makefiles/stdio.inc.yaml"),
+                           ("examples/basic/hello-world/Makefile",
+                            "examples/basic/hello-world/riot-app.yaml")):
             with self.subTest(make=make):
                 self.assertEqual(R.yaml_name(make), data)
                 self.assertEqual(R.make_name(data), make)
                 self.assertTrue(R.is_yaml_name(data))
 
     def test_other_names_are_rejected(self):
-        for name in ("Makefile", "Makefile.include", "features.yaml", "x.yaml"):
+        for name in ("Makefile.include", "Makefile.ci", "features.yaml", "x.yaml", ".inc.yaml"):
             with self.subTest(name=name):
                 with self.assertRaises(ValueError):
                     R.yaml_name(name) if name.startswith("Makefile") else R.make_name(name)

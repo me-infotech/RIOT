@@ -1,3 +1,6 @@
+# Generated from riot-app.yaml by dist/tools/config_data/config_data.py.
+# Do not edit: change riot-app.yaml and run `just generate-config-data`.
+
 # name of your application
 APPLICATION = bindist
 
@@ -22,10 +25,13 @@ QUIET ?= 1
 # to flag that the directory should only be included when doing a normal build,
 # and that the resulting .a should be saved when doing "make bindist"
 BIN_DIRS += abc
-BIN_USEMODULE += abc                    # include "abc" module
-BIN_USEMODULE += $(APPLICATION_MODULE)  # include application module
+
+# include "abc" module
+BIN_USEMODULE += abc
+
+# include application module
+BIN_USEMODULE += $(APPLICATION_MODULE)
 
 # list of extra files to include in binary distribution
 DIST_FILES += Makefile
-
 include $(RIOTBASE)/Makefile.include

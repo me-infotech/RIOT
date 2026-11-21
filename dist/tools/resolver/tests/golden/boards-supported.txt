@@ -1,0 +1,18 @@
+# golden output of GNU Make for the parity tests of step G0-2
+# generator: dist/tools/resolver/tests/record_golden.py
+# commit: 827338cf72616f884bfab485d4097d42030a1ad5 (git archive)
+# date: 2026-11-21
+# make: GNU Make 4.3
+# environment: env -i PATH HOME LC_ALL=C BOARDS; stdout and stderr merged
+## BOARDS='nrf52840dk native64' make --no-print-directory -C examples/basic/hello-world info-boards-supported
+## exit: 0
+using BOARD="native64" as "native" on a 64-bit system
+native64 nrf52840dk
+## BOARDS='nrf52840dk native64' make --no-print-directory -C examples/networking/gnrc/networking info-boards-supported
+## exit: 0
+using BOARD="native64" as "native" on a 64-bit system
+native64 nrf52840dk
+## BOARDS='nrf52840dk native64' make --no-print-directory -C examples/advanced/bindist info-boards-supported
+## exit: 0
+using BOARD="native64" as "native" on a 64-bit system
+native64 nrf52840dk

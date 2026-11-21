@@ -9,6 +9,7 @@ parity tests run Make again and compare.
 """
 
 import os
+import re
 import subprocess
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -27,6 +28,11 @@ BOARDS = ["nrf52840dk", "native64"]
 INFO_TARGETS = ["info-modules", "info-packages", "info-features-used",
                 "info-features-missing", "info-features-provided",
                 "info-debug-variable-MAKEFILE_LIST"]
+# Added in step G0-2 (resolver): the CPU of the board and its data. Recorded
+# on the same base commit (record_golden.py --root/--add, see there).
+CPU_TARGETS = ["info-cpu", "info-debug-variable-CPU_MODEL", "info-debug-variable-CPU_CORE",
+               "info-debug-variable-CPU_FAM", "info-debug-variable-CPU_ARCH"]
+INFO_TARGETS += CPU_TARGETS
 # The build command list (`make -n -k`) is compared for these applications.
 # No toolchain is needed: Make prints the commands and stops where a
 # generated file is missing, at the same place each time.
@@ -59,9 +65,20 @@ def targets(app: str) -> list:
     return INFO_TARGETS + ([BUILD_LIST] if app in BUILD_LIST_APPS else [])
 
 
-def normalize(text: str) -> str:
+def normalize(text: str, root: str = RIOTBASE) -> str:
     """Replace the repository path, so golden files are portable."""
-    return text.replace(RIOTBASE, PLACEHOLDER)
+    return text.replace(root, PLACEHOLDER)
+
+
+VERSION_RE = re.compile(r'-DRIOT_VERSION=\\"[^\\"]*\\"')
+
+
+def mask_version(result: tuple) -> tuple:
+    """(status, lines) with RIOT_VERSION masked: `git describe` names the
+    commit and branch of the checkout (the golden files were recorded on
+    another branch), not a result of the build configuration."""
+    status, lines = result
+    return status, [VERSION_RE.sub('-DRIOT_VERSION=\\"@VERSION@\\"', line) for line in lines]
 
 
 def golden_path(app: str, board: str) -> str:
@@ -69,11 +86,16 @@ def golden_path(app: str, board: str) -> str:
 
 
 def read_golden(path: str) -> tuple:
-    """(header lines, {command: (exit status, output lines)})."""
+    """(header lines, {command: (exit status, output lines)}).
+
+    The file ends with the line "## end", so that an empty last output line
+    does not leave a blank line at the end of the file."""
     header, entries, command = [], {}, None
     with open(path, encoding="utf-8") as file:
         for line in file.read().splitlines():
-            if line.startswith("## make "):
+            if line == "## end":
+                command = None
+            elif line.startswith("## make "):
                 command = line[3:]
                 entries[command] = [None, []]
             elif line.startswith("## exit: "):
@@ -85,9 +107,10 @@ def read_golden(path: str) -> tuple:
     return header, {c: (e[0], e[1]) for c, e in entries.items()}
 
 
-def run_make(argv: list) -> tuple:
-    """(exit status, normalised output lines) of one Make run. stdout and
-    stderr are merged: the build command list ends with Make's error."""
-    res = subprocess.run(argv, cwd=RIOTBASE, env=environment(), check=False,
+def run_make(argv: list, root: str = RIOTBASE) -> tuple:
+    """(exit status, normalised output lines) of one Make run in the tree
+    `root`. stdout and stderr are merged: the build command list ends with
+    Make's error."""
+    res = subprocess.run(argv, cwd=root, env=environment(), check=False,
                          stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-    return res.returncode, normalize(res.stdout).splitlines()
+    return res.returncode, normalize(res.stdout, root).splitlines()

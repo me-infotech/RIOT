@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 # SPDX-FileCopyrightText: 2026 RIOT contributors
 # SPDX-License-Identifier: LGPL-2.1-only
-"""Dependency and feature configuration of RIOT as data (migration step G0-1).
+"""Dependency and feature configuration of RIOT as data (migration steps
+G0-1 and G0-2).
 
-The YAML file next to a `Makefile.dep` (`deps.yaml`) or `Makefile.features`
-(`provides.yaml`) is the source; the Make file is generated from it and
-checked in, so that Make keeps working until nothing reads it any more.
+The YAML file next to a `Makefile.dep` (`deps.yaml`), `Makefile.features`
+(`provides.yaml`), a rule file of the build system pipeline
+(`makefiles/<name>.inc.mk` -> `<name>.inc.yaml`) or an application
+`Makefile` (`riot-app.yaml`) is the source; the Make file is generated from
+it and checked in, so that Make keeps working until nothing reads it any
+more.
 
   config_data.py generate [--check] [YAML…]   write (check) the Make files
   config_data.py validate [YAML…]             check the YAML against the schema
@@ -20,7 +24,7 @@ checked in, so that Make keeps working until nothing reads it any more.
                                               sample of scope.yaml
 
 Without file arguments, generate/validate use every YAML data file of the
-repository and roundtrip uses the files listed in scope.yaml.
+repository and roundtrip uses the files converted for scope.yaml.
 """
 
 import argparse
@@ -82,8 +86,17 @@ def expected_make_text(path: str) -> str:
 def title(make_path: str) -> str:
     directory = os.path.dirname(rel(make_path)) or "the repository root"
     base = os.path.basename(make_path)
-    what = "Dependency rules" if base.endswith(".dep") else "Provided features and CPU data"
-    return (f"{what} of {directory}. This file is the source: {base}\n"
+    if base == R.APP_MAKE:
+        what = "Configuration of the application"
+    elif base.endswith(R.INC_MAKE):
+        what = f"Rules of the build system ({base[:-len(R.INC_MAKE)]}) in"
+    elif base.endswith(".dep"):
+        what = "Dependency rules of"
+    elif base.endswith(".default"):
+        what = "Default modules of"
+    else:
+        what = "Provided features and CPU data of"
+    return (f"{what} {directory}. This file is the source: {base}\n"
             "next to it is generated from it (`just generate-config-data`).\n"
             "Format: dist/tools/config_data/README.md")
 
@@ -177,6 +190,14 @@ def load_scope() -> dict:
         return yaml.safe_load(file)
 
 
+def converted_files(scope: dict) -> list:
+    """Every Make file generated from YAML for the scope: the dependency and
+    feature files Make reads (G0-1), the rule files of the build system
+    pipeline and the application Makefiles (G0-2)."""
+    apps = [os.path.join(d, R.APP_MAKE) for d in scope["applications"].values()]
+    return sorted(scope["files"] + scope.get("pipeline", []) + apps)
+
+
 def git_show(rev: str, path: str) -> str:
     return subprocess.run(["git", "-C", R.RIOTBASE, "show", f"{rev}:{path}"],
                           capture_output=True, text=True, check=True).stdout
@@ -185,7 +206,7 @@ def git_show(rev: str, path: str) -> str:
 def cmd_roundtrip(args) -> int:
     scope = load_scope()
     rev = args.rev or scope["base"]
-    files = [rel(f) for f in args.files] or scope["files"]
+    files = [rel(f) for f in args.files] or converted_files(scope)
     failed = 0
     for path in files:
         yaml_path = os.path.join(R.RIOTBASE, R.yaml_name(path))

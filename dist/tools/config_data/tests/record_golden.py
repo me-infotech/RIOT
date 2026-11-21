@@ -11,8 +11,16 @@ a time, and writes golden/<app>__<board>.txt. Each file starts with a header
 The golden files of step G0-1 were recorded on the base commit, before any
 dependency or feature file was converted. Re-record only for a reviewed
 change of Make's behaviour and review the diff.
+
+Adding targets later (step G0-2 added sample.CPU_TARGETS): run Make on an
+unchanged tree of the base commit and insert only the new entries, keeping
+every recorded entry and the header:
+
+  git archive <base> | tar -x -C /tmp/base
+  record_golden.py --root /tmp/base --commit <base> --add info-cpu …
 """
 
+import argparse
 import datetime
 import os
 import subprocess
@@ -49,7 +57,40 @@ def header() -> list:
     ]
 
 
+def add_targets(root: str, commit: str, new: list) -> int:
+    """Insert the entries of `new` into the existing golden files, recorded
+    in the tree `root` (an unchanged checkout of `commit`)."""
+    stamp = (f"# added {datetime.date.today().isoformat()}: {' '.join(new)}; "
+             f"recorded on {commit} (git archive), {first_line(['make', '--version'])}")
+    for app, app_dir, board in sample.pairs():
+        path = sample.golden_path(app, board)
+        head, entries = sample.read_golden(path)
+        lines = list(head) + ([stamp] if stamp not in head else [])
+        for target in sample.targets(app):
+            argv = sample.make_argv(app_dir, board, target)
+            key = " ".join(argv)
+            if target in new:
+                entries[key] = sample.run_make(argv, root)
+            status, output = entries[key]
+            lines += ["## " + key, f"## exit: {status}"] + output
+        with open(path, "w", encoding="utf-8") as file:
+            file.write("\n".join(lines + ["## end"]) + "\n")
+        print(f"updated {os.path.relpath(path, sample.RIOTBASE)}")
+    return 0
+
+
 def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--root", help="tree to run Make in (with --add)")
+    parser.add_argument("--commit", help="commit of that tree (with --add)")
+    parser.add_argument("--add", nargs="+", metavar="TARGET",
+                        help="record only these targets and insert them")
+    args = parser.parse_args()
+    if args.add:
+        if not (args.root and args.commit):
+            parser.error("--add needs --root and --commit")
+        return add_targets(os.path.abspath(args.root), args.commit, args.add)
     head = header()
     os.makedirs(sample.GOLDEN, exist_ok=True)
     for app, app_dir, board in sample.pairs():
@@ -60,7 +101,7 @@ def main() -> int:
             lines += ["## " + " ".join(argv), f"## exit: {status}"] + output
         path = sample.golden_path(app, board)
         with open(path, "w", encoding="utf-8") as file:
-            file.write("\n".join(lines) + "\n")
+            file.write("\n".join(lines + ["## end"]) + "\n")
         print(f"wrote {os.path.relpath(path, sample.RIOTBASE)}")
     return 0
 

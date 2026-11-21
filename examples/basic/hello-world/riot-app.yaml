@@ -1,0 +1,19 @@
+# Configuration of the application examples/basic/hello-world. This file is the source: Makefile
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - comment: name of your application
+    set: {var: APPLICATION, value: hello-world}
+  - comment: 'If no BOARD is found in the environment, use this default:'
+    set: {var: BOARD, value: native, flavor: conditional}
+  - comment: 'This has to be the absolute path to the RIOT base directory:'
+    set: {var: RIOTBASE, value: '${CURDIR}/../../..', flavor: conditional}
+  - comment: |-
+      Comment this out to disable code in RIOT that does safety checking
+      which is not needed in a production environment but helps in the
+      development process:
+    set: {var: DEVELHELP, value: '1', flavor: conditional}
+  - comment: 'Change this to 0 show compiler invocation lines by default:'
+    set: {var: QUIET, value: '1', flavor: conditional}
+  - include: {path: '${RIOTBASE}/Makefile.include'}

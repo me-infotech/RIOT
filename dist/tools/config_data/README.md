@@ -200,13 +200,42 @@ one run against all info goldens of that attempt (hello-world,
 gnrc_networking, tests/periph/rtc on ten boards of nine CPU families,
 including error exits): 210/210 identical.
 
+Extension of step G0-2 (schema 2, pipeline rules, applications)
+---------------------------------------------------------------
+
+Step G0-2 (`dist/tools/resolver`) needs no Make file at all, so the rule
+files of the build system pipeline and the application Makefiles became
+data too (`scope.yaml`: `pipeline`, `applications`):
+
+| Make file (generated) | YAML (source) |
+|---|---|
+| `makefiles/<name>.inc.mk` | `makefiles/<name>.inc.yaml` (6: default modules x3, `stdio`, `features_modules`, `deprecated_modules`) |
+| application `Makefile` | `riot-app.yaml` (3 applications) |
+| `Makefile.default` | `default.yaml` (name only; none in the scope) |
+
+Schema 2 adds, for those files only (a file declares the lowest schema it
+needs; the 44 files keep `schema: 1`):
+
+| Construct | Meaning | Make (generated) |
+|---|---|---|
+| `{select: {var, match?, except?, replace?: {from, to}}}` as `add` item or `set` value | the words of `var` that match and are not excepted, `from` replaced by `to` | `$(subst F,T,$(filter M,$(filter-out E,$(V))))` |
+| `${NAME}` as a whole pattern word | the words of NAME are the patterns | `$(filter $(NAME),…)` |
+| `several: {var, match, except?}` | more than one distinct word selected | `ifeq (1,$(call _is_greater,$(words $(sort …)),1))`, with `include $(RIOTMAKE)/utils/strings.mk` first in the file |
+
+Round trip: 53/53 files (44 + 6 + 3) original = generated = YAML. The
+golden files gained `info-cpu` and `info-debug-variable-CPU_MODEL/CORE/FAM/ARCH`
+(same base commit, `record_golden.py --add`); the build command list is
+compared with RIOT_VERSION masked. Tests: `test_schema2.py` (S1-S5, 17
+tests); the whole directory now has 79 tests.
+
 Limits
 ------
 
 - Only 44 of 1157 files; Make reads converted and unconverted files mixed.
-- Two `include`s point to Make logic, not data: `makefiles/stdio.inc.mk`
-  (from `sys/Makefile.dep`) and `makefiles/features_check.inc.mk` (from
-  `sys/ztimer/Makefile.dep`); the resolver (G0-2) has to provide both.
+- Two `include`s pointed to Make logic, not data: `makefiles/stdio.inc.mk`
+  (from `sys/Makefile.dep`; data since G0-2) and
+  `makefiles/features_check.inc.mk` (from `sys/ztimer/Makefile.dep`; an
+  algorithm, implemented by the resolver of G0-2).
 - Comments are kept, the layout of the generated files is not (blank
   lines, alignment, trailing comments move above their line).
 - Board and CPU build data (`Makefile.include`) is not part of this step.

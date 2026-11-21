@@ -1,0 +1,10 @@
+# Rules of the build system (deprecated_modules) in makefiles. This file is the source: deprecated_modules.inc.mk
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - comment: |-
+      Add deprecated modules here
+      Keep this list ALPHABETICALLY SORTED!!!!111elven
+    add: {DEPRECATED_MODULES: [netdev_ieee802154_submac_soft_ack]}
+  - add: {DEPRECATED_MODULES: [sema_deprecated]}

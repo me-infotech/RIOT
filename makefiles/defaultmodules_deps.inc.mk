@@ -1,9 +1,13 @@
+# Generated from defaultmodules_deps.inc.yaml by dist/tools/config_data/config_data.py.
+# Do not edit: change defaultmodules_deps.inc.yaml and run `just generate-config-data`.
+
 # This files contains dependencies for default modules. They are parsed at the
 # end of the dependency loop. They MAY include new modules, but these modules
 # MUST NOT have dependencies themselves.
 
 ifneq (,$(filter auto_init%,$(USEMODULE)))
-  USEMODULE += preprocessor preprocessor_successor
+  USEMODULE += preprocessor
+  USEMODULE += preprocessor_successor
 endif
 
 ifneq (,$(filter auto_init_ztimer,$(USEMODULE)))

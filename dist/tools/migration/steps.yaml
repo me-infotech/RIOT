@@ -90,3 +90,17 @@ steps:
       pip: [pyyaml]
       tools: [just@1.59.0]
     docs: dist/tools/config_data/README.md
+
+  - id: g0-02-resolver
+    title: Resolver of modules, packages, features and CPU from the configuration data, without Make
+    group: G0
+    targets: []
+    provides:
+      - name: resolve
+        now: dist/tools/resolver/resolver.py -C <application> BOARD=<board> <info-…|json>
+        hardware: false
+    tests:
+      - dist/tools/resolver/tests
+    requires:
+      pip: [pyyaml]
+    docs: dist/tools/resolver/README.md

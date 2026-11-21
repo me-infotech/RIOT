@@ -22,12 +22,22 @@ Accepted statements (blanks around tokens do not matter):
   $(error|warning|info text)
   full-line and trailing comments (kept as `comment`)
 
+Schema 2 (rules of the build system pipeline, step G0-2):
+
+  a pattern list may name a variable as a whole word: $(filter $(L),$(V))
+  ifeq/ifneq (1,$(call _is_greater,$(words $(sort SEL)),1))   several / not
+  V := SEL   V = SEL   V += SEL   with SEL one of $(filter P…,$(V)),
+       $(filter-out E…,$(V)), both nested, or $(V), optionally inside
+       $(subst from,to,…)                                     select value
+  include $(RIOTMAKE)/utils/strings.mk as the first statement of a file
+       that uses `several` (the generator writes it again)
+
 Text may refer to variables as $(V) or ${V}; it is stored as ${V}.
 """
 
 import re
 
-from rules import NAME
+from rules import NAME, uses_several
 
 COND_RE = re.compile(r"^(ifeq|ifneq)\s*(.*)$")
 ASSIGN_RE = re.compile(rf"^({NAME})\s*(\+=|:=|\?=|=)\s*(.*)$")
@@ -35,6 +45,7 @@ INCLUDE_RE = re.compile(r"^(-include|sinclude|include)\s+(.*)$")
 REF_ONLY_RE = re.compile(rf"^\$[({{]({NAME})[)}}]$")
 MAKE_REF_RE = re.compile(rf"\$[({{]({NAME})[)}}]")
 SUBST_RE = re.compile(rf"^\$\(({NAME}):%=(.*)\)$")
+STRING_HELPERS_RE = re.compile(r"^include\s+\$[({]RIOTMAKE[)}]/utils/strings\.mk$")
 FLAVOR = {"=": None, ":=": "simple", "?=": "conditional"}
 
 
@@ -92,10 +103,66 @@ def template(text: str) -> str:
 
 
 def _patterns(text: str) -> list:
-    words = text.split()
-    if not words or any("$" in w or "(" in w for w in words):
+    """Pattern words; a whole word `$(V)` names the words of V (schema 2)."""
+    words = []
+    for word in text.split():
+        ref = REF_ONLY_RE.match(word)
+        if ref:
+            words.append("${" + ref.group(1) + "}")
+        elif "$" in word or "(" in word or ")" in word:
+            raise Unsupported(f"pattern list {text!r}")
+        else:
+            words.append(word)
+    if not words:
         raise Unsupported(f"pattern list {text!r}")
     return words
+
+
+def selection(text: str):
+    """The selection of `$(filter P,$(V))`, `$(filter-out E,$(V))` (or both
+    nested, in either order) or `$(V)`: {var, match?, except?}; None if the
+    text is something else."""
+    text = text.strip()
+    ref = REF_ONLY_RE.match(text)
+    if ref:
+        return {"var": ref.group(1)}
+    call = _call(text)
+    if not call or call[0] not in ("filter", "filter-out") or len(call[1]) != 2:
+        return None
+    func, (first, second) = call
+    key = "match" if func == "filter" else "except"
+    inner = REF_ONLY_RE.match(second)
+    if inner:
+        return {"var": inner.group(1), key: _patterns(first)}
+    nested = _call(second)
+    if (nested and len(nested[1]) == 2 and REF_ONLY_RE.match(nested[1][1])
+            and {func, nested[0]} == {"filter", "filter-out"}):
+        other = "except" if key == "match" else "match"
+        sel = {"var": REF_ONLY_RE.match(nested[1][1]).group(1), key: _patterns(first),
+               other: _patterns(nested[1][0])}
+        return {k: sel[k] for k in ("var", "match", "except")}
+    return None
+
+
+def select_value(text: str):
+    """`{select: …}` of a value that is exactly a selection, optionally inside
+    `$(subst from,to,…)`; None otherwise (schema 2)."""
+    text = text.strip()
+    call = _call(text) if text.startswith("$(") else None
+    if call and call[0] == "subst":
+        if len(call[1]) != 3 or any(re.search(r"[\s$(),#%]", a) for a in call[1][:2]) \
+                or not call[1][0]:
+            raise Unsupported(f"$(subst …) with other than literal words in {text!r}")
+        sel = selection(call[1][2])
+        if sel is None:
+            raise Unsupported(f"$(subst …) of other than a selection in {text!r}")
+        return {"select": {**sel, "replace": {"from": call[1][0], "to": call[1][1]}}}
+    if call is None or call[0] not in ("filter", "filter-out"):
+        return None
+    sel = selection(text)
+    if sel is None:
+        raise Unsupported(f"selection {text!r}")
+    return {"select": sel}
 
 
 def _operand(text: str):
@@ -109,6 +176,15 @@ def _operand(text: str):
     if all(REF_ONLY_RE.match(r) for r in refs):
         return ("refs", [REF_ONLY_RE.match(r).group(1) for r in refs])
     call = _call(text)
+    if call and call[0] == "call" and len(call[1]) == 3 and call[1][0] == "_is_greater" \
+            and call[1][2] == "1":
+        # $(call _is_greater,$(words $(sort SEL)),1): more than one word
+        words = _call(call[1][1])
+        inner = _call(words[1][0]) if words and words[0] == "words" else None
+        sel = selection(inner[1][0]) if inner and inner[0] == "sort" else None
+        if sel and "match" in sel:
+            return ("several", sel)
+        raise Unsupported(f"condition operand {text!r}")
     if call and len(call[1]) == 2:
         func, (first, second) = call
         ref = REF_ONLY_RE.match(first)
@@ -147,6 +223,9 @@ def condition(kind: str, args: str) -> dict:
         cond = {"one_of": by_kind["one_of"][1]}
     elif kinds == ["select", "words"]:
         cond = {"selection_equals": {**by_kind["select"][1], "words": by_kind["words"][1]}}
+        positive = not positive
+    elif kinds == ["several", "words"] and by_kind["words"][1] == ["1"]:
+        cond = {"several": by_kind["several"][1]}
         positive = not positive
     elif kinds in (["empty", "refs"], ["refs", "words"]):
         names = by_kind["refs"][1]
@@ -234,6 +313,14 @@ def _statement(code: str) -> list:
     match = ASSIGN_RE.match(code)
     if match:
         var, op, value = match.groups()
+        selected = select_value(value)
+        if selected is not None:
+            if op == "+=":
+                return [{"add": {var: [selected]}}]
+            rule = {"var": var, "value": selected}
+            if FLAVOR[op]:
+                rule["flavor"] = FLAVOR[op]
+            return [{"set": rule}]
         value = template(value.strip())
         if op == "+=":
             items = [value] if '"' in value else value.split()
@@ -251,6 +338,7 @@ def translate(text: str, path: str = "<text>") -> list:
     """The rule list of a Make file; raises Unsupported with file:line."""
     root = []
     stack = [{"body": root}]
+    helpers = []          # line of `include $(RIOTMAKE)/utils/strings.mk`
     pending = []          # comment lines waiting for the next statement
     mergeable = [False]   # the last rule of the body may take more words
 
@@ -261,7 +349,8 @@ def translate(text: str, path: str = "<text>") -> list:
         mergeable[0] = False
 
     def emit(rule, trailing):
-        lines = pending + ([trailing] if trailing is not None else [])
+        # an empty trailing comment (`… \` `#` closing a list) is no comment
+        lines = pending + ([trailing] if trailing else [])
         pending.clear()
         body = stack[-1]["body"]
         # `V += a` `V += b` on adjacent lines become one rule; a comment
@@ -330,6 +419,13 @@ def translate(text: str, path: str = "<text>") -> list:
             if code.split()[0] in ("define", "export", "unexport", "override",
                                    "undefine", "vpath", "private"):
                 raise Unsupported(f"{code!r}: not part of the format")
+            if STRING_HELPERS_RE.match(code):
+                if any(set(r) != {"comment"} for r in root) or len(stack) > 1 \
+                        or comment is not None:
+                    raise Unsupported("the string helpers are included only as the first "
+                                      "statement")
+                helpers.append(number)
+                continue
             for rule in _statement(code):
                 emit(rule, comment)
                 comment = None
@@ -338,4 +434,7 @@ def translate(text: str, path: str = "<text>") -> list:
     if len(stack) > 1:
         raise Unsupported(f"{path}:{stack[-1]['line']}: missing endif")
     flush()
+    if helpers and not uses_several(root):
+        raise Unsupported(f"{path}:{helpers[0]}: string helpers included, but no "
+                          "`several` condition uses them")
     return root

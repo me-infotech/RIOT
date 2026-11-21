@@ -1,0 +1,14 @@
+# Rules of the build system (defaultmodules_no_recursive_deps) in makefiles. This file is the source: defaultmodules_no_recursive_deps.inc.mk
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - comment: |-
+      This file declares DEFAULT_MODULEs, which may only have modules as
+      dependencies that themselves have no dependencies. DEFAULT_MODULEs that have
+      dependencies must be delcared in defaultmodules_deps.inc.mk.
+      DEFAULT_MODULEs declared in this file MAY be disabled during dependency
+      resolution.
+  - add: {DEFAULT_MODULE: [auto_init, periph_init]}
+  - add: {DEFAULT_MODULE: [periph_init_leds, periph_init_led0, periph_init_led1, periph_init_led2, periph_init_led3,
+        periph_init_led4, periph_init_led5, periph_init_led6, periph_init_led7, periph_init_buttons]}

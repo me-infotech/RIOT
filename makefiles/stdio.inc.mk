@@ -1,29 +1,13 @@
+# Generated from stdio.inc.yaml by dist/tools/config_data/config_data.py.
+# Do not edit: change stdio.inc.yaml and run `just generate-config-data`.
+
 include $(RIOTMAKE)/utils/strings.mk
 
 # List of available stdio backend modules.
-STDIO_MODULES = \
-  stdio_cdc_acm \
-  stdio_ethos \
-  stdio_fb \
-  stdio_mgba \
-  stdio_native \
-  stdio_nimble \
-  stdio_null \
-  stdio_rtt \
-  stdio_semihosting \
-  stdio_slipdev \
-  stdio_telnet \
-  stdio_tinyusb_cdc_acm \
-  stdio_uart \
-  stdio_udp \
-  stdio_usb_serial_jtag \
-  #
+STDIO_MODULES = stdio_cdc_acm stdio_ethos stdio_fb stdio_mgba stdio_native stdio_nimble stdio_null stdio_rtt stdio_semihosting stdio_slipdev stdio_telnet stdio_tinyusb_cdc_acm stdio_uart stdio_udp stdio_usb_serial_jtag
 
 # List of available legacy stdio backend modules.
-STDIO_LEGACY_MODULES = \
-  ethos_stdio \
-  stdio_ethos \
-  #
+STDIO_LEGACY_MODULES = ethos_stdio stdio_ethos
 
 ifeq (,$(filter $(STDIO_LEGACY_MODULES),$(USEMODULE)))
   USEMODULE += stdio
@@ -31,7 +15,7 @@ endif
 
 # Check if more than one STDIO has been selected, if so add stdio_dispatch.
 # This check will fail if 10 or more modules are selected.
-ifeq (1, $(call _is_greater,$(words $(sort $(filter $(STDIO_MODULES),$(USEMODULE)))),1))
+ifeq (1,$(call _is_greater,$(words $(sort $(filter $(STDIO_MODULES),$(USEMODULE)))),1))
   USEMODULE += stdio_dispatch
 endif
 

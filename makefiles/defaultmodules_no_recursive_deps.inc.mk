@@ -1,11 +1,14 @@
+# Generated from defaultmodules_no_recursive_deps.inc.yaml by dist/tools/config_data/config_data.py.
+# Do not edit: change defaultmodules_no_recursive_deps.inc.yaml and run `just generate-config-data`.
+
 # This file declares DEFAULT_MODULEs, which may only have modules as
 # dependencies that themselves have no dependencies. DEFAULT_MODULEs that have
 # dependencies must be delcared in defaultmodules_deps.inc.mk.
 # DEFAULT_MODULEs declared in this file MAY be disabled during dependency
 # resolution.
 
-DEFAULT_MODULE += auto_init periph_init
-
+DEFAULT_MODULE += auto_init
+DEFAULT_MODULE += periph_init
 DEFAULT_MODULE += periph_init_leds
 DEFAULT_MODULE += periph_init_led0
 DEFAULT_MODULE += periph_init_led1

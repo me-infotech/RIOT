@@ -1,0 +1,65 @@
+# Configuration of the application examples/networking/gnrc/networking. This file is the source: Makefile
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 1
+rules:
+  - comment: name of your application
+    set: {var: APPLICATION, value: gnrc_networking}
+  - comment: 'If no BOARD is found in the environment, use this default:'
+    set: {var: BOARD, value: native, flavor: conditional}
+  - comment: 'This has to be the absolute path to the RIOT base directory:'
+    set: {var: RIOTBASE, value: '${CURDIR}/../../../..', flavor: conditional}
+  - comment: |-
+      Include packages that pull up and auto-init the link layer.
+      NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
+    add: {USEMODULE: [netdev_default]}
+  - add: {USEMODULE: [auto_init_gnrc_netif]}
+  - comment: Activate ICMPv6 error messages
+    add: {USEMODULE: [gnrc_icmpv6_error]}
+  - comment: Specify the mandatory networking module for a IPv6 routing node
+    add: {USEMODULE: [gnrc_ipv6_router_default]}
+  - comment: Add a routing protocol
+    add: {USEMODULE: [gnrc_rpl]}
+  - add: {USEMODULE: [auto_init_gnrc_rpl]}
+  - comment: Additional networking modules that can be dropped if not needed
+    add: {USEMODULE: [gnrc_icmpv6_echo]}
+  - add: {USEMODULE: [gnrc_pktshark_default]}
+  - comment: Add also the shell, some shell commands
+    add: {USEMODULE: [shell]}
+  - add: {USEMODULE: [shell_cmds_default, shell_cmd_udp_server, ps, netstats_l2, netstats_ipv6, netstats_rpl]}
+  - comment: |-
+      Optionally include DNS support. This includes resolution of names at an
+      upstream DNS server and the handling of RDNSS options in Router Advertisements
+      to auto-configure that upstream DNS server.
+      USEMODULE += sock_dns              # include DNS client
+      USEMODULE += gnrc_ipv6_nib_dns     # include RDNSS option handling
+  - comment: |-
+      Comment this out to disable code in RIOT that does safety checking
+      which is not needed in a production environment but helps in the
+      development process:
+    set: {var: DEVELHELP, value: '1', flavor: conditional}
+  - comment: |-
+      Instead of simulating an Ethernet connection, we can also simulate
+      an IEEE 802.15.4 radio using ZEP
+    set: {var: USE_ZEP, value: '0', flavor: conditional}
+  - comment: set the ZEP port for native
+    set: {var: ZEP_PORT_BASE, value: '17754', flavor: conditional}
+  - if: {equals: {USE_ZEP: '1'}}
+    then:
+      - add: {USEMODULE: [socket_zep]}
+  - comment: |-
+      Uncomment the following 2 lines to specify static link lokal IPv6 address
+      this might be useful for testing, in cases where you cannot or do not want to
+      run a shell with ifconfig to get the real link lokal address.
+      IPV6_STATIC_LLADDR ?= '"fe80::cafe:cafe:cafe:1"'
+      CFLAGS += -DCONFIG_GNRC_IPV6_STATIC_LLADDR=$(IPV6_STATIC_LLADDR)
+  - comment: |-
+      Uncomment this to join RPL DODAGs even if DIOs do not contain
+      DODAG Configuration Options (see the doc for more info)
+      CFLAGS += -DCONFIG_GNRC_RPL_DODAG_CONF_OPTIONAL_ON_JOIN
+  - comment: 'Change this to 0 show compiler invocation lines by default:'
+    set: {var: QUIET, value: '1', flavor: conditional}
+  - add: {EXTERNAL_BOARD_DIRS: ['${RIOTBASE}/tests/build_system/external_board_dirs/esp-ci-boards']}
+  - include: {path: '${RIOTBASE}/Makefile.include'}
+  - comment: Set a custom channel if needed
+    include: {path: '${RIOTMAKE}/default-radio-settings.inc.mk'}

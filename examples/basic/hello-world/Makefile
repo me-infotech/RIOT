@@ -1,3 +1,6 @@
+# Generated from riot-app.yaml by dist/tools/config_data/config_data.py.
+# Do not edit: change riot-app.yaml and run `just generate-config-data`.
+
 # name of your application
 APPLICATION = hello-world
 
@@ -14,5 +17,4 @@ DEVELHELP ?= 1
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
-
 include $(RIOTBASE)/Makefile.include

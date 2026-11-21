@@ -1,26 +1,31 @@
 # SPDX-FileCopyrightText: 2026 RIOT contributors
 # SPDX-License-Identifier: LGPL-2.1-only
-"""Validator of the configuration data format (schema 1, see README.md).
+"""Validator of the configuration data format (schemas 1 and 2, see README.md).
 
 validate(document) returns a list of problems, each one with the path of
 the offending value (e.g. `rules[3].then[0].if.has.match[1]`); an empty list
 means the document is valid. Every condition and action is structured:
 the only reference to another value is `${NAME}` in a text, and no Make
-function or other Make syntax is accepted.
+function or other Make syntax is accepted. Schema 2 adds `select` values,
+`${NAME}` as a whole pattern word and the `several` condition.
 """
 
 import re
 
-from rules import NAME_RE, REF_RE, SCHEMA
+from rules import NAME_RE, REF_RE, SCHEMAS, needed_schema
 
 ACTIONS = ("if", "add", "set", "include", "error", "warning", "info")
-CONDITIONS = ("has", "selection_equals", "one_of", "equals", "not")
+CONDITIONS = ("has", "selection_equals", "one_of", "equals", "several", "not")
 BRANCHES = ("then", "elif", "else")
 FLAVORS = ("recursive", "simple", "conditional")
 # a word of a filter pattern: no blank, no `$`, `,`, `(`, `)`, `#`, at most one `%`
 PATTERN_RE = re.compile(r"^[^\s$(),#%]*%?[^\s$(),#%]*$")
+# schema 2: a pattern word may also be `${NAME}` (the words of NAME)
+PATTERN2_RE = re.compile(r"^(?:[^\s$(),#%]*%?[^\s$(),#%]*|\$\{[A-Za-z_][A-Za-z0-9_]*\})$")
 # a literal word compared with a value: like a pattern, without `%`
 WORD_RE = re.compile(r"^[^\s$(),#%]+$")
+# the text `replace` changes in each selected word: no blank, `$`, `,`, `(`, `)`, `#`, `%`
+REPLACE_RE = re.compile(r"^[^\s$(),#%]*$")
 
 
 def _text_problems(text, where, allow_blank=True, allow_percent=True,
@@ -77,9 +82,37 @@ def _selection_problems(value, where, extra=()):
     if problems:
         return problems
     problems += _name_problems(value["var"], f"{where}.var")
-    problems += _words_problems(value["match"], f"{where}.match", PATTERN_RE, "pattern")
+    problems += _words_problems(value["match"], f"{where}.match", PATTERN2_RE, "pattern")
     if "except" in value:
-        problems += _words_problems(value["except"], f"{where}.except", PATTERN_RE, "pattern")
+        problems += _words_problems(value["except"], f"{where}.except", PATTERN2_RE, "pattern")
+    return problems
+
+
+def select_problems(value, where):
+    """`{select: {var, match?, except?, replace?: {from, to}}}` (schema 2):
+    the words of var that match and are not excepted, each with `from`
+    replaced by `to`."""
+    problems = _keys_problems(value, where, ("select",))
+    if problems:
+        return problems
+    sel, where = value["select"], f"{where}.select"
+    problems = _keys_problems(sel, where, ("var",), ("match", "except", "replace"))
+    if problems:
+        return problems
+    problems += _name_problems(sel["var"], f"{where}.var")
+    for key in ("match", "except"):
+        if key in sel:
+            problems += _words_problems(sel[key], f"{where}.{key}", PATTERN2_RE, "pattern")
+    if "replace" in sel:
+        rep = sel["replace"]
+        here = f"{where}.replace"
+        problems += _keys_problems(rep, here, ("from", "to"))
+        if not problems:
+            for key in ("from", "to"):
+                if not isinstance(rep[key], str) or not REPLACE_RE.match(rep[key]):
+                    problems.append(f"{here}.{key}: {rep[key]!r} is not a literal text")
+            if rep["from"] == "":
+                problems.append(f"{here}.from: must not be empty")
     return problems
 
 
@@ -92,7 +125,7 @@ def condition_problems(cond, where, negated=False):
         if negated:
             return [f"{where}: `not` inside `not`; write the condition itself"]
         return condition_problems(value, where, negated=True)
-    if key == "has":
+    if key in ("has", "several"):
         return _selection_problems(value, where)
     if key == "selection_equals":
         problems = _selection_problems(value, where, ("words",))
@@ -133,6 +166,9 @@ def _action_problems(rule, key, where):
         if not isinstance(items, list) or not items:
             return problems + [f"{where}.{var}: must be a non-empty list"]
         for i, item in enumerate(items):
+            if isinstance(item, dict):
+                problems += select_problems(item, f"{where}.{var}[{i}]")
+                continue
             problems += _text_problems(item, f"{where}.{var}[{i}]")
             if isinstance(item, str) and not item.strip():
                 problems.append(f"{where}.{var}[{i}]: must not be empty")
@@ -142,7 +178,10 @@ def _action_problems(rule, key, where):
         if problems:
             return problems
         problems += _name_problems(value["var"], f"{where}.var")
-        problems += _text_problems(value["value"], f"{where}.value")
+        if isinstance(value["value"], dict):
+            problems += select_problems(value["value"], f"{where}.value")
+        else:
+            problems += _text_problems(value["value"], f"{where}.value")
         if value.get("flavor", "recursive") not in FLAVORS:
             problems.append(f"{where}.flavor: one of {', '.join(FLAVORS)}")
         return problems
@@ -232,10 +271,12 @@ def validate(document) -> list:
     if not isinstance(document, dict):
         return ["document: must be a mapping with schema and rules"]
     problems = [f"document: unknown key {k!r}" for k in document if k not in ("schema", "rules")]
-    if document.get("schema") != SCHEMA:
-        problems.append(f"schema: must be {SCHEMA}")
+    if document.get("schema") not in SCHEMAS:
+        problems.append(f"schema: must be one of {', '.join(map(str, SCHEMAS))}")
     if "rules" not in document:
         problems.append("document: missing key 'rules'")
     else:
         problems += rules_problems(document["rules"])
+        if not problems and document["schema"] < needed_schema(document["rules"]):
+            problems.append(f"schema: the rules need schema {needed_schema(document['rules'])}")
     return problems

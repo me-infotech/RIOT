@@ -135,7 +135,7 @@ class RepositoryRoundTripTest(unittest.TestCase):
             raise unittest.SkipTest(f"base commit {cls.scope['base'][:10]} not available")
 
     def test_original_generated_and_yaml_rules_are_equal(self):
-        for path in self.scope["files"]:
+        for path in config_data.converted_files(self.scope):
             with self.subTest(path=path):
                 with open(os.path.join(R.RIOTBASE, path), encoding="utf-8") as file:
                     generated = file.read()
@@ -147,7 +147,7 @@ class RepositoryRoundTripTest(unittest.TestCase):
         result = subprocess.run([sys.executable, os.path.join(TOOL, "config_data.py"),
                                  "roundtrip"], capture_output=True, text=True, check=False)
         self.assertEqual(result.returncode, 0, result.stderr)
-        n = len(self.scope["files"])
+        n = len(config_data.converted_files(self.scope))
         self.assertIn(f"{n}/{n} files: original = generated = YAML", result.stdout)
 
 

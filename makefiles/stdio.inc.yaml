@@ -1,0 +1,87 @@
+# Rules of the build system (stdio) in makefiles. This file is the source: stdio.inc.mk
+# next to it is generated from it (`just generate-config-data`).
+# Format: dist/tools/config_data/README.md
+schema: 2
+rules:
+  - comment: List of available stdio backend modules.
+    set: {var: STDIO_MODULES, value: stdio_cdc_acm stdio_ethos stdio_fb stdio_mgba stdio_native stdio_nimble
+        stdio_null stdio_rtt stdio_semihosting stdio_slipdev stdio_telnet stdio_tinyusb_cdc_acm stdio_uart
+        stdio_udp stdio_usb_serial_jtag}
+  - comment: List of available legacy stdio backend modules.
+    set: {var: STDIO_LEGACY_MODULES, value: ethos_stdio stdio_ethos}
+  - if: {not: {has: {var: USEMODULE, match: ['${STDIO_LEGACY_MODULES}']}}}
+    then:
+      - add: {USEMODULE: [stdio]}
+  - comment: |-
+      Check if more than one STDIO has been selected, if so add stdio_dispatch.
+      This check will fail if 10 or more modules are selected.
+    if: {several: {var: USEMODULE, match: ['${STDIO_MODULES}']}}
+    then:
+      - add: {USEMODULE: [stdio_dispatch]}
+  - if: {has: {var: USEMODULE, match: [stdio_cdc_acm]}}
+    then:
+      - add: {USEMODULE: [usbus_cdc_acm, stdin, stdio_available]}
+  - if: {has: {var: USEMODULE, match: [stdio_tinyusb_cdc_acm]}}
+    then:
+      - add: {USEPKG: [tinyusb]}
+  - if: {has: {var: USEMODULE, match: [stdio_rtt]}}
+    then:
+      - add: {USEMODULE: [ztimer_msec]}
+  - if: {has: {var: USEMODULE, match: [stdio_ethos]}}
+    then:
+      - add: {USEMODULE: [ethos_stdio, stdin]}
+  - if: {has: {var: USEMODULE, match: [stdio_nimble]}}
+    then:
+      - add: {USEMODULE: [stdio_available]}
+      - add: {USEPKG: [nimble]}
+      - add: {USEMODULE: [tsrb, stdin, nimble_svc_gap, nimble_svc_gatt]}
+      - if: {has: {var: USEMODULE, match: [stdio_nimble_debug]}}
+        then:
+          - add: {FEATURES_REQUIRED: [periph_uart]}
+  - if: {has: {var: USEMODULE, match: [stdin]}}
+    then:
+      - if: {has: {var: USEMODULE, match: [stdio_uart]}}
+        then:
+          - add: {USEMODULE: [stdio_uart_rx]}
+  - if: {has: {var: USEMODULE, match: [stdio_uart_rx]}}
+    then:
+      - add: {USEMODULE: [stdin, stdio_uart, stdio_available]}
+  - if: {has: {var: USEMODULE, match: [stdio_uart, stdio_slipdev]}}
+    then:
+      - add: {FEATURES_REQUIRED_ANY: [periph_uart|periph_lpuart]}
+  - if: {has: {var: USEMODULE, match: [stdio_semihosting]}}
+    then:
+      - add: {USEMODULE: [ztimer_msec]}
+      - add: {FEATURES_REQUIRED_ANY: [cpu_core_cortexm|arch_riscv]}
+  - if: {has: {var: USEMODULE, match: [stdio_telnet]}}
+    then:
+      - add: {DEFAULT_MODULE: [auto_init_telnet]}
+      - add: {USEMODULE: [telnet]}
+  - if: {has: {var: USEMODULE, match: [stdio_udp]}}
+    then:
+      - add: {USEMODULE: [sock_udp, sock_async]}
+  - if: {has: {var: USEMODULE, match: [stdio_notify]}}
+    then:
+      - add: {USEMODULE: [stdin]}
+  - if: {has: {var: USEMODULE, match: [stdin]}}
+    then:
+      - add: {USEMODULE: [isrpipe]}
+  - comment: |-
+      Enable stdout buffering for modules that benefit from sending out buffers in
+      larger chunks.
+    if: {has: {var: USEMODULE, match: [picolibc]}}
+    then:
+      - if: {has: {var: USEMODULE, match: [stdio_cdc_acm, stdio_ethos, stdio_slipdev, stdio_semihosting,
+              stdio_tinyusb_cdc_acm]}}
+        then:
+          - add: {USEMODULE: [picolibc_stdout_buffered]}
+  - comment: |-
+      Select stdio_default if no other STDIO backend has been selected so far.
+      If no STDIO backend has been selected in the second round of dependency
+      resolution, then select stdio_uart.
+    if: {not: {has: {var: USEMODULE, match: ['${STDIO_MODULES}']}}}
+    then:
+      - if: {has: {var: USEMODULE, match: [stdio_default]}}
+        then:
+          - add: {USEMODULE: [stdio_uart]}
+      - add: {USEMODULE: [stdio_default]}

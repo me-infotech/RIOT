@@ -81,7 +81,9 @@ class ConditionTest(unittest.TestCase):
 
     def test_unsupported_conditions(self):
         for line in ("ifeq ($(OS) $(OS_ARCH),Linux)",          # counts differ
-                     "ifneq (,$(filter $(A),$(B)))",            # two variables
+                     "ifneq (,$(filter $(A)x,$(B)))",           # reference inside a word
+                     "ifeq (2,$(call _is_greater,$(words $(sort $(filter a,$(B)))),1))",
+                     "ifeq (1,$(call _is_greater,$(words $(filter a,$(B))),1))",  # no sort
                      "ifneq (,$(findstring x,$(USEMODULE)))",   # other function
                      "ifneq (,$(filter x,$(USEMODULE) y))",     # words after the variable
                      "ifneq (,$(filter $(X)_a,$(USEMODULE)))",  # computed pattern
