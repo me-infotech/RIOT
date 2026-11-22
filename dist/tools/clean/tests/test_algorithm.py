@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-FileCopyrightText: 2026 RIOT contributors
 # SPDX-License-Identifier: LGPL-2.1-only
-"""A1-A6 (algorithm) and S1-S5 (safety) of `clean` without Make.
+"""A1-A6 (algorithm) and S1-S4 (safety) of `clean` without Make.
 
 A1 the clean data is read where Make includes its owner; its value stays
    recursive (BOARD read late) and a command line value replaces it
@@ -23,8 +23,8 @@ S2 below the application's build directories (<app>/bin, BINDIRBASE,
    RIOTBASE, the application directory and their parents are never roots
 S3 no symbolic link below a root leads out of it
 S4 every path is checked before anything is removed: one refusal, nothing
-   removed
-S5 `-n` refuses as well
+   removed; `-n` refuses as well
+(S5, BINDIRBASE removed as a whole, is distclean's: dist/tools/distclean/tests)
 """
 
 import io
@@ -272,7 +272,7 @@ class ExitTest(unittest.TestCase):
 
 
 class SafetyTest(unittest.TestCase):
-    """S1-S5."""
+    """S1-S4."""
 
     def refused(self, t, *args, **values):
         status, out, err = t.clean(*args, **values)
@@ -369,7 +369,7 @@ class SafetyTest(unittest.TestCase):
         finally:
             t.cleanup()
 
-    def test_s5_dry_run_refuses(self):
+    def test_s4_dry_run_refuses(self):
         t = Tree()
         try:
             status, out, _ = t.clean("-n", BINDIRBASE="/")

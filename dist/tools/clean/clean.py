@@ -2,13 +2,18 @@
 # SPDX-FileCopyrightText: 2026 RIOT contributors
 # SPDX-License-Identifier: LGPL-2.1-only
 """Remove the build products of an application without Make, from data only
-(step G2C-1).
+(steps G2C-1 `clean` and G2C-2 `distclean`).
 
   clean.py clean -C <app> BOARD=<board> [-B <dir>] [-n] [VAR=VALUE…]
       remove what GNU Make's target `clean` removes (the package build
       directories, Make's BINDIR, the scan-build reports) and the build
       directory of `just build`/`just flash` (default <app>/bin/cmake-<board>,
       or <dir>). -n: print the commands, run nothing
+  clean.py distclean -C <app> BOARD=<board> [-B <dir>] [-n] [VAR=VALUE…]
+      remove what GNU Make's target `distclean` of the application removes
+      (per package its build directory and its source directory, then
+      BINDIRBASE) and the build directory of `just build` when it is not
+      below BINDIRBASE
   clean.py generate [--check] [CLEAN_DATA…]
       write (check) the Make adapters generated from the clean data (all
       clean data files of the repository without arguments)
@@ -27,12 +32,17 @@ What is algorithm (this file) and what it replaces (Make file:line):
   make_part        Makefile.include:605-611 (`clean`): one sub-make per
                    package of PKG_PATHS, rm -rf BINDIR, rm -rf
                    SCANBUILD_OUTPUTDIR (in the application directory)
-  package_part     pkg/pkg.mk:178-185 (`clean::` of every package): rm -rf
-                   PKG_BUILD_DIR, or `git clean` in PKG_SOURCE_DIR when the
-                   package builds in its source directory
+  distclean_part   Makefile.include:624-626 (`distclean`): one sub-make
+                   `distclean` per package of PKG_PATHS, rm -rf BINDIRBASE
+  package_part     pkg/pkg.mk:178-188 (`clean::` and `distclean:: clean` of
+                   every package): rm -rf PKG_BUILD_DIR, or `git clean` in
+                   PKG_SOURCE_DIR when the package builds in its source
+                   directory; for distclean then rm -rf PKG_SOURCE_DIR
   build_part       the build directory of `just build`/`just flash`
                    (cmake_gen.py builddir()), which Make does not know
-  refusals         safety: what may be removed (rules S1-S5, README)
+  refusals         safety: what may be removed (rules S1-S5, README; S5 distclean)
+  run              Make's error handling: `-` lines ignored, a failing line
+                   of a package's sub-make ends that sub-make
 """
 
 from __future__ import annotations
@@ -123,10 +133,13 @@ def evaluate(app_dir: str, variables: dict) -> CleanEvaluator:
 
 
 # --- the plan: one entry per command --------------------------------------------------
-def rm_entry(path: str, cwd: str, origin: str, echo: bool, package: str = None) -> dict:
+def rm_entry(path: str, cwd: str, origin: str, echo: bool, package: str = None,
+             ignore: bool = True) -> dict:
+    """`rm -rf <path>`; ignore: Make's `-` (a failure does not end the
+    package's sub-make)."""
     return {"command": f"rm -rf {path}", "argv": ["rm", "-rf", path], "cwd": cwd,
             "targets": [path], "test_dir": None, "echo": echo, "origin": origin,
-            "package": package}
+            "package": package, "ignore": ignore}
 
 
 def git_clean_entry(src: str, cwd: str, package: str) -> dict:
@@ -135,12 +148,14 @@ def git_clean_entry(src: str, cwd: str, package: str) -> dict:
                        f"-e '{PKG_STATE_FILE}*'",
             "argv": git + ["clean", "-xdff", "**", "-e", f"{PKG_STATE_FILE}*"], "cwd": cwd,
             "targets": [src], "test_dir": src, "echo": False, "origin": "pkg/pkg.mk:181",
-            "package": package}
+            "package": package, "ignore": True}
 
 
-def package_part(env: dict, cmdline: dict, pkg_path: str, read: list) -> list:
-    """`make -C <pkg> clean` (Makefile.include:607): the `clean::` rule of
-    pkg/pkg.mk:178-185 with the package's variables."""
+def package_part(env: dict, cmdline: dict, pkg_path: str, read: list,
+                 goal: str = "clean") -> list:
+    """`make -C <pkg> <goal>` (Makefile.include:607, 625): the `clean::` rule
+    of pkg/pkg.mk:178-185 with the package's variables and, for the goal
+    distclean, the rule `distclean:: clean` of pkg/pkg.mk:187-188."""
     curdir = os.path.normpath(pkg_path)
     make_file = os.path.join(curdir, "Makefile")
     data = buildeval.pkg_yaml_name(make_file)
@@ -154,23 +169,46 @@ def package_part(env: dict, cmdline: dict, pkg_path: str, read: list) -> list:
     src, build = v.get("PKG_SOURCE_DIR").strip(), v.get("PKG_BUILD_DIR").strip()
     if src == build:
         # `@-test -d … && git … clean`: silent
-        return [git_clean_entry(src, curdir, pkg_path)]
-    # `rm -rf $(PKG_BUILD_DIR)`: no `@`, Make prints it
-    return [rm_entry(build, curdir, "pkg/pkg.mk:184", True, pkg_path)]
+        entries = [git_clean_entry(src, curdir, pkg_path)]
+    else:
+        # `rm -rf $(PKG_BUILD_DIR)`: no `@`, Make prints it; no `-`
+        entries = [rm_entry(build, curdir, "pkg/pkg.mk:184", True, pkg_path, ignore=False)]
+    if goal == "distclean":
+        # `rm -rf $(PKG_SOURCE_DIR)` after the prerequisite clean: printed, no `-`
+        entries.append(rm_entry(src, curdir, "pkg/pkg.mk:188", True, pkg_path, ignore=False))
+    return entries
+
+
+def packages_part(ev, goal: str) -> list:
+    """`-@$(foreach dir,$(PKG_PATHS),"$(MAKE)" -C $(dir) <goal> $(NEWLINE))`
+    (Makefile.include:607, 625): the package's rules for every entry of
+    PKG_PATHS, in Make's order, with the exported and command line variables
+    of the top level."""
+    v = ev.v
+    env, cmdline = P.exported(v, v.words("BUILD_EXPORTED")), P.command_line(v)
+    entries = []
+    for pkg_path in v.words("PKG_PATHS"):
+        entries += package_part(env, cmdline, pkg_path, ev.read, goal)
+    return entries
 
 
 def make_part(ev) -> list:
     """Makefile.include:605-611, in Make's order."""
     v = ev.v
-    names = v.words("BUILD_EXPORTED")
-    env, cmdline = P.exported(v, names), P.command_line(v)
     curdir = v.get("CURDIR").strip()
-    entries = []
-    for pkg_path in v.words("PKG_PATHS"):
-        entries += package_part(env, cmdline, pkg_path, ev.read)
+    entries = packages_part(ev, "clean")
     entries.append(rm_entry(v.get("BINDIR").strip(), curdir, "Makefile.include:608", False))
     entries.append(rm_entry(v.get("SCANBUILD_OUTPUTDIR").strip(), curdir,
                             "Makefile.include:609", False))
+    return entries
+
+
+def distclean_part(ev) -> list:
+    """Makefile.include:624-626, in Make's order."""
+    v = ev.v
+    entries = packages_part(ev, "distclean")
+    entries.append(rm_entry(v.get("BINDIRBASE").strip(), v.get("CURDIR").strip(),
+                            "Makefile.include:626", False))
     return entries
 
 
@@ -191,17 +229,19 @@ def build_part(app_dir: str, variables: dict, builddir: str, bindir: str) -> lis
     return [rm_entry(directory, os.path.abspath(app_dir), "cmake_gen.py builddir()", False)]
 
 
-def roots(v) -> list:
+def roots(v, extra: tuple = ()) -> list:
     """The application's build directories and RIOT's build directory: the
-    only directories below which `clean` removes anything (S2). A root that
-    is `/`, the home directory, RIOTBASE, the application directory or a
-    directory above one of them is no root."""
+    only directories below which `clean` removes anything (S2); extra: more
+    candidates (distclean: PKGDIRBASE, where it removes package sources). A
+    root that is `/`, the home directory, RIOTBASE, the application directory
+    or a directory above one of them is no root."""
     get = lambda name: os.path.normpath(v.get(name).strip())  # noqa: E731
     protected = {"/", os.path.normpath(os.path.expanduser("~")), RIOTBASE, get("APPDIR"),
                  get("CURDIR")}
     protected |= {os.path.realpath(p) for p in protected}
     candidates = [os.path.join(get("APPDIR"), "bin"), get("BINDIRBASE"),
                   os.path.join(get("CURDIR"), "scan-build"), get("BUILD_DIR")]
+    candidates += [get(name) for name in extra]
     found = []
     for root in candidates:
         if not os.path.isabs(root) or root in found:
@@ -220,12 +260,41 @@ def plan_clean(app_dir: str, variables: dict, builddir: str = None) -> dict:
     v = ev.v
     recipe = make_part(ev)
     build = build_part(app_dir, variables, builddir, v.get("BINDIR").strip())
-    return {"clean": recipe, "build": build, "curdir": v.get("CURDIR").strip(),
-            "roots": roots(v), "packages": v.words("PKG_PATHS"), "data": ev.clean_read}
+    return {"target": "clean", "clean": recipe, "build": build,
+            "curdir": v.get("CURDIR").strip(), "roots": roots(v),
+            "packages": v.words("PKG_PATHS"), "data": ev.clean_read, "whole": []}
+
+
+def plan_distclean(app_dir: str, variables: dict, builddir: str = None) -> dict:
+    """What `make distclean` of the application does, and the build
+    directory of the build without Make when it is not below BINDIRBASE
+    (the same evaluation as clean; the plan keeps the key `clean` for Make's
+    part)."""
+    ev = evaluate(app_dir, variables)
+    v = ev.v
+    recipe = distclean_part(ev)
+    bindirbase = v.get("BINDIRBASE").strip()
+    build = build_part(app_dir, variables, builddir, bindirbase)
+    return {"target": "distclean", "clean": recipe, "build": build,
+            "curdir": v.get("CURDIR").strip(), "roots": roots(v, ("PKGDIRBASE",)),
+            "packages": v.words("PKG_PATHS"), "data": ev.clean_read,
+            "whole": [os.path.normpath(bindirbase)]}
+
+
+def whole_root_problem(path: str, roots_: list) -> str:
+    """S5 (distclean): BINDIRBASE itself may go when it is a root (S2: not
+    `/`, HOME, RIOTBASE, the application directory or above one of them) and
+    not a directory directly below `/`."""
+    if path not in roots_:
+        return f"{path}: BINDIRBASE is no build directory (S2: {' '.join(roots_)})"
+    if os.path.dirname(path) == "/":
+        return f"{path}: a directory directly below / is never removed as a whole (S5)"
+    return ""
 
 
 def refusals(result: dict) -> list:
-    """S1-S4 for every path of the plan (empty: everything may be removed)."""
+    """S1-S4 (S5 for the paths of `whole`, distclean) for every path of the
+    plan (empty: everything may be removed)."""
     problems = []
     real_roots = [(r, os.path.realpath(r)) for r in result["roots"]]
     for entry in result["clean"] + result["build"]:
@@ -234,6 +303,11 @@ def refusals(result: dict) -> list:
                 problems.append(f"{target!r}: not a plain path (S1)")
                 continue
             path = os.path.normpath(os.path.join(entry["cwd"], target))
+            if path in result.get("whole", []):
+                problem = whole_root_problem(path, result["roots"])
+                if problem:
+                    problems.append(problem)
+                continue
             root = next((r for r, _ in real_roots if inside(path, r)), None)
             if root is None:
                 problems.append(f"{path}: outside the application's build directories and "
@@ -246,15 +320,28 @@ def refusals(result: dict) -> list:
 
 
 def run(result: dict) -> int:
-    """Run the plan as Make runs `clean`: every line, a failure ignored."""
+    """Run the plan as Make runs `clean`/`distclean`: every line; a failure
+    of the top level is ignored (Make's `-`); a failing line of a package
+    without `-` ends that package's sub-make (its later lines do not run),
+    which the top level ignores."""
+    target, ended = result.get("target", "clean"), set()
     for entry in result["clean"] + result["build"]:
+        if entry["package"] in ended:
+            continue                       # the package's sub-make stopped
         if entry["test_dir"] is not None and not os.path.isdir(entry["test_dir"]):
             continue                       # `test -d … &&`: nothing to clean
         if entry["echo"]:
             print(entry["command"], flush=True)
         status = subprocess.run(entry["argv"], cwd=entry["cwd"], check=False).returncode
-        if status != 0:
-            print(f"clean: `{entry['command']}` ({entry['origin']}) failed with exit status "
+        if status == 0:
+            continue
+        if entry["package"] and not entry.get("ignore", True):
+            ended.add(entry["package"])
+            print(f"{target}: `{entry['command']}` ({entry['origin']}) failed with exit status "
+                  f"{status}: the rest of {target} in {entry['package']} is skipped, as "
+                  f"Make's sub-make stops (ignored, as Make's `-`)", file=sys.stderr)
+        else:
+            print(f"{target}: `{entry['command']}` ({entry['origin']}) failed with exit status "
                   f"{status} (ignored, as Make's `-`)", file=sys.stderr)
     return 0
 
@@ -263,7 +350,7 @@ def run(result: dict) -> int:
 def parse(argv: list):
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("command", choices=("clean", "generate"))
+    parser.add_argument("command", choices=("clean", "distclean", "generate"))
     parser.add_argument("-C", dest="app", help="application directory")
     parser.add_argument("-B", dest="builddir", help="build directory of `just build`")
     parser.add_argument("-n", "--dry-run", action="store_true", help="print, run nothing")
@@ -279,7 +366,7 @@ def parse(argv: list):
         name, value = item.split("=", 1)
         variables[name] = value
     if not args.app or "BOARD" not in variables:
-        parser.error("clean needs -C <application> and BOARD=<board>")
+        parser.error(f"{args.command} needs -C <application> and BOARD=<board>")
     return args, variables
 
 
@@ -314,7 +401,8 @@ def cmd_generate(check: bool, files: list = None) -> int:
 
 
 def cmd_clean(args, variables: dict) -> int:
-    result = plan_clean(args.app, variables, args.builddir)
+    plan = plan_distclean if args.command == "distclean" else plan_clean
+    result = plan(args.app, variables, args.builddir)
     problems = refusals(result)
     if problems:
         for problem in problems:

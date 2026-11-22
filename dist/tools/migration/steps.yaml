@@ -195,3 +195,17 @@ steps:
     requires:
       tools: [just@1.59.0]
     docs: dist/tools/task_layer/README.md
+
+  - id: g2c-02-distclean
+    title: Remove the build products and package sources of an application (distclean) without Make
+    group: "2C"
+    targets:
+      - name: distclean
+        now: just distclean <application> <board> [VAR=VALUE…]
+        hardware: false
+    tests:
+      - dist/tools/distclean/tests
+    requires:
+      pip: [pyyaml]
+      tools: [just@1.59.0]
+    docs: dist/tools/clean/README.md

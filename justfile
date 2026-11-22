@@ -14,9 +14,10 @@
 # commands are no longer Make targets. The applications of step G3-1 are
 # built with `just build` (CMake + Ninja, dist/tools/cmake_gen), flashed
 # with `just flash` (dist/tools/flash), distributed as binaries with
-# `just bindist` (dist/tools/bindist) and cleaned with `just clean`
-# (dist/tools/clean); all others are still built, flashed, distributed and
-# cleaned with make in their directory. Tested with just 1.59.0.
+# `just bindist` (dist/tools/bindist) and cleaned with `just clean` and
+# `just distclean` (dist/tools/clean); all others are still built, flashed,
+# distributed and cleaned with make in their directory. Tested with just
+# 1.59.0.
 
 # Recipe lines run with /bin/sh, as GNU Make ran them.
 set shell := ["/bin/sh", "-c"]
@@ -185,3 +186,11 @@ generate-clean-data:
 # Example: just clean examples/basic/hello-world nrf52840dk
 clean app board *vars:
     @./dist/tools/clean/clean.py clean -C {{ quote(app) }} BOARD={{ quote(board) }} {{ vars }}
+
+# Remove what `make distclean` of the application removes (per package of
+# PKG_PATHS its build directory and its source directory in BUILD_DIR/pkg,
+# then BINDIRBASE <app>/bin) and the build directory of `just build`/`just
+# flash` when it is not below BINDIRBASE, without Make (step G2C-2).
+# Example: just distclean examples/basic/hello-world nrf52840dk
+distclean app board *vars:
+    @./dist/tools/clean/clean.py distclean -C {{ quote(app) }} BOARD={{ quote(board) }} {{ vars }}

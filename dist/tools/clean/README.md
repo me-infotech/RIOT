@@ -21,8 +21,9 @@ path is refused by the safety rules, nothing is removed.
 
 Scope: `examples/basic/hello-world`, `examples/networking/gnrc/networking`,
 `examples/advanced/bindist` on **nrf52840dk** (decision D22). `clean-pkg`,
-`clean-intermediates`, `distclean` and the root Makefile's `clean`,
-`distclean` and `pkg-clean` are other targets and not part of this step.
+`clean-intermediates` and the root Makefile's `clean`, `distclean` and
+`pkg-clean` are other targets and not part of this step; the application's
+`distclean` is step G2C-2 (section [distclean](#distclean-step-g2c-2) below).
 
 What Make's `clean` does (base 74a0fb9743)
 -------------------------------------------
@@ -262,3 +263,210 @@ Limits
   compared (irrelevant to `clean`). `just flash` is not run in the tree
   test; its only extra output (`burn.seg` of J-Link) is in the build
   directory.
+
+distclean (step G2C-2)
+======================
+
+`just distclean <application> <board>` removes what GNU Make's target
+`distclean` of the application removes and, like `just clean`, the build
+directory of `just build` when it is not below BINDIRBASE. Same tool, same
+inputs, same exit status as `clean` (0, 2, 3, 4); no make process, no Make
+file, no Make syntax.
+
+```sh
+just distclean examples/basic/hello-world nrf52840dk
+just distclean examples/basic/hello-world nrf52840dk -B /path/below/a/root
+dist/tools/clean/clean.py distclean -C <app> BOARD=<board> [-B <dir>] [-n] [VAR=VALUE…]
+```
+
+What Make's `distclean` does (base 74a0fb9743)
+----------------------------------------------
+
+`Makefile.include:624-626`, in the application directory, and in every
+package of PKG_PATHS (sub-make) the rules of `pkg/pkg.mk:177-188`:
+
+```make
+distclean:
+	-@$(foreach dir,$(PKG_PATHS),"$(MAKE)" -C $(dir) distclean $(NEWLINE))
+	-@rm -rf $(BINDIRBASE)
+
+distclean:: clean                # pkg/pkg.mk: clean:: as for `clean`
+	rm -rf $(PKG_SOURCE_DIR)
+```
+
+For the scope (`make -n distclean`, all three applications alike):
+
+| # | Command | Printed | Value |
+|---|---|---|---|
+| 1 | `rm -rf $(PKG_BUILD_DIR)` of pkg/cmsis (its `clean::`) | yes | `<app>/bin/nrf52840dk/pkg-build/cmsis` |
+| 2 | `rm -rf $(PKG_SOURCE_DIR)` of pkg/cmsis (pkg.mk:188, `PKG_SOURCE_DIR ?= $(PKGDIRBASE)/$(PKG_NAME)`) | yes | `BUILD_DIR/pkg/cmsis` |
+| 3-4 | the same for pkg/mpaland-printf | yes | |
+| 5 | `rm -rf $(BINDIRBASE)` | no | `<app>/bin` (every board, also `bin/cmake-<board>` of `just build`) |
+
+`distclean` does not depend on `clean`: the scan-build reports
+(`scan-build/<board>`), the distribution `bindist/`, other packages in
+`BUILD_DIR/pkg`, the sparse files (`build/pkg/cmsis.sparse`), the nRF vendor
+headers (`BUILD_DIR/nrf5x_nrfx_mdk`) and `CACHEDIR.TAG` stay. An in-source
+package runs its silent `git clean` (as for `clean`) and then `rm -rf` of the
+source directory. The package sources are shared by all applications: as
+with Make, the next build of any application prepares them again.
+
+Make's error handling, which `distclean` makes visible: every line of a
+package's sub-make is without `-`, so a failing line (e.g. `rm -rf` of a
+directory it cannot empty) ends that sub-make - the package's source stays
+- and the top level ignores it (`-@`) and goes on with the next package and
+BINDIRBASE; exit status 0.
+
+Implementation (`clean.py`, no new module, no duplicated logic)
+---------------------------------------------------------------
+
+| Part | Make lines | Shared with `clean` |
+|---|---|---|
+| evaluation (`evaluate`) | Makefile.include, resolver, build data | the same function |
+| `packages_part(ev, goal)` | the foreach of Makefile.include:607/625 | the same function, goal `clean`/`distclean` |
+| `package_part(…, goal)` | pkg/pkg.mk:178-188: the `clean::` entries, then for `distclean` `rm -rf $(PKG_SOURCE_DIR)` | the `clean::` entries are those of `clean` (test) |
+| `distclean_part` | Makefile.include:624-626 | - |
+| `build_part` | the build directory of `just build`, dropped below BINDIRBASE | the same function |
+| `refusals`, `run` | safety; Make's `-` and the end of a failing sub-make | the same functions (`clean` has one line per package, so its behaviour is unchanged) |
+
+Data: nothing new. Every value is data or algorithm of an earlier step:
+BINDIRBASE, PKGDIRBASE, BUILD_DIR (directories, G3-1), PKG_PATHS (resolver,
+G0-2), PKG_SOURCE_DIR/PKG_BUILD_DIR/PKG_BUILD_OUT_OF_SOURCE
+(`pkg/pkg.build.yaml`, G0-3), the clean data of G2C-1 (read by the shared
+evaluation). No Make file changes, so no adapter is needed.
+
+Safety
+------
+
+The rules S1-S4 of `clean` apply to every path of the plan; distclean adds
+PKGDIRBASE to the roots of S2 (the package sources lie below it) and one
+rule for the path that is a root itself:
+
+| Rule | |
+|---|---|
+| S1-S4 | as for `clean` (plain words; below a root - `<app>/bin`, BINDIRBASE, `<app>/scan-build`, BUILD_DIR, **PKGDIRBASE**; no symbolic link out of a root; all checked before anything runs, `-n` refuses as well) |
+| S5 | BINDIRBASE itself (Makefile.include:626) is removed only when it is a root (S2: not `/`, `$HOME`, RIOTBASE, the application directory or above one of them) and not a directory directly below `/` (`BINDIRBASE=/usr`, `/opt`: refused) |
+
+Make's `distclean` runs `rm -rf $(BINDIRBASE)` for any value
+(`make distclean BINDIRBASE=$HOME` removes the home directory);
+`just distclean` refuses with exit 4 and removes nothing.
+
+Root `distclean` (stays in Make, unchanged)
+-------------------------------------------
+
+The root Makefile's `distclean` (`docclean _pkg-clean DISTCLEAN--<dir>…`,
+step G2C-3) runs `make -C <dir> distclean` in every application and tool
+directory (746 directories), without BOARD: the default board native64,
+outside the data. It therefore keeps calling Make's application-level
+`distclean`, which stays in Make (R3) for all applications and boards
+outside the data; calling just for the three scope applications would only
+apply for BOARD=nrf52840dk and would duplicate the iteration. Nothing of the
+root Makefile changes; the test compares its `make -n distclean` (sub-makes
+replaced by `echo`) with the Makefiles of 74a0fb9743 and 9cd0952bc7: equal,
+all directories (the three scope applications included) iterated.
+
+R3: Make keeps the application's `distclean` (recipes of Makefile.include and
+pkg/pkg.mk line for line as in the base commits, `make -n distclean` works
+for native64, where `clean.py distclean` stops with exit 3). It leaves Make
+when the data covers every application and board.
+
+Parity (2026-11-22, base 74a0fb9743, `dist/tools/distclean/tests/golden/`)
+--------------------------------------------------------------------------
+
+Golden file (`record_golden.py`, git checkout of the base, GNU Make 4.3,
+`env -i PATH HOME LC_ALL=C GIT_ALLOW_PROTOCOL=file`, umask 022): `make -n
+distclean` for 8 cases and 4 tree cases with the sample of G2C-1 (stub
+toolchain, stand-in prepared packages in BUILD_DIR, no network) plus
+stand-ins that must stay (`scan-build/…`, `BUILD_DIR/pkg/other-package`) or
+go (`bin/native64`, `bin/cmake-native64`); `hello-world-locked` adds a
+directory of mode 0555 below `pkg-build/cmsis`. Header with command,
+commit, date, last line `## end`.
+
+| nrf52840dk | result |
+|---|---|
+| `make -n distclean` cases (hello-world, gnrc_networking, bindist; BINDIRBASE, PKGDIRBASE, BUILD_DIR elsewhere, in-source packages, BUILD_IN_DOCKER) | 8 |
+| plan = `make -n distclean` (commands with their package, in order); build part empty, `rm -rf <app>/bin/cmake-nrf52840dk` with BINDIRBASE elsewhere | 8/8 |
+| `clean.py distclean -n` = Make's commands + build part | 8/8 |
+| tree: `just build` (+ `just bindist`) + `just distclean` = `make all` (`bindist`) + `make distclean`: exit status, output, file list (60, 61, 74 entries) | 3/3 |
+| failing sub-make (`-locked`): exit status 0, file list (71 entries: the cmsis sources stay), output without Make's diagnostics | 1/1 |
+| build products before distclean (Make: 93, 311, 95 files; `just build`: > 50 in bin/cmake-nrf52840dk) | 3/3 |
+| live Make in this checkout: `make -n distclean` = golden | 8/8 |
+| live `make distclean` on the tree of `just build` = golden tree | 1/1 |
+| root `make -n distclean` = the Makefiles of both bases | 2/2 |
+
+Rules and tests
+---------------
+
+```sh
+python3 -m unittest discover -s dist/tools/distclean/tests -t dist/tools/distclean/tests -v
+dist/tools/migration/run_tests.py --step g2c-02-distclean
+```
+
+37 tests in 5 modules (about 40 s; make, just, cmake, ninja, git; one build
+at a time with `-j 1`). The test helpers (`dsample.py`) build on the sample
+of G2C-1; the no-Make detectors are those of G2C-1.
+
+| Rule | Module | How |
+|---|---|---|
+| A1-A7 | `test_distclean_algorithm` | order, commands, printed lines, origins, working directories, `ignore`; the package lines of distclean are those of clean plus the source; in-source `git clean` then `rm -rf` on a real repository; build part (default, -B, BINDIRBASE elsewhere); removes exactly the plan; a failing package line ends its sub-make, a failing top-level line is ignored; `-n`; exit 3, 2 and argument errors |
+| S1-S5 | `test_distclean_safety` | 10 non-plain words, 11 values and 5 `-B` outside the roots, accepted roots, a symbolic link out of BUILD_DIR (and BINDIRBASE as a link), one refusal removes nothing, `-n` refuses, BINDIRBASE directly below `/`; values naming system or home directories run only with `-n` |
+| P1-P5 | `test_distclean_parity` | table above |
+| N1-N4 | `test_distclean_no_make` | audit-hook trace (8 cases x `-n`/run: no Make file, no make; processes rm, git, toolchain probes), `just distclean` with a stub make (never called), static check, recipe without make (probes of every detector) |
+| R1, R3, R4, O1 | `test_distclean_transition` | `just --dry-run distclean`, parameters as `build`/`clean`; Make's recipes as in both bases, native64 with make (clean.py: exit 3); root `distclean`; register entry |
+
+Deliberate differences
+----------------------
+
+* Refused paths (exit 4, S1-S5) where Make would remove.
+* Diagnostics of a failing line: `distclean: \`…\` (origin) failed with exit
+  status N…` instead of Make's `make[1]: *** […] Error N` and `make: […]
+  Error N (ignored)`; the commands, rm's own messages, the effect and the
+  exit status are Make's (tree case `-locked`).
+* Inherited from `clean`: an in-source package whose directory is missing
+  is skipped silently, where Make prints `make[1]: [pkg.mk:181: clean] Error
+  1 (ignored)`.
+* `just distclean` also removes the build directory of `just build` when it
+  is not below BINDIRBASE (`-B`, BINDIRBASE elsewhere); Make does not know
+  it.
+
+Mutation probe (distclean)
+--------------------------
+
+| Part | Deliberate defect | Failing tests |
+|---|---|---|
+| A1a | BINDIRBASE not removed | distclean failures=35; clean OK |
+| A1b | one package skipped (first of PKG_PATHS) | distclean failures=32; clean OK |
+| A1c | one path too many: also the scan-build reports | distclean failures=23; clean OK |
+| A1d | BINDIRBASE removed before the packages | distclean failures=19; clean OK |
+| A2a | package source not removed | distclean failures=45; clean OK |
+| A2b | package source line not printed | distclean failures=6; clean OK |
+| A2c | in-source: git clean dropped for distclean | distclean failures=4; clean OK |
+| A3a | build directory removed although below BINDIRBASE | distclean failures=17; clean OK |
+| A3b | build directory never removed | distclean failures=8; clean OK |
+| A5 | failing package line does not end its sub-make | distclean failures=2; clean OK |
+| S2 | PKGDIRBASE no root | distclean failures=6; clean OK |
+| S5a | S5 off: BINDIRBASE removed as a whole without checks | distclean failures=5; clean OK |
+| S5b | S5: directories below / allowed | distclean failures=4; clean OK |
+| S4 | distclean: first command runs before the check | distclean failures=6; clean OK |
+| N1 | distclean starts make --version | distclean failures=18; clean failures=1 |
+| N2 | distclean opens Makefile.include | distclean failures=17; clean OK |
+| R1 | just recipe calls make | distclean failures=6 |
+| R3 | Make's application distclean changed (rm -rf $(BINDIR)) | distclean failures=12 |
+| R4 | root distclean: sub-make goal clean | distclean failures=2 |
+| O1 | register: distclean marked as hardware | distclean failures=1 |
+| G1 | golden: one package line dropped from the tree output | distclean failures=1 |
+
+21/21 defects detected (2026-11-22; each file copied before the change,
+restored from the copy and compared by SHA-256 afterwards; HOME set to a
+temporary directory; the distclean tests, for clean.py also the clean tests).
+
+Limits
+------
+
+* Scope and exit 3 as for `clean` (three applications on nrf52840dk,
+  PKG_SOURCE_LOCAL, packages without package data).
+* Packages with their own `distclean::`/`clean::` rules (c25519,
+  cryptoauthlib, driver_cryptocell_310, jerryscript, picosdk) have no
+  package data (exit 3).
+* The tree comparison uses the stub toolchain and stand-in packages of
+  G2C-1; real package sources (git checkouts) are not downloaded.

@@ -1,0 +1,386 @@
+# golden output of GNU Make for the parity tests of step G2C-2 (distclean without Make)
+# generator: dist/tools/distclean/tests/record_golden.py
+# commit: 74a0fb9743ab307a79e30c41ce23c628641ce0b9 (git checkout, unchanged; the applications copied outside it)
+# date: 2026-11-22
+# make: GNU Make 4.3
+# environment: env -i PATH HOME LC_ALL=C GIT_ALLOW_PROTOCOL=file; umask 022; stdout, then stderr
+# tree cases: make -j1 <goal> with a stub toolchain and stand-in prepared packages in BUILD_DIR=@TMP@/build (dist/tools/clean/tests/sample.py), then the stand-ins sample.EXTRA and dsample.KEEP_IN_BUILD_DIR (-locked: dsample.LOCKED, mode 0555), then make distclean
+## hello-world: make -n distclean [examples/basic/hello-world]
+## exit: 0
+"make" -C @RIOTBASE@/pkg/cmsis/ distclean 
+rm -rf @APPDIR@/bin/nrf52840dk/pkg-build/cmsis
+rm -rf @RIOTBASE@/build/pkg/cmsis
+"make" -C @RIOTBASE@/pkg/mpaland-printf/ distclean 
+rm -rf @APPDIR@/bin/nrf52840dk/pkg-build/mpaland-printf
+rm -rf @RIOTBASE@/build/pkg/mpaland-printf
+rm -rf @APPDIR@/bin
+## gnrc_networking: make -n distclean [examples/networking/gnrc/networking]
+## exit: 0
+"make" -C @RIOTBASE@/pkg/cmsis/ distclean 
+rm -rf @APPDIR@/bin/nrf52840dk/pkg-build/cmsis
+rm -rf @RIOTBASE@/build/pkg/cmsis
+"make" -C @RIOTBASE@/pkg/mpaland-printf/ distclean 
+rm -rf @APPDIR@/bin/nrf52840dk/pkg-build/mpaland-printf
+rm -rf @RIOTBASE@/build/pkg/mpaland-printf
+rm -rf @APPDIR@/bin
+## bindist: make -n distclean [examples/advanced/bindist]
+## exit: 0
+"make" -C @RIOTBASE@/pkg/cmsis/ distclean 
+rm -rf @APPDIR@/bin/nrf52840dk/pkg-build/cmsis
+rm -rf @RIOTBASE@/build/pkg/cmsis
+"make" -C @RIOTBASE@/pkg/mpaland-printf/ distclean 
+rm -rf @APPDIR@/bin/nrf52840dk/pkg-build/mpaland-printf
+rm -rf @RIOTBASE@/build/pkg/mpaland-printf
+rm -rf @APPDIR@/bin
+## bindirbase: make -n distclean [examples/basic/hello-world BINDIRBASE=@TMP@/elsewhere]
+## exit: 0
+"make" -C @RIOTBASE@/pkg/cmsis/ distclean 
+rm -rf @TMP@/elsewhere/nrf52840dk/pkg-build/cmsis
+rm -rf @RIOTBASE@/build/pkg/cmsis
+"make" -C @RIOTBASE@/pkg/mpaland-printf/ distclean 
+rm -rf @TMP@/elsewhere/nrf52840dk/pkg-build/mpaland-printf
+rm -rf @RIOTBASE@/build/pkg/mpaland-printf
+rm -rf @TMP@/elsewhere
+## pkgdirbase: make -n distclean [examples/basic/hello-world PKGDIRBASE=@TMP@/pkg]
+## exit: 0
+"make" -C @RIOTBASE@/pkg/cmsis/ distclean 
+rm -rf @APPDIR@/bin/nrf52840dk/pkg-build/cmsis
+rm -rf @TMP@/pkg/cmsis
+"make" -C @RIOTBASE@/pkg/mpaland-printf/ distclean 
+rm -rf @APPDIR@/bin/nrf52840dk/pkg-build/mpaland-printf
+rm -rf @TMP@/pkg/mpaland-printf
+rm -rf @APPDIR@/bin
+## build-dir: make -n distclean [examples/basic/hello-world BUILD_DIR=@TMP@/build]
+## exit: 0
+"make" -C @RIOTBASE@/pkg/cmsis/ distclean 
+rm -rf @APPDIR@/bin/nrf52840dk/pkg-build/cmsis
+rm -rf @TMP@/build/pkg/cmsis
+"make" -C @RIOTBASE@/pkg/mpaland-printf/ distclean 
+rm -rf @APPDIR@/bin/nrf52840dk/pkg-build/mpaland-printf
+rm -rf @TMP@/build/pkg/mpaland-printf
+rm -rf @APPDIR@/bin
+## in-source-packages: make -n distclean [examples/basic/hello-world PKG_BUILD_OUT_OF_SOURCE=0]
+## exit: 0
+"make" -C @RIOTBASE@/pkg/cmsis/ distclean 
+test -d @APPDIR@/bin/nrf52840dk/pkg/cmsis && git -C @APPDIR@/bin/nrf52840dk/pkg/cmsis --git-dir=.git --work-tree=. clean -xdff '**' -e '.pkg-state.git*'
+rm -rf @APPDIR@/bin/nrf52840dk/pkg/cmsis
+"make" -C @RIOTBASE@/pkg/mpaland-printf/ distclean 
+test -d @APPDIR@/bin/nrf52840dk/pkg/mpaland-printf && git -C @APPDIR@/bin/nrf52840dk/pkg/mpaland-printf --git-dir=.git --work-tree=. clean -xdff '**' -e '.pkg-state.git*'
+rm -rf @APPDIR@/bin/nrf52840dk/pkg/mpaland-printf
+rm -rf @APPDIR@/bin
+## docker: make -n distclean [examples/basic/hello-world BUILD_IN_DOCKER=1]
+## exit: 0
+"make" -C @RIOTBASE@/pkg/cmsis/ distclean 
+rm -rf @APPDIR@/bin/nrf52840dk/pkg-build/cmsis
+rm -rf @RIOTBASE@/build/pkg/cmsis
+"make" -C @RIOTBASE@/pkg/mpaland-printf/ distclean 
+rm -rf @APPDIR@/bin/nrf52840dk/pkg-build/mpaland-printf
+rm -rf @RIOTBASE@/build/pkg/mpaland-printf
+rm -rf @APPDIR@/bin
+## hello-world: build products before make distclean (after make all)
+bin/nrf52840dk: 93 files
+## hello-world: make distclean (after make all)
+## exit: 0
+rm -rf @APPDIR@/bin/nrf52840dk/pkg-build/cmsis
+rm -rf @TMP@/build/pkg/cmsis
+rm -rf @APPDIR@/bin/nrf52840dk/pkg-build/mpaland-printf
+rm -rf @TMP@/build/pkg/mpaland-printf
+## hello-world: tree after make distclean
+build dir
+build/CACHEDIR.TAG file
+build/nrf5x_nrfx_mdk dir
+build/nrf5x_nrfx_mdk/nrf52 dir
+build/nrf5x_nrfx_mdk/nrf52.sparse file
+build/nrf5x_nrfx_mdk/nrf52/.git dir
+build/nrf5x_nrfx_mdk/nrf52/.pkg-state.git-downloaded file
+build/nrf5x_nrfx_mdk/nrf52/.pkg-state.git-patched file
+build/nrf5x_nrfx_mdk/nrf52/.pkg-state.git-prepared file
+build/nrf5x_nrfx_mdk/nrf52/mdk dir
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52810.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52810_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52810_name_change.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52810_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52811.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52811_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52811_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52832_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52833.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52833_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52833_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52840.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52840_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52840_name_change.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52840_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor dir
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52810.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52810_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52810_name_change.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52810_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52811.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52811_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52811_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52832_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52833.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52833_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52833_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52840.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52840_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52840_name_change.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52840_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52_bitfields.h file
+build/pkg dir
+build/pkg/cmsis.sparse file
+build/pkg/other-package dir
+build/pkg/other-package/.pkg-state.git-prepared file
+build/pkg/other-package/x.c file
+hello-world dir
+hello-world/Makefile file
+hello-world/README.md file
+hello-world/main.c file
+hello-world/riot-app.yaml file
+hello-world/scan-build dir
+hello-world/scan-build/native64 dir
+hello-world/scan-build/native64/index.html file
+hello-world/scan-build/nrf52840dk dir
+hello-world/scan-build/nrf52840dk/index.html file
+## gnrc_networking: build products before make distclean (after make all)
+bin/nrf52840dk: 311 files
+## gnrc_networking: make distclean (after make all)
+## exit: 0
+rm -rf @APPDIR@/bin/nrf52840dk/pkg-build/cmsis
+rm -rf @TMP@/build/pkg/cmsis
+rm -rf @APPDIR@/bin/nrf52840dk/pkg-build/mpaland-printf
+rm -rf @TMP@/build/pkg/mpaland-printf
+## gnrc_networking: tree after make distclean
+build dir
+build/CACHEDIR.TAG file
+build/nrf5x_nrfx_mdk dir
+build/nrf5x_nrfx_mdk/nrf52 dir
+build/nrf5x_nrfx_mdk/nrf52.sparse file
+build/nrf5x_nrfx_mdk/nrf52/.git dir
+build/nrf5x_nrfx_mdk/nrf52/.pkg-state.git-downloaded file
+build/nrf5x_nrfx_mdk/nrf52/.pkg-state.git-patched file
+build/nrf5x_nrfx_mdk/nrf52/.pkg-state.git-prepared file
+build/nrf5x_nrfx_mdk/nrf52/mdk dir
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52810.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52810_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52810_name_change.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52810_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52811.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52811_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52811_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52832_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52833.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52833_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52833_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52840.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52840_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52840_name_change.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52840_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor dir
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52810.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52810_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52810_name_change.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52810_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52811.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52811_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52811_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52832_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52833.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52833_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52833_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52840.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52840_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52840_name_change.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52840_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52_bitfields.h file
+build/pkg dir
+build/pkg/cmsis.sparse file
+build/pkg/other-package dir
+build/pkg/other-package/.pkg-state.git-prepared file
+build/pkg/other-package/x.c file
+gnrc_networking dir
+gnrc_networking/Makefile file
+gnrc_networking/Makefile.ci file
+gnrc_networking/README.md file
+gnrc_networking/main.c file
+gnrc_networking/riot-app.yaml file
+gnrc_networking/scan-build dir
+gnrc_networking/scan-build/native64 dir
+gnrc_networking/scan-build/native64/index.html file
+gnrc_networking/scan-build/nrf52840dk dir
+gnrc_networking/scan-build/nrf52840dk/index.html file
+## bindist: build products before make distclean (after make bindist)
+bin/nrf52840dk: 95 files
+## bindist: make distclean (after make bindist)
+## exit: 0
+rm -rf @APPDIR@/bin/nrf52840dk/pkg-build/cmsis
+rm -rf @TMP@/build/pkg/cmsis
+rm -rf @APPDIR@/bin/nrf52840dk/pkg-build/mpaland-printf
+rm -rf @TMP@/build/pkg/mpaland-printf
+## bindist: tree after make distclean
+bindist dir
+bindist/Makefile file
+bindist/README.md file
+bindist/abc dir
+bindist/abc/Makefile file
+bindist/abc/abc.c file
+bindist/abc/module.yaml file
+bindist/bindist dir
+bindist/bindist/Makefile file
+bindist/bindist/Makefile.distcheck file
+bindist/bindist/bin dir
+bindist/bindist/bin/nrf52840dk dir
+bindist/bindist/bin/nrf52840dk/abc dir
+bindist/bindist/bin/nrf52840dk/abc/abc.o file
+bindist/bindist/bin/nrf52840dk/application_bindist dir
+bindist/bindist/bin/nrf52840dk/application_bindist/main.o file
+bindist/bindist/bindist.bin file
+bindist/main.c file
+bindist/riot-app.yaml file
+bindist/scan-build dir
+bindist/scan-build/native64 dir
+bindist/scan-build/native64/index.html file
+bindist/scan-build/nrf52840dk dir
+bindist/scan-build/nrf52840dk/index.html file
+build dir
+build/CACHEDIR.TAG file
+build/nrf5x_nrfx_mdk dir
+build/nrf5x_nrfx_mdk/nrf52 dir
+build/nrf5x_nrfx_mdk/nrf52.sparse file
+build/nrf5x_nrfx_mdk/nrf52/.git dir
+build/nrf5x_nrfx_mdk/nrf52/.pkg-state.git-downloaded file
+build/nrf5x_nrfx_mdk/nrf52/.pkg-state.git-patched file
+build/nrf5x_nrfx_mdk/nrf52/.pkg-state.git-prepared file
+build/nrf5x_nrfx_mdk/nrf52/mdk dir
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52810.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52810_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52810_name_change.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52810_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52811.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52811_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52811_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52832_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52833.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52833_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52833_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52840.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52840_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52840_name_change.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52840_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor dir
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52810.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52810_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52810_name_change.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52810_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52811.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52811_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52811_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52832_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52833.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52833_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52833_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52840.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52840_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52840_name_change.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52840_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52_bitfields.h file
+build/pkg dir
+build/pkg/cmsis.sparse file
+build/pkg/other-package dir
+build/pkg/other-package/.pkg-state.git-prepared file
+build/pkg/other-package/x.c file
+## hello-world-locked: build products before make distclean (after make all)
+bin/nrf52840dk: 93 files
+## hello-world-locked: make distclean (after make all)
+## exit: 0
+rm -rf @APPDIR@/bin/nrf52840dk/pkg-build/cmsis
+rm -rf @APPDIR@/bin/nrf52840dk/pkg-build/mpaland-printf
+rm -rf @TMP@/build/pkg/mpaland-printf
+rm: cannot remove '@APPDIR@/bin/nrf52840dk/pkg-build/cmsis/locked/keep.o': Permission denied
+make[1]: *** [@RIOTBASE@/pkg/pkg.mk:184: clean] Error 1
+make: [@RIOTBASE@/Makefile.include:625: distclean] Error 2 (ignored)
+rm: cannot remove '@APPDIR@/bin/nrf52840dk/pkg-build/cmsis/locked/keep.o': Permission denied
+make: [@RIOTBASE@/Makefile.include:626: distclean] Error 1 (ignored)
+## hello-world-locked: tree after make distclean
+build dir
+build/CACHEDIR.TAG file
+build/nrf5x_nrfx_mdk dir
+build/nrf5x_nrfx_mdk/nrf52 dir
+build/nrf5x_nrfx_mdk/nrf52.sparse file
+build/nrf5x_nrfx_mdk/nrf52/.git dir
+build/nrf5x_nrfx_mdk/nrf52/.pkg-state.git-downloaded file
+build/nrf5x_nrfx_mdk/nrf52/.pkg-state.git-patched file
+build/nrf5x_nrfx_mdk/nrf52/.pkg-state.git-prepared file
+build/nrf5x_nrfx_mdk/nrf52/mdk dir
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52810.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52810_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52810_name_change.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52810_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52811.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52811_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52811_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52832_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52833.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52833_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52833_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52840.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52840_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52840_name_change.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52840_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/mdk/nrf52_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor dir
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52810.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52810_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52810_name_change.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52810_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52811.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52811_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52811_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52832_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52833.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52833_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52833_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52840.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52840_bitfields.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52840_name_change.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52840_peripherals.h file
+build/nrf5x_nrfx_mdk/nrf52/vendor/nrf52_bitfields.h file
+build/pkg dir
+build/pkg/cmsis dir
+build/pkg/cmsis.sparse file
+build/pkg/cmsis/.git dir
+build/pkg/cmsis/.pkg-state.git-downloaded file
+build/pkg/cmsis/.pkg-state.git-patched file
+build/pkg/cmsis/.pkg-state.git-prepared file
+build/pkg/other-package dir
+build/pkg/other-package/.pkg-state.git-prepared file
+build/pkg/other-package/x.c file
+hello-world dir
+hello-world/Makefile file
+hello-world/README.md file
+hello-world/bin dir
+hello-world/bin/nrf52840dk dir
+hello-world/bin/nrf52840dk/pkg-build dir
+hello-world/bin/nrf52840dk/pkg-build/cmsis dir
+hello-world/bin/nrf52840dk/pkg-build/cmsis/locked dir
+hello-world/bin/nrf52840dk/pkg-build/cmsis/locked/keep.o file
+hello-world/main.c file
+hello-world/riot-app.yaml file
+hello-world/scan-build dir
+hello-world/scan-build/native64 dir
+hello-world/scan-build/native64/index.html file
+hello-world/scan-build/nrf52840dk dir
+hello-world/scan-build/nrf52840dk/index.html file
+## end
