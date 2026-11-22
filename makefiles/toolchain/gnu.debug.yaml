@@ -1,0 +1,8 @@
+# Debugger data of makefiles/toolchain/gnu.inc.mk (step G2B-1): the GNU
+# toolchain debugs with GDB. Source of gnu.debug.inc.mk (`just
+# generate-term-data`), which gnu.inc.mk includes after its build part.
+# Format: dist/tools/term/README.md.
+schema: 4
+rules:
+  - comment: We use GDB for debugging
+    include: {path: '${RIOTMAKE}/tools/gdb.inc.mk'}

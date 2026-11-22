@@ -1,0 +1,19 @@
+# Debugger data of makefiles/tools/gdb.inc.mk (step G2B-1): the GDB of the
+# debugger scripts (exported to every command, so the terminal of
+# RIOT_TERMINAL=semihosting gets it too). The answer of the shell is the probe
+# PROBE_GDB_STATUS (makefiles/term_providers.inc.mk). Source of
+# gdb.debug.inc.mk (`just generate-term-data`), which gdb.inc.mk includes.
+# Format: dist/tools/term/README.md.
+schema: 4
+rules:
+  - set: {var: GDBPREFIX, value: '${PREFIX}', flavor: conditional, export: true}
+  - comment: |-
+      If the user installed a magic single target GDB rather than just using
+      gdb-multiarch, there typically is a reason for it - e.g. missing support for
+      that particular target in gdb-multiarch.
+    if: {equals: {PROBE_GDB_STATUS: '0'}}
+    then:
+      - set: {var: GDB, value: '${GDBPREFIX}gdb', flavor: conditional, export: true}
+    else:
+      - comment: gdb-multiarch is normally
+        set: {var: GDB, value: gdb-multiarch, flavor: conditional, export: true}

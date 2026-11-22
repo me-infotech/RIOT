@@ -1,0 +1,17 @@
+# Debugger data of makefiles/tools/dbg_common.inc.mk (step G2B-1): the
+# settings every GDB based debugger shares. Source of dbg_common.debug.inc.mk
+# (`just generate-term-data`), which dbg_common.inc.mk includes. Format:
+# dist/tools/term/README.md.
+schema: 4
+rules:
+  - comment: Control whether to use PyCortexMDebug
+    set: {var: USE_PYCORTEXMDEBUG, value: '0', flavor: conditional}
+  - if: {equals: {USE_PYCORTEXMDEBUG: '1'}}
+    then:
+      - add: {DEBUGDEPS: ['${RIOTTOOLS}/PyCortexMDebug/checkout']}
+      - add: {DBG_EXTRA_FLAGS: ["--init-command='${RIOTTOOLS}/PyCortexMDebug/checkout/scripts/gdb.py'"]}
+      - if: {nonempty: [SVD_MODEL]}
+        then:
+          - add: {DBG_EXTRA_FLAGS: ["--eval-command='svd_load ${SVD_VENDOR} ${SVD_MODEL}'"]}
+  - comment: Add RIOT_BASE to the list of directories to search for source code in
+    add: {DBG_EXTRA_FLAGS: ["--eval-command='directory ${RIOTBASE}'"]}

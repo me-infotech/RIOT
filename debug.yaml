@@ -1,0 +1,8 @@
+# Debugger data of Makefile.include (step G2B-1): the ELF file of the
+# debugger (RIOT_TERMINAL=semihosting runs the debugger with it). Source of
+# debug.inc.mk next to it (`just generate-term-data`), which Makefile.include
+# includes where the line was. Format: dist/tools/term/README.md.
+schema: 4
+rules:
+  - comment: elf file used for the debugger, must include bootloader offset
+    set: {var: DEBUG_ELFFILE, value: '${ELFFILE}', flavor: conditional}

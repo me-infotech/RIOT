@@ -1,0 +1,935 @@
+# golden output of GNU Make for the parity tests of step G2B-1 (terminal without Make)
+# generator: dist/tools/term/tests/record_golden.py
+# commit: 481caa4b65e455b4c9d8215e30c4e74a9072795b (git archive; terminal scripts replaced only for the calls)
+# date: 2026-11-22
+# make: GNU Make 4.3
+# stubs: date -> 2026-01-02_03.04.05, ttys.py -> '/dev/ttyACM7 000683654321' or failure, terminals -> recorder; USER=riot
+# environment: env -i PATH HOME LC_ALL=C USER TMPDIR (PATH: stub directories first);
+#   stdout and stderr merged, `make: ***` lines of the terminal call left out;
+#   stdin /dev/null; BINDIRBASE outside the tree
+# terminal environment: BAUD DBG DBG_DEFAULT_FLAGS DBG_EXTRA_FLAGS DBG_FLAGS FLASH_ADDR GDB GDB_PORT GDB_PORT_CORE_OFFSET HOME JLINK JLINK_DEVICE JLINK_IF JLINK_SERIAL JLINK_SERVER JLINK_SKIP_VERSION JLINK_SPEED JLINK_TERMFLAGS JLINK_TERMPROG OPENOCD OPENOCD_ADAPTER_INIT OPENOCD_CONFIG OPENOCD_CORE OPENOCD_DBG_EXTRA_CMD OPENOCD_DBG_START_CMD OPENOCD_EXTRA_INIT OPENOCD_SERVER_ADDRESS OPENOCD_TERMFLAGS OPENOCD_TERMPROG PYTERMFLAGS RAM_LEN RAM_START_ADDR RIOTTOOLS RTT_PORT SETSID TCL_PORT TELNET_PORT TUI
+## pyterm: make -n term [examples/advanced/bindist]
+## exit: 0
+command -v @RIOTBASE@/dist/tools/pyterm/pyterm >/dev/null 2>&1 || { /usr/bin/env echo 'Terminal program @RIOTBASE@/dist/tools/pyterm/pyterm is required but not found in PATH.  Aborting.'; exit 1;}
+@RIOTBASE@/dist/tools/pyterm/pyterm -p "/dev/ttyACM0" -b "115200" -ln "/tmp/pyterm-riot" -rn "2026-01-02_03.04.05-bindist-nrf52840dk"  
+## pyterm: terminal call [examples/advanced/bindist]
+## exit: 0
+out: @RIOTBASE@/dist/tools/pyterm/pyterm -p "/dev/ttyACM0" -b "115200" -ln "/tmp/pyterm-riot" -rn "2026-01-02_03.04.05-bindist-nrf52840dk"  
+terminal @RIOTBASE@/dist/tools/pyterm/pyterm [-p] [/dev/ttyACM0] [-b] [115200] [-ln] [/tmp/pyterm-riot] [-rn] [2026-01-02_03.04.05-bindist-nrf52840dk]
+BAUD=[115200]
+DBG unset
+DBG_DEFAULT_FLAGS unset
+DBG_EXTRA_FLAGS=[--eval-command='directory @RIOTBASE@']
+DBG_FLAGS unset
+FLASH_ADDR=[0x0]
+GDB=[gdb-multiarch]
+GDB_PORT unset
+GDB_PORT_CORE_OFFSET unset
+HOME=[@HOME@]
+JLINK unset
+JLINK_DEVICE unset
+JLINK_IF unset
+JLINK_SERIAL unset
+JLINK_SERVER unset
+JLINK_SKIP_VERSION unset
+JLINK_SPEED unset
+JLINK_TERMFLAGS unset
+JLINK_TERMPROG unset
+OPENOCD unset
+OPENOCD_ADAPTER_INIT=[-c 'source [find interface/jlink.cfg]' -c 'transport select swd']
+OPENOCD_CONFIG=[@RIOTBASE@/boards/common/nrf52/dist/openocd.cfg]
+OPENOCD_CORE unset
+OPENOCD_DBG_EXTRA_CMD unset
+OPENOCD_DBG_START_CMD unset
+OPENOCD_EXTRA_INIT unset
+OPENOCD_SERVER_ADDRESS unset
+OPENOCD_TERMFLAGS unset
+OPENOCD_TERMPROG unset
+PYTERMFLAGS unset
+RAM_LEN unset
+RAM_START_ADDR unset
+RIOTTOOLS=[@RIOTBASE@/dist/tools]
+RTT_PORT unset
+SETSID unset
+TCL_PORT unset
+TELNET_PORT unset
+TUI unset
+## picocom: make -n term [examples/advanced/bindist RIOT_TERMINAL=picocom]
+## exit: 0
+command -v picocom >/dev/null 2>&1 || { /usr/bin/env echo 'Terminal program picocom is required but not found in PATH.  Aborting.'; exit 1;}
+picocom --nolock --imap lfcrlf --baud "115200" "/dev/ttyACM0" 
+## picocom: terminal call [examples/advanced/bindist RIOT_TERMINAL=picocom]
+## exit: 0
+out: picocom --nolock --imap lfcrlf --baud "115200" "/dev/ttyACM0" 
+terminal @STUBS@/term/picocom [--nolock] [--imap] [lfcrlf] [--baud] [115200] [/dev/ttyACM0]
+BAUD=[115200]
+DBG unset
+DBG_DEFAULT_FLAGS unset
+DBG_EXTRA_FLAGS=[--eval-command='directory @RIOTBASE@']
+DBG_FLAGS unset
+FLASH_ADDR=[0x0]
+GDB=[gdb-multiarch]
+GDB_PORT unset
+GDB_PORT_CORE_OFFSET unset
+HOME=[@HOME@]
+JLINK unset
+JLINK_DEVICE unset
+JLINK_IF unset
+JLINK_SERIAL unset
+JLINK_SERVER unset
+JLINK_SKIP_VERSION unset
+JLINK_SPEED unset
+JLINK_TERMFLAGS unset
+JLINK_TERMPROG unset
+OPENOCD unset
+OPENOCD_ADAPTER_INIT=[-c 'source [find interface/jlink.cfg]' -c 'transport select swd']
+OPENOCD_CONFIG=[@RIOTBASE@/boards/common/nrf52/dist/openocd.cfg]
+OPENOCD_CORE unset
+OPENOCD_DBG_EXTRA_CMD unset
+OPENOCD_DBG_START_CMD unset
+OPENOCD_EXTRA_INIT unset
+OPENOCD_SERVER_ADDRESS unset
+OPENOCD_TERMFLAGS unset
+OPENOCD_TERMPROG unset
+PYTERMFLAGS unset
+RAM_LEN unset
+RAM_START_ADDR unset
+RIOTTOOLS=[@RIOTBASE@/dist/tools]
+RTT_PORT unset
+SETSID unset
+TCL_PORT unset
+TELNET_PORT unset
+TUI unset
+## socat: make -n term [examples/advanced/bindist RIOT_TERMINAL=socat]
+## exit: 0
+command -v socat >/dev/null 2>&1 || { /usr/bin/env echo 'Terminal program socat is required but not found in PATH.  Aborting.'; exit 1;}
+socat - open:/dev/ttyACM0,b115200,nonblock,clocal=1,cread=1,echo=0,raw,cs8,parenb=0,cstopb=0 
+## socat: terminal call [examples/advanced/bindist RIOT_TERMINAL=socat]
+## exit: 0
+out: socat - open:/dev/ttyACM0,b115200,nonblock,clocal=1,cread=1,echo=0,raw,cs8,parenb=0,cstopb=0 
+terminal @STUBS@/term/socat [-] [open:/dev/ttyACM0,b115200,nonblock,clocal=1,cread=1,echo=0,raw,cs8,parenb=0,cstopb=0]
+BAUD=[115200]
+DBG unset
+DBG_DEFAULT_FLAGS unset
+DBG_EXTRA_FLAGS=[--eval-command='directory @RIOTBASE@']
+DBG_FLAGS unset
+FLASH_ADDR=[0x0]
+GDB=[gdb-multiarch]
+GDB_PORT unset
+GDB_PORT_CORE_OFFSET unset
+HOME=[@HOME@]
+JLINK unset
+JLINK_DEVICE unset
+JLINK_IF unset
+JLINK_SERIAL unset
+JLINK_SERVER unset
+JLINK_SKIP_VERSION unset
+JLINK_SPEED unset
+JLINK_TERMFLAGS unset
+JLINK_TERMPROG unset
+OPENOCD unset
+OPENOCD_ADAPTER_INIT=[-c 'source [find interface/jlink.cfg]' -c 'transport select swd']
+OPENOCD_CONFIG=[@RIOTBASE@/boards/common/nrf52/dist/openocd.cfg]
+OPENOCD_CORE unset
+OPENOCD_DBG_EXTRA_CMD unset
+OPENOCD_DBG_START_CMD unset
+OPENOCD_EXTRA_INIT unset
+OPENOCD_SERVER_ADDRESS unset
+OPENOCD_TERMFLAGS unset
+OPENOCD_TERMPROG unset
+PYTERMFLAGS unset
+RAM_LEN unset
+RAM_START_ADDR unset
+RIOTTOOLS=[@RIOTBASE@/dist/tools]
+RTT_PORT unset
+SETSID unset
+TCL_PORT unset
+TELNET_PORT unset
+TUI unset
+## miniterm: make -n term [examples/advanced/bindist RIOT_TERMINAL=miniterm]
+## exit: 0
+command -v miniterm >/dev/null 2>&1 || { /usr/bin/env echo 'Terminal program miniterm is required but not found in PATH.  Aborting.'; exit 1;}
+miniterm --eol LF "/dev/ttyACM0" "115200"  
+## miniterm: terminal call [examples/advanced/bindist RIOT_TERMINAL=miniterm]
+## exit: 0
+out: miniterm --eol LF "/dev/ttyACM0" "115200"  
+terminal @STUBS@/term/miniterm [--eol] [LF] [/dev/ttyACM0] [115200]
+BAUD=[115200]
+DBG unset
+DBG_DEFAULT_FLAGS unset
+DBG_EXTRA_FLAGS=[--eval-command='directory @RIOTBASE@']
+DBG_FLAGS unset
+FLASH_ADDR=[0x0]
+GDB=[gdb-multiarch]
+GDB_PORT unset
+GDB_PORT_CORE_OFFSET unset
+HOME=[@HOME@]
+JLINK unset
+JLINK_DEVICE unset
+JLINK_IF unset
+JLINK_SERIAL unset
+JLINK_SERVER unset
+JLINK_SKIP_VERSION unset
+JLINK_SPEED unset
+JLINK_TERMFLAGS unset
+JLINK_TERMPROG unset
+OPENOCD unset
+OPENOCD_ADAPTER_INIT=[-c 'source [find interface/jlink.cfg]' -c 'transport select swd']
+OPENOCD_CONFIG=[@RIOTBASE@/boards/common/nrf52/dist/openocd.cfg]
+OPENOCD_CORE unset
+OPENOCD_DBG_EXTRA_CMD unset
+OPENOCD_DBG_START_CMD unset
+OPENOCD_EXTRA_INIT unset
+OPENOCD_SERVER_ADDRESS unset
+OPENOCD_TERMFLAGS unset
+OPENOCD_TERMPROG unset
+PYTERMFLAGS unset
+RAM_LEN unset
+RAM_START_ADDR unset
+RIOTTOOLS=[@RIOTBASE@/dist/tools]
+RTT_PORT unset
+SETSID unset
+TCL_PORT unset
+TELNET_PORT unset
+TUI unset
+## jelly: make -n term [examples/advanced/bindist RIOT_TERMINAL=jelly]
+## exit: 0
+command -v Jelly >/dev/null 2>&1 || { /usr/bin/env echo 'Terminal program Jelly is required but not found in PATH.  Aborting.'; exit 1;}
+Jelly /dev/ttyACM0 
+## jelly: terminal call [examples/advanced/bindist RIOT_TERMINAL=jelly]
+## exit: 0
+out: Jelly /dev/ttyACM0 
+terminal @STUBS@/term/Jelly [/dev/ttyACM0]
+BAUD=[115200]
+DBG unset
+DBG_DEFAULT_FLAGS unset
+DBG_EXTRA_FLAGS=[--eval-command='directory @RIOTBASE@']
+DBG_FLAGS unset
+FLASH_ADDR=[0x0]
+GDB=[gdb-multiarch]
+GDB_PORT unset
+GDB_PORT_CORE_OFFSET unset
+HOME=[@HOME@]
+JLINK unset
+JLINK_DEVICE unset
+JLINK_IF unset
+JLINK_SERIAL unset
+JLINK_SERVER unset
+JLINK_SKIP_VERSION unset
+JLINK_SPEED unset
+JLINK_TERMFLAGS unset
+JLINK_TERMPROG unset
+OPENOCD unset
+OPENOCD_ADAPTER_INIT=[-c 'source [find interface/jlink.cfg]' -c 'transport select swd']
+OPENOCD_CONFIG=[@RIOTBASE@/boards/common/nrf52/dist/openocd.cfg]
+OPENOCD_CORE unset
+OPENOCD_DBG_EXTRA_CMD unset
+OPENOCD_DBG_START_CMD unset
+OPENOCD_EXTRA_INIT unset
+OPENOCD_SERVER_ADDRESS unset
+OPENOCD_TERMFLAGS unset
+OPENOCD_TERMPROG unset
+PYTERMFLAGS unset
+RAM_LEN unset
+RAM_START_ADDR unset
+RIOTTOOLS=[@RIOTBASE@/dist/tools]
+RTT_PORT unset
+SETSID unset
+TCL_PORT unset
+TELNET_PORT unset
+TUI unset
+## jlink: make -n term [examples/advanced/bindist RIOT_TERMINAL=jlink PROGRAMMER=jlink]
+## exit: 0
+command -v @RIOTBASE@/dist/tools/jlink/jlink.sh >/dev/null 2>&1 || { /usr/bin/env echo 'Terminal program @RIOTBASE@/dist/tools/jlink/jlink.sh is required but not found in PATH.  Aborting.'; exit 1;}
+@RIOTBASE@/dist/tools/jlink/jlink.sh term-rtt 
+## jlink: terminal call [examples/advanced/bindist RIOT_TERMINAL=jlink PROGRAMMER=jlink]
+## exit: 0
+out: @RIOTBASE@/dist/tools/jlink/jlink.sh term-rtt 
+terminal @RIOTBASE@/dist/tools/jlink/jlink.sh [term-rtt]
+BAUD=[115200]
+DBG unset
+DBG_DEFAULT_FLAGS unset
+DBG_EXTRA_FLAGS=[--eval-command='directory @RIOTBASE@']
+DBG_FLAGS unset
+FLASH_ADDR=[0x0]
+GDB=[gdb-multiarch]
+GDB_PORT unset
+GDB_PORT_CORE_OFFSET unset
+HOME=[@HOME@]
+JLINK=[JLinkExe]
+JLINK_DEVICE=[nrf52840_xxaa]
+JLINK_IF unset
+JLINK_SERIAL=[]
+JLINK_SERVER unset
+JLINK_SKIP_VERSION unset
+JLINK_SPEED unset
+JLINK_TERMFLAGS unset
+JLINK_TERMPROG unset
+OPENOCD unset
+OPENOCD_ADAPTER_INIT unset
+OPENOCD_CONFIG unset
+OPENOCD_CORE unset
+OPENOCD_DBG_EXTRA_CMD unset
+OPENOCD_DBG_START_CMD unset
+OPENOCD_EXTRA_INIT unset
+OPENOCD_SERVER_ADDRESS unset
+OPENOCD_TERMFLAGS unset
+OPENOCD_TERMPROG unset
+PYTERMFLAGS unset
+RAM_LEN unset
+RAM_START_ADDR unset
+RIOTTOOLS=[@RIOTBASE@/dist/tools]
+RTT_PORT unset
+SETSID unset
+TCL_PORT unset
+TELNET_PORT unset
+TUI unset
+## openocd-rtt: make -n term [examples/advanced/bindist RIOT_TERMINAL=openocd-rtt]
+## exit: 0
+command -v @RIOTBASE@/dist/tools/openocd/openocd.sh >/dev/null 2>&1 || { /usr/bin/env echo 'Terminal program @RIOTBASE@/dist/tools/openocd/openocd.sh is required but not found in PATH.  Aborting.'; exit 1;}
+RAM_START_ADDR=0x20000000 RAM_LEN=0x40000 @RIOTBASE@/dist/tools/openocd/openocd.sh term-rtt 
+## openocd-rtt: terminal call [examples/advanced/bindist RIOT_TERMINAL=openocd-rtt]
+## exit: 0
+out: RAM_START_ADDR=0x20000000 RAM_LEN=0x40000 @RIOTBASE@/dist/tools/openocd/openocd.sh term-rtt 
+terminal @RIOTBASE@/dist/tools/openocd/openocd.sh [term-rtt]
+BAUD=[115200]
+DBG unset
+DBG_DEFAULT_FLAGS unset
+DBG_EXTRA_FLAGS=[--eval-command='directory @RIOTBASE@']
+DBG_FLAGS unset
+FLASH_ADDR=[0x0]
+GDB=[gdb-multiarch]
+GDB_PORT unset
+GDB_PORT_CORE_OFFSET unset
+HOME=[@HOME@]
+JLINK unset
+JLINK_DEVICE unset
+JLINK_IF unset
+JLINK_SERIAL unset
+JLINK_SERVER unset
+JLINK_SKIP_VERSION unset
+JLINK_SPEED unset
+JLINK_TERMFLAGS unset
+JLINK_TERMPROG unset
+OPENOCD unset
+OPENOCD_ADAPTER_INIT=[-c 'source [find interface/jlink.cfg]' -c 'transport select swd']
+OPENOCD_CONFIG=[@RIOTBASE@/boards/common/nrf52/dist/openocd.cfg]
+OPENOCD_CORE unset
+OPENOCD_DBG_EXTRA_CMD unset
+OPENOCD_DBG_START_CMD unset
+OPENOCD_EXTRA_INIT unset
+OPENOCD_SERVER_ADDRESS unset
+OPENOCD_TERMFLAGS unset
+OPENOCD_TERMPROG unset
+PYTERMFLAGS unset
+RAM_LEN=[0x40000]
+RAM_START_ADDR=[0x20000000]
+RIOTTOOLS=[@RIOTBASE@/dist/tools]
+RTT_PORT unset
+SETSID unset
+TCL_PORT unset
+TELNET_PORT unset
+TUI unset
+## semihosting: make -n term [examples/advanced/bindist RIOT_TERMINAL=semihosting]
+## exit: 0
+command -v @RIOTBASE@/dist/tools/openocd/openocd.sh >/dev/null 2>&1 || { /usr/bin/env echo 'Terminal program @RIOTBASE@/dist/tools/openocd/openocd.sh is required but not found in PATH.  Aborting.'; exit 1;}
+@RIOTBASE@/dist/tools/openocd/openocd.sh debug @BINDIR@/bindist.elf 
+## semihosting: terminal call [examples/advanced/bindist RIOT_TERMINAL=semihosting]
+## exit: 0
+out: @RIOTBASE@/dist/tools/openocd/openocd.sh debug @BINDIR@/bindist.elf 
+terminal @RIOTBASE@/dist/tools/openocd/openocd.sh [debug] [@BINDIR@/bindist.elf]
+BAUD=[115200]
+DBG unset
+DBG_DEFAULT_FLAGS unset
+DBG_EXTRA_FLAGS=[--eval-command='directory @RIOTBASE@']
+DBG_FLAGS unset
+FLASH_ADDR=[0x0]
+GDB=[gdb-multiarch]
+GDB_PORT unset
+GDB_PORT_CORE_OFFSET unset
+HOME=[@HOME@]
+JLINK unset
+JLINK_DEVICE unset
+JLINK_IF unset
+JLINK_SERIAL unset
+JLINK_SERVER unset
+JLINK_SKIP_VERSION unset
+JLINK_SPEED unset
+JLINK_TERMFLAGS unset
+JLINK_TERMPROG unset
+OPENOCD unset
+OPENOCD_ADAPTER_INIT=[-c 'source [find interface/jlink.cfg]' -c 'transport select swd']
+OPENOCD_CONFIG=[@RIOTBASE@/boards/common/nrf52/dist/openocd.cfg]
+OPENOCD_CORE unset
+OPENOCD_DBG_EXTRA_CMD=[-c 'arm semihosting enable']
+OPENOCD_DBG_START_CMD unset
+OPENOCD_EXTRA_INIT unset
+OPENOCD_SERVER_ADDRESS unset
+OPENOCD_TERMFLAGS unset
+OPENOCD_TERMPROG unset
+PYTERMFLAGS unset
+RAM_LEN unset
+RAM_START_ADDR unset
+RIOTTOOLS=[@RIOTBASE@/dist/tools]
+RTT_PORT unset
+SETSID unset
+TCL_PORT unset
+TELNET_PORT unset
+TUI unset
+## semihosting-jlink: make -n term [examples/advanced/bindist RIOT_TERMINAL=semihosting PROGRAMMER=jlink]
+## exit: 0
+command -v @RIOTBASE@/dist/tools/jlink/jlink.sh >/dev/null 2>&1 || { /usr/bin/env echo 'Terminal program @RIOTBASE@/dist/tools/jlink/jlink.sh is required but not found in PATH.  Aborting.'; exit 1;}
+@RIOTBASE@/dist/tools/jlink/jlink.sh debug @BINDIR@/bindist.elf 
+## semihosting-jlink: terminal call [examples/advanced/bindist RIOT_TERMINAL=semihosting PROGRAMMER=jlink]
+## exit: 0
+out: @RIOTBASE@/dist/tools/jlink/jlink.sh debug @BINDIR@/bindist.elf 
+terminal @RIOTBASE@/dist/tools/jlink/jlink.sh [debug] [@BINDIR@/bindist.elf]
+BAUD=[115200]
+DBG unset
+DBG_DEFAULT_FLAGS unset
+DBG_EXTRA_FLAGS=[--eval-command='directory @RIOTBASE@']
+DBG_FLAGS unset
+FLASH_ADDR=[0x0]
+GDB=[gdb-multiarch]
+GDB_PORT unset
+GDB_PORT_CORE_OFFSET unset
+HOME=[@HOME@]
+JLINK=[JLinkExe]
+JLINK_DEVICE=[nrf52840_xxaa]
+JLINK_IF unset
+JLINK_SERIAL=[]
+JLINK_SERVER unset
+JLINK_SKIP_VERSION unset
+JLINK_SPEED unset
+JLINK_TERMFLAGS unset
+JLINK_TERMPROG unset
+OPENOCD unset
+OPENOCD_ADAPTER_INIT unset
+OPENOCD_CONFIG unset
+OPENOCD_CORE unset
+OPENOCD_DBG_EXTRA_CMD=[-c 'arm semihosting enable']
+OPENOCD_DBG_START_CMD unset
+OPENOCD_EXTRA_INIT unset
+OPENOCD_SERVER_ADDRESS unset
+OPENOCD_TERMFLAGS unset
+OPENOCD_TERMPROG unset
+PYTERMFLAGS unset
+RAM_LEN unset
+RAM_START_ADDR unset
+RIOTTOOLS=[@RIOTBASE@/dist/tools]
+RTT_PORT unset
+SETSID unset
+TCL_PORT unset
+TELNET_PORT unset
+TUI unset
+## semihosting-bmp: make -n term [examples/advanced/bindist RIOT_TERMINAL=semihosting PROGRAMMER=bmp]
+## exit: 0
+command -v @RIOTBASE@/dist/tools/bmp/bmp.py >/dev/null 2>&1 || { /usr/bin/env echo 'Terminal program @RIOTBASE@/dist/tools/bmp/bmp.py is required but not found in PATH.  Aborting.'; exit 1;}
+@RIOTBASE@/dist/tools/bmp/bmp.py  debug @BINDIR@/bindist.elf 
+## semihosting-bmp: terminal call [examples/advanced/bindist RIOT_TERMINAL=semihosting PROGRAMMER=bmp]
+## exit: 0
+out: @RIOTBASE@/dist/tools/bmp/bmp.py  debug @BINDIR@/bindist.elf 
+terminal @RIOTBASE@/dist/tools/bmp/bmp.py [debug] [@BINDIR@/bindist.elf]
+BAUD=[115200]
+DBG unset
+DBG_DEFAULT_FLAGS unset
+DBG_EXTRA_FLAGS unset
+DBG_FLAGS unset
+FLASH_ADDR=[0x0]
+GDB=[gdb-multiarch]
+GDB_PORT unset
+GDB_PORT_CORE_OFFSET unset
+HOME=[@HOME@]
+JLINK unset
+JLINK_DEVICE unset
+JLINK_IF unset
+JLINK_SERIAL unset
+JLINK_SERVER unset
+JLINK_SKIP_VERSION unset
+JLINK_SPEED unset
+JLINK_TERMFLAGS unset
+JLINK_TERMPROG unset
+OPENOCD unset
+OPENOCD_ADAPTER_INIT unset
+OPENOCD_CONFIG unset
+OPENOCD_CORE unset
+OPENOCD_DBG_EXTRA_CMD=[-c 'arm semihosting enable']
+OPENOCD_DBG_START_CMD unset
+OPENOCD_EXTRA_INIT unset
+OPENOCD_SERVER_ADDRESS unset
+OPENOCD_TERMFLAGS unset
+OPENOCD_TERMPROG unset
+PYTERMFLAGS unset
+RAM_LEN unset
+RAM_START_ADDR unset
+RIOTTOOLS=[@RIOTBASE@/dist/tools]
+RTT_PORT unset
+SETSID unset
+TCL_PORT unset
+TELNET_PORT unset
+TUI unset
+## native: make -n term [examples/advanced/bindist RIOT_TERMINAL=native]
+## exit: 0
+command -v @BINDIR@/bindist.elf >/dev/null 2>&1 || { /usr/bin/env echo 'Terminal program @BINDIR@/bindist.elf is required but not found in PATH.  Aborting.'; exit 1;}
+@BINDIR@/bindist.elf  
+## native: terminal call [examples/advanced/bindist RIOT_TERMINAL=native]
+## exit: 0
+out: @BINDIR@/bindist.elf  
+terminal @BINDIR@/bindist.elf
+BAUD=[115200]
+DBG unset
+DBG_DEFAULT_FLAGS unset
+DBG_EXTRA_FLAGS=[--eval-command='directory @RIOTBASE@']
+DBG_FLAGS unset
+FLASH_ADDR=[0x0]
+GDB=[gdb-multiarch]
+GDB_PORT unset
+GDB_PORT_CORE_OFFSET unset
+HOME=[@HOME@]
+JLINK unset
+JLINK_DEVICE unset
+JLINK_IF unset
+JLINK_SERIAL unset
+JLINK_SERVER unset
+JLINK_SKIP_VERSION unset
+JLINK_SPEED unset
+JLINK_TERMFLAGS unset
+JLINK_TERMPROG unset
+OPENOCD unset
+OPENOCD_ADAPTER_INIT=[-c 'source [find interface/jlink.cfg]' -c 'transport select swd']
+OPENOCD_CONFIG=[@RIOTBASE@/boards/common/nrf52/dist/openocd.cfg]
+OPENOCD_CORE unset
+OPENOCD_DBG_EXTRA_CMD unset
+OPENOCD_DBG_START_CMD unset
+OPENOCD_EXTRA_INIT unset
+OPENOCD_SERVER_ADDRESS unset
+OPENOCD_TERMFLAGS unset
+OPENOCD_TERMPROG unset
+PYTERMFLAGS unset
+RAM_LEN unset
+RAM_START_ADDR unset
+RIOTTOOLS=[@RIOTBASE@/dist/tools]
+RTT_PORT unset
+SETSID unset
+TCL_PORT unset
+TELNET_PORT unset
+TUI unset
+## bmp: make -n term [examples/advanced/bindist PROGRAMMER=bmp]
+## exit: 0
+command -v @RIOTBASE@/dist/tools/pyterm/pyterm >/dev/null 2>&1 || { /usr/bin/env echo 'Terminal program @RIOTBASE@/dist/tools/pyterm/pyterm is required but not found in PATH.  Aborting.'; exit 1;}
+@RIOTBASE@/dist/tools/pyterm/pyterm -p "/dev/ttyACM1" -b "115200" -ln "/tmp/pyterm-riot" -rn "2026-01-02_03.04.05-bindist-nrf52840dk"  
+## bmp: terminal call [examples/advanced/bindist PROGRAMMER=bmp]
+## exit: 0
+out: @RIOTBASE@/dist/tools/pyterm/pyterm -p "/dev/ttyACM1" -b "115200" -ln "/tmp/pyterm-riot" -rn "2026-01-02_03.04.05-bindist-nrf52840dk"  
+terminal @RIOTBASE@/dist/tools/pyterm/pyterm [-p] [/dev/ttyACM1] [-b] [115200] [-ln] [/tmp/pyterm-riot] [-rn] [2026-01-02_03.04.05-bindist-nrf52840dk]
+BAUD=[115200]
+DBG unset
+DBG_DEFAULT_FLAGS unset
+DBG_EXTRA_FLAGS unset
+DBG_FLAGS unset
+FLASH_ADDR=[0x0]
+GDB=[gdb-multiarch]
+GDB_PORT unset
+GDB_PORT_CORE_OFFSET unset
+HOME=[@HOME@]
+JLINK unset
+JLINK_DEVICE unset
+JLINK_IF unset
+JLINK_SERIAL unset
+JLINK_SERVER unset
+JLINK_SKIP_VERSION unset
+JLINK_SPEED unset
+JLINK_TERMFLAGS unset
+JLINK_TERMPROG unset
+OPENOCD unset
+OPENOCD_ADAPTER_INIT unset
+OPENOCD_CONFIG unset
+OPENOCD_CORE unset
+OPENOCD_DBG_EXTRA_CMD unset
+OPENOCD_DBG_START_CMD unset
+OPENOCD_EXTRA_INIT unset
+OPENOCD_SERVER_ADDRESS unset
+OPENOCD_TERMFLAGS unset
+OPENOCD_TERMPROG unset
+PYTERMFLAGS unset
+RAM_LEN unset
+RAM_START_ADDR unset
+RIOTTOOLS=[@RIOTBASE@/dist/tools]
+RTT_PORT unset
+SETSID unset
+TCL_PORT unset
+TELNET_PORT unset
+TUI unset
+## port: make -n term [examples/advanced/bindist PORT=/dev/ttyUSB3]
+## exit: 0
+command -v @RIOTBASE@/dist/tools/pyterm/pyterm >/dev/null 2>&1 || { /usr/bin/env echo 'Terminal program @RIOTBASE@/dist/tools/pyterm/pyterm is required but not found in PATH.  Aborting.'; exit 1;}
+@RIOTBASE@/dist/tools/pyterm/pyterm -p "/dev/ttyUSB3" -b "115200" -ln "/tmp/pyterm-riot" -rn "2026-01-02_03.04.05-bindist-nrf52840dk"  
+## port: terminal call [examples/advanced/bindist PORT=/dev/ttyUSB3]
+## exit: 0
+out: @RIOTBASE@/dist/tools/pyterm/pyterm -p "/dev/ttyUSB3" -b "115200" -ln "/tmp/pyterm-riot" -rn "2026-01-02_03.04.05-bindist-nrf52840dk"  
+terminal @RIOTBASE@/dist/tools/pyterm/pyterm [-p] [/dev/ttyUSB3] [-b] [115200] [-ln] [/tmp/pyterm-riot] [-rn] [2026-01-02_03.04.05-bindist-nrf52840dk]
+BAUD=[115200]
+DBG unset
+DBG_DEFAULT_FLAGS unset
+DBG_EXTRA_FLAGS=[--eval-command='directory @RIOTBASE@']
+DBG_FLAGS unset
+FLASH_ADDR=[0x0]
+GDB=[gdb-multiarch]
+GDB_PORT unset
+GDB_PORT_CORE_OFFSET unset
+HOME=[@HOME@]
+JLINK unset
+JLINK_DEVICE unset
+JLINK_IF unset
+JLINK_SERIAL unset
+JLINK_SERVER unset
+JLINK_SKIP_VERSION unset
+JLINK_SPEED unset
+JLINK_TERMFLAGS unset
+JLINK_TERMPROG unset
+OPENOCD unset
+OPENOCD_ADAPTER_INIT=[-c 'source [find interface/jlink.cfg]' -c 'transport select swd']
+OPENOCD_CONFIG=[@RIOTBASE@/boards/common/nrf52/dist/openocd.cfg]
+OPENOCD_CORE unset
+OPENOCD_DBG_EXTRA_CMD unset
+OPENOCD_DBG_START_CMD unset
+OPENOCD_EXTRA_INIT unset
+OPENOCD_SERVER_ADDRESS unset
+OPENOCD_TERMFLAGS unset
+OPENOCD_TERMPROG unset
+PYTERMFLAGS unset
+RAM_LEN unset
+RAM_START_ADDR unset
+RIOTTOOLS=[@RIOTBASE@/dist/tools]
+RTT_PORT unset
+SETSID unset
+TCL_PORT unset
+TELNET_PORT unset
+TUI unset
+## port-env: make -n term [examples/advanced/bindist env:PORT=/dev/ttyUSB4]
+## exit: 0
+command -v @RIOTBASE@/dist/tools/pyterm/pyterm >/dev/null 2>&1 || { /usr/bin/env echo 'Terminal program @RIOTBASE@/dist/tools/pyterm/pyterm is required but not found in PATH.  Aborting.'; exit 1;}
+@RIOTBASE@/dist/tools/pyterm/pyterm -p "/dev/ttyUSB4" -b "115200" -ln "/tmp/pyterm-riot" -rn "2026-01-02_03.04.05-bindist-nrf52840dk"  
+## port-env: terminal call [examples/advanced/bindist env:PORT=/dev/ttyUSB4]
+## exit: 0
+out: @RIOTBASE@/dist/tools/pyterm/pyterm -p "/dev/ttyUSB4" -b "115200" -ln "/tmp/pyterm-riot" -rn "2026-01-02_03.04.05-bindist-nrf52840dk"  
+terminal @RIOTBASE@/dist/tools/pyterm/pyterm [-p] [/dev/ttyUSB4] [-b] [115200] [-ln] [/tmp/pyterm-riot] [-rn] [2026-01-02_03.04.05-bindist-nrf52840dk]
+BAUD=[115200]
+DBG unset
+DBG_DEFAULT_FLAGS unset
+DBG_EXTRA_FLAGS=[--eval-command='directory @RIOTBASE@']
+DBG_FLAGS unset
+FLASH_ADDR=[0x0]
+GDB=[gdb-multiarch]
+GDB_PORT unset
+GDB_PORT_CORE_OFFSET unset
+HOME=[@HOME@]
+JLINK unset
+JLINK_DEVICE unset
+JLINK_IF unset
+JLINK_SERIAL unset
+JLINK_SERVER unset
+JLINK_SKIP_VERSION unset
+JLINK_SPEED unset
+JLINK_TERMFLAGS unset
+JLINK_TERMPROG unset
+OPENOCD unset
+OPENOCD_ADAPTER_INIT=[-c 'source [find interface/jlink.cfg]' -c 'transport select swd']
+OPENOCD_CONFIG=[@RIOTBASE@/boards/common/nrf52/dist/openocd.cfg]
+OPENOCD_CORE unset
+OPENOCD_DBG_EXTRA_CMD unset
+OPENOCD_DBG_START_CMD unset
+OPENOCD_EXTRA_INIT unset
+OPENOCD_SERVER_ADDRESS unset
+OPENOCD_TERMFLAGS unset
+OPENOCD_TERMPROG unset
+PYTERMFLAGS unset
+RAM_LEN unset
+RAM_START_ADDR unset
+RIOTTOOLS=[@RIOTBASE@/dist/tools]
+RTT_PORT unset
+SETSID unset
+TCL_PORT unset
+TELNET_PORT unset
+TUI unset
+## terminal-env: make -n term [examples/advanced/bindist env:RIOT_TERMINAL=picocom]
+## exit: 0
+command -v picocom >/dev/null 2>&1 || { /usr/bin/env echo 'Terminal program picocom is required but not found in PATH.  Aborting.'; exit 1;}
+picocom --nolock --imap lfcrlf --baud "115200" "/dev/ttyACM0" 
+## terminal-env: terminal call [examples/advanced/bindist env:RIOT_TERMINAL=picocom]
+## exit: 0
+out: picocom --nolock --imap lfcrlf --baud "115200" "/dev/ttyACM0" 
+terminal @STUBS@/term/picocom [--nolock] [--imap] [lfcrlf] [--baud] [115200] [/dev/ttyACM0]
+BAUD=[115200]
+DBG unset
+DBG_DEFAULT_FLAGS unset
+DBG_EXTRA_FLAGS=[--eval-command='directory @RIOTBASE@']
+DBG_FLAGS unset
+FLASH_ADDR=[0x0]
+GDB=[gdb-multiarch]
+GDB_PORT unset
+GDB_PORT_CORE_OFFSET unset
+HOME=[@HOME@]
+JLINK unset
+JLINK_DEVICE unset
+JLINK_IF unset
+JLINK_SERIAL unset
+JLINK_SERVER unset
+JLINK_SKIP_VERSION unset
+JLINK_SPEED unset
+JLINK_TERMFLAGS unset
+JLINK_TERMPROG unset
+OPENOCD unset
+OPENOCD_ADAPTER_INIT=[-c 'source [find interface/jlink.cfg]' -c 'transport select swd']
+OPENOCD_CONFIG=[@RIOTBASE@/boards/common/nrf52/dist/openocd.cfg]
+OPENOCD_CORE unset
+OPENOCD_DBG_EXTRA_CMD unset
+OPENOCD_DBG_START_CMD unset
+OPENOCD_EXTRA_INIT unset
+OPENOCD_SERVER_ADDRESS unset
+OPENOCD_TERMFLAGS unset
+OPENOCD_TERMPROG unset
+PYTERMFLAGS unset
+RAM_LEN unset
+RAM_START_ADDR unset
+RIOTTOOLS=[@RIOTBASE@/dist/tools]
+RTT_PORT unset
+SETSID unset
+TCL_PORT unset
+TELNET_PORT unset
+TUI unset
+## most-recent: make -n term [examples/advanced/bindist MOST_RECENT_PORT=1]
+## exit: 0
+command -v @RIOTBASE@/dist/tools/pyterm/pyterm >/dev/null 2>&1 || { /usr/bin/env echo 'Terminal program @RIOTBASE@/dist/tools/pyterm/pyterm is required but not found in PATH.  Aborting.'; exit 1;}
+@RIOTBASE@/dist/tools/pyterm/pyterm -p "/dev/ttyACM7" -b "115200" -ln "/tmp/pyterm-riot" -rn "2026-01-02_03.04.05-bindist-nrf52840dk"  
+## most-recent: terminal call [examples/advanced/bindist MOST_RECENT_PORT=1]
+## exit: 0
+out: @RIOTBASE@/dist/tools/pyterm/pyterm -p "/dev/ttyACM7" -b "115200" -ln "/tmp/pyterm-riot" -rn "2026-01-02_03.04.05-bindist-nrf52840dk"  
+terminal @RIOTBASE@/dist/tools/pyterm/pyterm [-p] [/dev/ttyACM7] [-b] [115200] [-ln] [/tmp/pyterm-riot] [-rn] [2026-01-02_03.04.05-bindist-nrf52840dk]
+BAUD=[115200]
+DBG unset
+DBG_DEFAULT_FLAGS unset
+DBG_EXTRA_FLAGS=[--eval-command='directory @RIOTBASE@']
+DBG_FLAGS unset
+FLASH_ADDR=[0x0]
+GDB=[gdb-multiarch]
+GDB_PORT unset
+GDB_PORT_CORE_OFFSET unset
+HOME=[@HOME@]
+JLINK unset
+JLINK_DEVICE unset
+JLINK_IF unset
+JLINK_SERIAL unset
+JLINK_SERVER unset
+JLINK_SKIP_VERSION unset
+JLINK_SPEED unset
+JLINK_TERMFLAGS unset
+JLINK_TERMPROG unset
+OPENOCD unset
+OPENOCD_ADAPTER_INIT=[-c 'source [find interface/jlink.cfg]' -c 'transport select swd']
+OPENOCD_CONFIG=[@RIOTBASE@/boards/common/nrf52/dist/openocd.cfg]
+OPENOCD_CORE unset
+OPENOCD_DBG_EXTRA_CMD unset
+OPENOCD_DBG_START_CMD unset
+OPENOCD_EXTRA_INIT unset
+OPENOCD_SERVER_ADDRESS unset
+OPENOCD_TERMFLAGS unset
+OPENOCD_TERMPROG unset
+PYTERMFLAGS unset
+RAM_LEN unset
+RAM_START_ADDR unset
+RIOTTOOLS=[@RIOTBASE@/dist/tools]
+RTT_PORT unset
+SETSID unset
+TCL_PORT unset
+TELNET_PORT unset
+TUI unset
+ttys.py [--most-recent] [--format] [path] [serial] [--model] [J-Link]
+## most-recent-jlink: make -n term [examples/advanced/bindist MOST_RECENT_PORT=1 RIOT_TERMINAL=jlink PROGRAMMER=jlink]
+## exit: 0
+command -v @RIOTBASE@/dist/tools/jlink/jlink.sh >/dev/null 2>&1 || { /usr/bin/env echo 'Terminal program @RIOTBASE@/dist/tools/jlink/jlink.sh is required but not found in PATH.  Aborting.'; exit 1;}
+@RIOTBASE@/dist/tools/jlink/jlink.sh term-rtt 
+## most-recent-jlink: terminal call [examples/advanced/bindist MOST_RECENT_PORT=1 RIOT_TERMINAL=jlink PROGRAMMER=jlink]
+## exit: 0
+out: @RIOTBASE@/dist/tools/jlink/jlink.sh term-rtt 
+terminal @RIOTBASE@/dist/tools/jlink/jlink.sh [term-rtt]
+BAUD=[115200]
+DBG unset
+DBG_DEFAULT_FLAGS unset
+DBG_EXTRA_FLAGS=[--eval-command='directory @RIOTBASE@']
+DBG_FLAGS unset
+FLASH_ADDR=[0x0]
+GDB=[gdb-multiarch]
+GDB_PORT unset
+GDB_PORT_CORE_OFFSET unset
+HOME=[@HOME@]
+JLINK=[JLinkExe]
+JLINK_DEVICE=[nrf52840_xxaa]
+JLINK_IF unset
+JLINK_SERIAL=[000683654321]
+JLINK_SERVER unset
+JLINK_SKIP_VERSION unset
+JLINK_SPEED unset
+JLINK_TERMFLAGS unset
+JLINK_TERMPROG unset
+OPENOCD unset
+OPENOCD_ADAPTER_INIT unset
+OPENOCD_CONFIG unset
+OPENOCD_CORE unset
+OPENOCD_DBG_EXTRA_CMD unset
+OPENOCD_DBG_START_CMD unset
+OPENOCD_EXTRA_INIT unset
+OPENOCD_SERVER_ADDRESS unset
+OPENOCD_TERMFLAGS unset
+OPENOCD_TERMPROG unset
+PYTERMFLAGS unset
+RAM_LEN unset
+RAM_START_ADDR unset
+RIOTTOOLS=[@RIOTBASE@/dist/tools]
+RTT_PORT unset
+SETSID unset
+TCL_PORT unset
+TELNET_PORT unset
+TUI unset
+ttys.py [--most-recent] [--format] [path] [serial] [--model] [J-Link]
+## most-recent-openocd-rtt: make -n term [examples/advanced/bindist MOST_RECENT_PORT=1 RIOT_TERMINAL=openocd-rtt]
+## exit: 0
+command -v @RIOTBASE@/dist/tools/openocd/openocd.sh >/dev/null 2>&1 || { /usr/bin/env echo 'Terminal program @RIOTBASE@/dist/tools/openocd/openocd.sh is required but not found in PATH.  Aborting.'; exit 1;}
+RAM_START_ADDR=0x20000000 RAM_LEN=0x40000 @RIOTBASE@/dist/tools/openocd/openocd.sh term-rtt 
+## most-recent-openocd-rtt: terminal call [examples/advanced/bindist MOST_RECENT_PORT=1 RIOT_TERMINAL=openocd-rtt]
+## exit: 0
+out: RAM_START_ADDR=0x20000000 RAM_LEN=0x40000 @RIOTBASE@/dist/tools/openocd/openocd.sh term-rtt 
+terminal @RIOTBASE@/dist/tools/openocd/openocd.sh [term-rtt]
+BAUD=[115200]
+DBG unset
+DBG_DEFAULT_FLAGS unset
+DBG_EXTRA_FLAGS=[--eval-command='directory @RIOTBASE@']
+DBG_FLAGS unset
+FLASH_ADDR=[0x0]
+GDB=[gdb-multiarch]
+GDB_PORT unset
+GDB_PORT_CORE_OFFSET unset
+HOME=[@HOME@]
+JLINK unset
+JLINK_DEVICE unset
+JLINK_IF unset
+JLINK_SERIAL unset
+JLINK_SERVER unset
+JLINK_SKIP_VERSION unset
+JLINK_SPEED unset
+JLINK_TERMFLAGS unset
+JLINK_TERMPROG unset
+OPENOCD unset
+OPENOCD_ADAPTER_INIT=[-c 'source [find interface/jlink.cfg]' -c 'transport select swd']
+OPENOCD_CONFIG=[@RIOTBASE@/boards/common/nrf52/dist/openocd.cfg]
+OPENOCD_CORE unset
+OPENOCD_DBG_EXTRA_CMD unset
+OPENOCD_DBG_START_CMD unset
+OPENOCD_EXTRA_INIT unset
+OPENOCD_SERVER_ADDRESS unset
+OPENOCD_TERMFLAGS unset
+OPENOCD_TERMPROG unset
+PYTERMFLAGS unset
+RAM_LEN=[0x40000]
+RAM_START_ADDR=[0x20000000]
+RIOTTOOLS=[@RIOTBASE@/dist/tools]
+RTT_PORT unset
+SETSID unset
+TCL_PORT unset
+TELNET_PORT unset
+TUI unset
+ttys.py [--most-recent] [--format] [path] [serial] [--model] [J-Link]
+## most-recent-none: make -n term [examples/advanced/bindist MOST_RECENT_PORT=1]
+## exit: 0
+command -v @RIOTBASE@/dist/tools/pyterm/pyterm >/dev/null 2>&1 || { /usr/bin/env echo 'Terminal program @RIOTBASE@/dist/tools/pyterm/pyterm is required but not found in PATH.  Aborting.'; exit 1;}
+@RIOTBASE@/dist/tools/pyterm/pyterm -p "no-tty-detected" -b "115200" -ln "/tmp/pyterm-riot" -rn "2026-01-02_03.04.05-bindist-nrf52840dk"  
+## most-recent-none: terminal call [examples/advanced/bindist MOST_RECENT_PORT=1]
+## exit: 0
+out: @RIOTBASE@/dist/tools/pyterm/pyterm -p "no-tty-detected" -b "115200" -ln "/tmp/pyterm-riot" -rn "2026-01-02_03.04.05-bindist-nrf52840dk"  
+terminal @RIOTBASE@/dist/tools/pyterm/pyterm [-p] [no-tty-detected] [-b] [115200] [-ln] [/tmp/pyterm-riot] [-rn] [2026-01-02_03.04.05-bindist-nrf52840dk]
+BAUD=[115200]
+DBG unset
+DBG_DEFAULT_FLAGS unset
+DBG_EXTRA_FLAGS=[--eval-command='directory @RIOTBASE@']
+DBG_FLAGS unset
+FLASH_ADDR=[0x0]
+GDB=[gdb-multiarch]
+GDB_PORT unset
+GDB_PORT_CORE_OFFSET unset
+HOME=[@HOME@]
+JLINK unset
+JLINK_DEVICE unset
+JLINK_IF unset
+JLINK_SERIAL unset
+JLINK_SERVER unset
+JLINK_SKIP_VERSION unset
+JLINK_SPEED unset
+JLINK_TERMFLAGS unset
+JLINK_TERMPROG unset
+OPENOCD unset
+OPENOCD_ADAPTER_INIT=[-c 'source [find interface/jlink.cfg]' -c 'transport select swd']
+OPENOCD_CONFIG=[@RIOTBASE@/boards/common/nrf52/dist/openocd.cfg]
+OPENOCD_CORE unset
+OPENOCD_DBG_EXTRA_CMD unset
+OPENOCD_DBG_START_CMD unset
+OPENOCD_EXTRA_INIT unset
+OPENOCD_SERVER_ADDRESS unset
+OPENOCD_TERMFLAGS unset
+OPENOCD_TERMPROG unset
+PYTERMFLAGS unset
+RAM_LEN unset
+RAM_START_ADDR unset
+RIOTTOOLS=[@RIOTBASE@/dist/tools]
+RTT_PORT unset
+SETSID unset
+TCL_PORT unset
+TELNET_PORT unset
+TUI unset
+ttys.py [--most-recent] [--format] [path] [serial] [--model] [J-Link]
+## cleanterm: make -n cleanterm [examples/advanced/bindist]
+## exit: 0
+command -v @RIOTBASE@/dist/tools/pyterm/pyterm >/dev/null 2>&1 || { /usr/bin/env echo 'Terminal program @RIOTBASE@/dist/tools/pyterm/pyterm is required but not found in PATH.  Aborting.'; exit 1;}
+@RIOTBASE@/dist/tools/pyterm/pyterm -p "/dev/ttyACM0" -b "115200" -ln "/tmp/pyterm-riot" -rn "2026-01-02_03.04.05-bindist-nrf52840dk" --no-reconnect --noprefix --no-repeat-command-on-empty-line 
+## cleanterm: terminal call [examples/advanced/bindist]
+## exit: 0
+out: @RIOTBASE@/dist/tools/pyterm/pyterm -p "/dev/ttyACM0" -b "115200" -ln "/tmp/pyterm-riot" -rn "2026-01-02_03.04.05-bindist-nrf52840dk" --no-reconnect --noprefix --no-repeat-command-on-empty-line 
+terminal @RIOTBASE@/dist/tools/pyterm/pyterm [-p] [/dev/ttyACM0] [-b] [115200] [-ln] [/tmp/pyterm-riot] [-rn] [2026-01-02_03.04.05-bindist-nrf52840dk] [--no-reconnect] [--noprefix] [--no-repeat-command-on-empty-line]
+BAUD=[115200]
+DBG unset
+DBG_DEFAULT_FLAGS unset
+DBG_EXTRA_FLAGS=[--eval-command='directory @RIOTBASE@']
+DBG_FLAGS unset
+FLASH_ADDR=[0x0]
+GDB=[gdb-multiarch]
+GDB_PORT unset
+GDB_PORT_CORE_OFFSET unset
+HOME=[@HOME@]
+JLINK unset
+JLINK_DEVICE unset
+JLINK_IF unset
+JLINK_SERIAL unset
+JLINK_SERVER unset
+JLINK_SKIP_VERSION unset
+JLINK_SPEED unset
+JLINK_TERMFLAGS unset
+JLINK_TERMPROG unset
+OPENOCD unset
+OPENOCD_ADAPTER_INIT=[-c 'source [find interface/jlink.cfg]' -c 'transport select swd']
+OPENOCD_CONFIG=[@RIOTBASE@/boards/common/nrf52/dist/openocd.cfg]
+OPENOCD_CORE unset
+OPENOCD_DBG_EXTRA_CMD unset
+OPENOCD_DBG_START_CMD unset
+OPENOCD_EXTRA_INIT unset
+OPENOCD_SERVER_ADDRESS unset
+OPENOCD_TERMFLAGS unset
+OPENOCD_TERMPROG unset
+PYTERMFLAGS=[--no-reconnect --noprefix --no-repeat-command-on-empty-line]
+RAM_LEN unset
+RAM_START_ADDR unset
+RIOTTOOLS=[@RIOTBASE@/dist/tools]
+RTT_PORT unset
+SETSID unset
+TCL_PORT unset
+TELNET_PORT unset
+TUI unset
+## end

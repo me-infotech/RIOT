@@ -1,13 +1,8 @@
 # Programmer and flasher settings: generated from flash.yaml (step G3-2)
 include $(RIOTBOARD)/nrf52840dk/flash.inc.mk
 
-# If port selection via ttys.py is enabled by `MOST_RECENT_PORT=1`, filter
-# USB serials to only select the UART bridge of integrated J-Link debugger.
-TTY_BOARD_FILTER := --model J-Link
-
-# The TTY serial also is the ID of the debug adapter, as the TTY is provided by
-# the debug adapter
-DEBUG_ADAPTER_ID_IS_TTY_SERIAL := 1
+# TTY filter of `MOST_RECENT_PORT=1`: generated from term.yaml (step G2B-1)
+include $(RIOTBOARD)/nrf52840dk/term.inc.mk
 
 # The build part (the include of the common nRF52 DK settings) is build data:
 # boards/nrf52840dk/build.yaml. The file included here is generated from it

@@ -1,0 +1,14 @@
+# Terminal data of boards/nrf52840dk/Makefile.include (step G2B-1): how
+# `MOST_RECENT_PORT=1` finds the board's TTY. Source of term.inc.mk next to
+# it (`just generate-term-data`), which the Make file includes after its
+# flash adapter. Format: dist/tools/term/README.md.
+schema: 4
+rules:
+  - comment: |-
+      If port selection via ttys.py is enabled by `MOST_RECENT_PORT=1`, filter
+      USB serials to only select the UART bridge of integrated J-Link debugger.
+    set: {var: TTY_BOARD_FILTER, value: --model J-Link, flavor: simple}
+  - comment: |-
+      The TTY serial also is the ID of the debug adapter, as the TTY is provided by
+      the debug adapter
+    set: {var: DEBUG_ADAPTER_ID_IS_TTY_SERIAL, value: '1', flavor: simple}

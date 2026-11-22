@@ -1,0 +1,143 @@
+# Terminal data of makefiles/tools/serial.inc.mk (step G2B-1): the serial
+# port, the baud rate and the terminal program of RIOT_TERMINAL with its
+# flags. Source of serial.term.inc.mk (`just generate-term-data`), which
+# serial.inc.mk includes. The answers of the shell are the probes
+# PROBE_TTY_DETECTED, PROBE_DATE_TIME and PROBE_TTY_USBMODEM
+# (makefiles/term_providers.inc.mk). Format: dist/tools/term/README.md.
+schema: 4
+rules:
+  - comment: Select the most recently attached tty interface
+    if: {equals: {MOST_RECENT_PORT: '1'}}
+    then:
+      - if: {not: {nonempty: [TTY_SELECT_CMD]}}
+        then:
+          - if: {has: {var: USEMODULE, match: [stdio_cdc_acm]}}
+            then:
+              - set: {var: TTY_SELECT_CMD, value: "${RIOTTOOLS}/usb-serial/ttys.py --most-recent --format path serial --model '${BOARD}' --vendor 'RIOT-os\\.org'", flavor: simple}
+              - comment: Allow matching board by RIOT serial
+                if: {nonempty: [SERIAL]}
+                then:
+                  - add: {TTY_SELECT_CMD: ['--serial "${SERIAL}"']}
+              - comment: |-
+                  Allow matching the bootloader TTY as well, if not running RIOT but
+                  but the bootloader
+                if: {nonempty: [PROG_TTY_BOARD_FILTER]}
+                then:
+                  - add: {TTY_SELECT_CMD: ['|| ${RIOTTOOLS}/usb-serial/ttys.py --most-recent --format path serial ${PROG_TTY_BOARD_FILTER}']}
+            else:
+              - set: {var: TTY_SELECT_CMD, value: '${RIOTTOOLS}/usb-serial/ttys.py --most-recent --format path serial ${TTY_BOARD_FILTER}', flavor: simple}
+      - set: {var: TTY_DETECTED, value: '${PROBE_TTY_DETECTED}', flavor: simple}
+      - set: {var: PORT_DETECTED, value: {word: {var: TTY_DETECTED, index: 1}}, flavor: simple}
+      - set: {var: PORT_SERIAL_DETECTED, value: {word: {var: TTY_DETECTED, index: -1}}, flavor: simple}
+      - set: {var: PORT, value: {word: {var: TTY_DETECTED, index: 1}}, flavor: conditional}
+      - if: {equals: {DEBUG_ADAPTER_ID_IS_TTY_SERIAL: '1'}}
+        then:
+          - set: {var: DEBUG_ADAPTER_ID, value: '${PORT_SERIAL_DETECTED}', flavor: conditional}
+  - comment: Otherwise, use as default the most commonly used ports on Linux and OSX
+    set: {var: PORT_LINUX, value: /dev/ttyACM0, flavor: conditional}
+  - set: {var: PORT_DARWIN, value: {word: {var: PROBE_TTY_USBMODEM, index: 1}}, flavor: conditional}
+  - comment: set default port depending on operating system
+    if: {equals: {OS: Linux}}
+    then:
+      - set: {var: PORT, value: '${PORT_LINUX}', flavor: conditional}
+    elif:
+      - if: {equals: {OS: Darwin}}
+        then:
+          - set: {var: PORT, value: '${PORT_DARWIN}', flavor: conditional}
+  - comment: Default PROG_DEV is the same as PORT
+    set: {var: PROG_DEV, value: '${PORT}', flavor: conditional}
+  - set: {var: BAUD, value: '115200', flavor: conditional, export: true}
+  - if: {has: {var: USEMODULE, match: [stdio_rtt]}}
+    then:
+      - if: {equals: {PROGRAMMER: openocd}}
+        then:
+          - set: {var: RIOT_TERMINAL, value: openocd-rtt, flavor: conditional}
+        elif:
+          - if: {equals: {PROGRAMMER: jlink}}
+            then:
+              - set: {var: RIOT_TERMINAL, value: jlink, flavor: conditional}
+          - if: {equals: {RIOT_TERMINAL: ''}}
+            then:
+              - warning: '"Warning: No RIOT_TERMINAL set, but using stdio_rtt: The default terminal is likely not to work."'
+  - set: {var: RIOT_TERMINAL, value: pyterm, flavor: conditional}
+  - if: {equals: {RIOT_TERMINAL: pyterm}}
+    then:
+      - set: {var: PYTERMSESSION, value: '${PROBE_DATE_TIME}-${APPLICATION}-${BOARD}', flavor: conditional}
+      - set: {var: PYTERMLOGDIR, value: '"/tmp/pyterm-${USER}"', flavor: conditional}
+      - set: {var: TERMPROG, value: '${RIOTTOOLS}/pyterm/pyterm', flavor: conditional}
+      - set: {var: TERMFLAGS, value: '-p "${PORT}" -b "${BAUD}" -ln ${PYTERMLOGDIR} -rn "${PYTERMSESSION}" ${PYTERMFLAGS}', flavor: conditional}
+    elif:
+      - if: {equals: {RIOT_TERMINAL: socat}}
+        then:
+          - set: {var: SOCAT_OUTPUT, value: '-', flavor: conditional}
+          - set: {var: TERMPROG, value: '${RIOT_TERMINAL}', flavor: conditional}
+          - if: {equals: {OS: Linux}}
+            comment: |-
+              RIOT's build image is based on Ubuntu 22.04, which ships a broken version
+              of socat that does not support the "ispeed" and "ospeed" options. Once
+              Ubuntu 22.04 is end-of-life (April 2027), the Linux-specific case can be
+              removed. See https://bugs.launchpad.net/ubuntu/+source/socat/+bug/2165102
+              for more information on the issue.
+            then:
+              - set: {var: TERMFLAGS, value: '${SOCAT_OUTPUT} open:${PORT},b${BAUD},nonblock,clocal=1,cread=1,echo=0,raw,cs8,parenb=0,cstopb=0', flavor: conditional}
+            elif:
+              - if: {equals: {OS: Darwin}}
+                then:
+                  - set: {var: TERMFLAGS, value: '${SOCAT_OUTPUT} open:${PORT},ispeed=${BAUD},ospeed=${BAUD},nonblock,clocal=1,cread=1,echo=0,raw,cs8,parenb=0,cstopb=0', flavor: conditional}
+      - if: {equals: {RIOT_TERMINAL: picocom}}
+        then:
+          - set: {var: TERMPROG, value: picocom, flavor: conditional}
+          - set: {var: TERMFLAGS, value: '--nolock --imap lfcrlf --baud "${BAUD}" "${PORT}"', flavor: conditional}
+      - if: {equals: {RIOT_TERMINAL: miniterm}}
+        then:
+          - comment: |-
+              The executable for miniterm depends on the version and the way it was
+              installed. Check for all (currently) known possibilities and select
+              the correct one.
+            if: {command: {name: pyserial-miniterm.py}}
+            then:
+              - set: {var: TERMPROG, value: pyserial-miniterm.py, flavor: conditional}
+            elif:
+              - if: {command: {name: pyserial-miniterm}}
+                then:
+                  - set: {var: TERMPROG, value: pyserial-miniterm, flavor: conditional}
+              - if: {command: {name: miniterm.py}}
+                then:
+                  - set: {var: TERMPROG, value: miniterm.py, flavor: conditional}
+              - if: {command: {name: miniterm}}
+                then:
+                  - set: {var: TERMPROG, value: miniterm, flavor: conditional}
+            else:
+              - error: The pyserial miniterm was not found! Check if pyserial is installed.
+          - comment: |-
+              The RIOT shell will still transmit back a CRLF, but at least with --eol LF
+              we avoid sending two lines on every "enter".
+            set: {var: TERMFLAGS, value: '--eol LF "${PORT}" "${BAUD}" ${MINITERMFLAGS}', flavor: conditional}
+      - if: {equals: {RIOT_TERMINAL: jlink}}
+        then:
+          - set: {var: TERMPROG, value: '${RIOTTOOLS}/jlink/jlink.sh'}
+          - set: {var: TERMFLAGS, value: term-rtt}
+      - if: {equals: {RIOT_TERMINAL: semihosting}}
+        then:
+          - set: {var: TERMPROG, value: '${DEBUGGER}'}
+          - set: {var: TERMFLAGS, value: '${DEBUGGER_FLAGS}'}
+          - add: {OPENOCD_DBG_EXTRA_CMD: ["-c 'arm semihosting enable'"]}
+          - export: {targets: term cleanterm, vars: [OPENOCD_DBG_EXTRA_CMD]}
+      - if: {equals: {RIOT_TERMINAL: openocd-rtt}}
+        then:
+          - set: {var: TERMENV, value: 'RAM_START_ADDR=${RAM_START_ADDR} RAM_LEN=${RAM_LEN}'}
+          - set: {var: TERMPROG, value: '${RIOTTOOLS}/openocd/openocd.sh'}
+          - set: {var: TERMFLAGS, value: term-rtt}
+      - if: {equals: {RIOT_TERMINAL: bootterm}}
+        then:
+          - set: {var: TERMENV, value: BT_PORT_CRLF=1}
+          - set: {var: TERMPROG, value: '${RIOTTOOLS}/bootterm/bt'}
+          - set: {var: TERMFLAGS, value: '${BOOTTERMFLAGS} -a -b ${BAUD} ${PORT}'}
+          - add: {TERMDEPS: ['${TERMPROG}']}
+      - if: {equals: {RIOT_TERMINAL: native}}
+        then:
+          - set: {var: TERMPROG, value: '${ELFFILE}', flavor: conditional}
+      - if: {equals: {RIOT_TERMINAL: jelly}}
+        then:
+          - set: {var: TERMPROG, value: Jelly}
+          - add: {TERMFLAGS: ['${PORT}']}

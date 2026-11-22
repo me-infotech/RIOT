@@ -15,9 +15,10 @@
 # built with `just build` (CMake + Ninja, dist/tools/cmake_gen), flashed
 # with `just flash` (dist/tools/flash), distributed as binaries with
 # `just bindist` (dist/tools/bindist) and cleaned with `just clean` and
-# `just distclean` (dist/tools/clean); all others are still built, flashed,
-# distributed and cleaned with make in their directory. Tested with just
-# 1.59.0.
+# `just distclean` (dist/tools/clean); their terminal is opened with `just
+# term` and `just cleanterm` (dist/tools/term); all others are still built,
+# flashed, distributed, cleaned and opened with make in their directory.
+# Tested with just 1.59.0.
 
 # Recipe lines run with /bin/sh, as GNU Make ran them.
 set shell := ["/bin/sh", "-c"]
@@ -194,3 +195,22 @@ clean app board *vars:
 # Example: just distclean examples/basic/hello-world nrf52840dk
 distclean app board *vars:
     @./dist/tools/clean/clean.py distclean -C {{ quote(app) }} BOARD={{ quote(board) }} {{ vars }}
+
+# Regenerate the Make adapters (term.inc.mk, <x>.term.inc.mk, debug.inc.mk,
+# <x>.debug.inc.mk) from the terminal and debugger data (maintenance of step
+# G2B-1; private: not a former Make target).
+[private]
+generate-term-data:
+    @./dist/tools/term/term.py generate
+
+# Open the terminal of an application on the board without Make, as `make
+# term` (step G2B-1): RIOT_TERMINAL (default pyterm), PORT, BAUD, … as for
+# make; nothing is built (flash first with `just flash`).
+# Example: just term examples/basic/hello-world nrf52840dk RIOT_TERMINAL=picocom
+term app board *vars:
+    @./dist/tools/term/term.py term -C {{ quote(app) }} BOARD={{ quote(board) }} {{ vars }}
+
+# The terminal without pyterm's logging and prefixes, as `make cleanterm`
+# (step G2B-1). Example: just cleanterm examples/basic/hello-world nrf52840dk
+cleanterm app board *vars:
+    @./dist/tools/term/term.py cleanterm -C {{ quote(app) }} BOARD={{ quote(board) }} {{ vars }}

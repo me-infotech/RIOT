@@ -68,13 +68,17 @@ class GoldenFilesTest(unittest.TestCase):
         self.assertEqual(sorted(found), SCOPE["files"])
 
 
-NEW_ADAPTERS = ("flash.inc.mk", ".dist.inc.mk", ".clean.inc.mk")
+NEW_ADAPTERS = ("flash.inc.mk", ".dist.inc.mk", ".clean.inc.mk", "/term.inc.mk", ".term.inc.mk",
+                "/debug.inc.mk", ".debug.inc.mk", "/term_providers.inc.mk")
 
 
 def without_flash_adapters(result: tuple) -> tuple:
     """MAKEFILE_LIST without the Make adapters generated from the flash data
     (step G3-2, `*flash.inc.mk`), the distribution data (step G3-3,
-    `<x>.dist.inc.mk`) and the clean data (step G2C-1, `<x>.clean.inc.mk`):
+    `<x>.dist.inc.mk`), the clean data (step G2C-1, `<x>.clean.inc.mk`) and
+    the terminal and debugger data with their probes (step G2B-1,
+    `term.inc.mk`, `<x>.term.inc.mk`, `debug.inc.mk`, `<x>.debug.inc.mk`,
+    `term_providers.inc.mk`):
     new files that the Make files of the base commit did not include; the
     settings in them were in those Make files."""
     status, lines = result

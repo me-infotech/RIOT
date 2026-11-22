@@ -123,6 +123,9 @@ include $(RIOTMAKE)/utils/strings.mk
 # values the build data reads but does not define (probes, build algorithm)
 include $(RIOTMAKE)/build_providers.inc.mk
 
+# values the terminal data reads but does not define (probes, step G2B-1)
+include $(RIOTMAKE)/term_providers.inc.mk
+
 # include nimble makefile tools
 include $(RIOTMAKE)/pkg/nimble.adv.mk
 
@@ -450,8 +453,8 @@ ifneq (,$(filter suit,$(USEMODULE)))
   include $(RIOTMAKE)/suit.inc.mk
 endif
 
-# elf file used for the debugger, must include bootloader offset
-DEBUG_ELFFILE ?= $(ELFFILE)
+# The ELF file of the debugger: generated from debug.yaml (step G2B-1)
+include $(RIOTBASE)/debug.inc.mk
 
 # Targets to get given file
 elffile: $(ELFFILE)

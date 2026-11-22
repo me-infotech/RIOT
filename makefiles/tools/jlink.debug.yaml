@@ -1,0 +1,23 @@
+# Debugger data of makefiles/tools/jlink.inc.mk (step G2B-1): debugger,
+# debug server and reset of the programmer `jlink` (dist/tools/jlink/jlink.sh);
+# the terminal reads DEBUGGER for RIOT_TERMINAL=semihosting. Source of
+# jlink.debug.inc.mk (`just generate-term-data`), which jlink.inc.mk includes
+# after its flash adapter. Format: dist/tools/term/README.md.
+schema: 4
+rules:
+  - comment: |-
+      the settings every GDB based debugger shares (stand_in: read here by the
+      terminal without Make; the owner includes dbg_common.inc.mk itself, before
+      its flash adapter)
+    include: {path: '${RIOTMAKE}/tools/dbg_common.inc.mk'}
+    stand_in: makefiles/tools/jlink.inc.mk
+  - set: {var: DEBUGGER, value: '${RIOTTOOLS}/jlink/jlink.sh', flavor: conditional}
+  - set: {var: DEBUGSERVER, value: '${RIOTTOOLS}/jlink/jlink.sh', flavor: conditional}
+  - set: {var: RESET, value: '${RIOTTOOLS}/jlink/jlink.sh', flavor: conditional}
+  - set: {var: DEBUGGER_FLAGS, value: 'debug ${DEBUG_ELFFILE}', flavor: conditional}
+  - set: {var: DEBUGSERVER_FLAGS, value: debug-server, flavor: conditional}
+  - set: {var: RESET_FLAGS, value: reset, flavor: conditional}
+  - if: {nonempty: [DBG_EXTRA_FLAGS]}
+    then:
+      - comment: Export OPENOCD_DBG_EXTRA_CMD only to the flash/flash-only target
+        export: {targets: '${JLINK_DEBUG_TARGETS}', vars: [DBG_EXTRA_FLAGS]}

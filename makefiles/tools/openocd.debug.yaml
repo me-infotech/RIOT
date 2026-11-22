@@ -1,0 +1,35 @@
+# Debugger data of makefiles/tools/openocd.inc.mk (step G2B-1): debugger,
+# debug server and client and reset of the programmer `openocd`
+# (dist/tools/openocd/openocd.sh) and the variables they get; the terminal
+# reads DEBUGGER for RIOT_TERMINAL=semihosting. Source of openocd.debug.inc.mk
+# (`just generate-term-data`), which openocd.inc.mk includes after its flash
+# adapter. Format: dist/tools/term/README.md.
+schema: 4
+rules:
+  - comment: |-
+      the settings every GDB based debugger shares (stand_in: read here by the
+      terminal without Make; the owner includes dbg_common.inc.mk itself, before
+      its flash adapter)
+    include: {path: '${RIOTMAKE}/tools/dbg_common.inc.mk'}
+    stand_in: makefiles/tools/openocd.inc.mk
+  - set: {var: DEBUGGER, value: '${RIOTTOOLS}/openocd/openocd.sh', flavor: conditional}
+  - set: {var: DEBUGSERVER, value: '${RIOTTOOLS}/openocd/openocd.sh', flavor: conditional}
+  - set: {var: DEBUGCLIENT, value: '${RIOTTOOLS}/openocd/openocd.sh', flavor: conditional}
+  - set: {var: RESET, value: '${RIOTTOOLS}/openocd/openocd.sh', flavor: conditional}
+  - set: {var: DEBUGGER_FLAGS, value: 'debug ${DEBUG_ELFFILE}', flavor: conditional}
+  - set: {var: DEBUGSERVER_FLAGS, value: debug-server, flavor: conditional}
+  - set: {var: DEBUGCLIENT_FLAGS, value: 'debug-client ${DEBUG_ELFFILE}', flavor: conditional}
+  - set: {var: RESET_FLAGS, value: reset, flavor: conditional}
+  - if: {nonempty: [OPENOCD_CMD_RESET_RUN]}
+    then:
+      - comment: Export OPENOCD_CMD_RESET_RUN only to the reset target
+        export: {targets: reset, vars: [OPENOCD_CMD_RESET_RUN]}
+  - set: {var: OPENOCD_DEBUG_TARGETS, value: debug debugr debug-server debug-client}
+  - if: {nonempty: [OPENOCD_DBG_EXTRA_CMD]}
+    then:
+      - comment: Export OPENOCD_DBG_EXTRA_CMD only to the flash/flash-only target
+        export: {targets: '${OPENOCD_DEBUG_TARGETS}', vars: [OPENOCD_DBG_EXTRA_CMD]}
+  - if: {nonempty: [DBG_EXTRA_FLAGS]}
+    then:
+      - comment: Export OPENOCD_DBG_EXTRA_CMD only to the flash/flash-only target
+        export: {targets: '${OPENOCD_DEBUG_TARGETS}', vars: [DBG_EXTRA_FLAGS]}

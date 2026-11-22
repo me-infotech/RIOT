@@ -1,13 +1,9 @@
 # Programmer and flasher settings: generated from flash.yaml (step G3-2)
 include $(RIOTBOARD)/common/nrf52/flash.inc.mk
 
+# Serial port of the Black Magic Probe: generated from term.yaml (step G2B-1)
+include $(RIOTBOARD)/common/nrf52/term.inc.mk
+
 # The include path is build data: boards/common/nrf52/build.yaml. The file
 # included here is generated from it (`just generate-config-data`).
 include $(RIOTBOARD)/common/nrf52/build.mk
-
-ifeq (bmp,$(PROGRAMMER))
-  # On Blackmagic Probe, the first ACM is used to connect to the gdb server,
-  # the second is the BMP's UART interface
-  PORT_LINUX ?= /dev/ttyACM1
-  PORT_DARWIN ?= $(wordlist 2, 2, $(sort $(wildcard /dev/tty.usbmodem*)))
-endif

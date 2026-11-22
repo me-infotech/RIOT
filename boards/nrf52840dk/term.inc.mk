@@ -1,0 +1,10 @@
+# Generated from term.yaml by dist/tools/term/term.py.
+# Do not edit: change term.yaml and run `just generate-term-data`.
+
+# If port selection via ttys.py is enabled by `MOST_RECENT_PORT=1`, filter
+# USB serials to only select the UART bridge of integrated J-Link debugger.
+TTY_BOARD_FILTER := --model J-Link
+
+# The TTY serial also is the ID of the debug adapter, as the TTY is provided by
+# the debug adapter
+DEBUG_ADAPTER_ID_IS_TTY_SERIAL := 1

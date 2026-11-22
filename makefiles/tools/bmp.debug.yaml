@@ -1,0 +1,11 @@
+# Debugger data of makefiles/tools/bmp.inc.mk (step G2B-1): debugger and
+# reset of the programmer `bmp` (Black Magic Probe, dist/tools/bmp/bmp.py);
+# the terminal reads DEBUGGER for RIOT_TERMINAL=semihosting. Source of
+# bmp.debug.inc.mk (`just generate-term-data`), which bmp.inc.mk includes
+# after its flash adapter. Format: dist/tools/term/README.md.
+schema: 4
+rules:
+  - set: {var: DEBUGGER, value: '${RIOTTOOLS}/bmp/bmp.py', flavor: conditional}
+  - set: {var: RESET, value: '${RIOTTOOLS}/bmp/bmp.py', flavor: conditional}
+  - set: {var: DEBUGGER_FLAGS, value: '${BMP_OPTIONS} debug ${DEBUG_ELFFILE}', flavor: conditional}
+  - set: {var: RESET_FLAGS, value: '${BMP_OPTIONS} reset', flavor: conditional}

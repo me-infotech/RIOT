@@ -209,3 +209,34 @@ steps:
       pip: [pyyaml]
       tools: [just@1.59.0]
     docs: dist/tools/clean/README.md
+
+  - id: g2b-01-term
+    title: Open the terminal of an application (term, cleanterm) from the terminal data, without Make
+    group: "2B"
+    targets:
+      - name: term
+        now: just term <application> <board> [RIOT_TERMINAL=…] [PORT=…] [VAR=VALUE…]
+        hardware: true
+        board_test: >-
+          nRF52840 DK on USB: for hello-world, gnrc_networking and bindist run
+          `just flash <app> nrf52840dk`, then `just term <app> nrf52840dk`
+          (pyterm): hello-world must print "Hello World!" after a reset,
+          gnrc_networking and bindist must answer at the shell prompt (`help`);
+          repeat with RIOT_TERMINAL=picocom and RIOT_TERMINAL=socat (installed)
+          and with MOST_RECENT_PORT=1; Ctrl+C must end the terminal; compare
+          each with `make term` of the same application (same port, flags and
+          output)
+      - name: cleanterm
+        now: just cleanterm <application> <board> [VAR=VALUE…]
+        hardware: true
+        board_test: >-
+          nRF52840 DK on USB, after `just flash examples/basic/hello-world
+          nrf52840dk`: `just cleanterm examples/basic/hello-world nrf52840dk`
+          must show the output without pyterm's prefixes and log; compare with
+          `make cleanterm`
+    tests:
+      - dist/tools/term/tests
+    requires:
+      pip: [pyyaml]
+      tools: [just@1.59.0]
+    docs: dist/tools/term/README.md
