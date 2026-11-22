@@ -14,6 +14,10 @@ file includes the adapters generated from them, after its flash adapter
                              <dir>/term.yaml               <dir>/term.inc.mk
   <dir>/<x>.inc.mk           <dir>/<x>.debug.yaml          <dir>/<x>.debug.inc.mk
                              <dir>/<x>.term.yaml           <dir>/<x>.term.inc.mk
+                             <dir>/<x>.test.yaml           <dir>/<x>.test.inc.mk
+
+The test data (`test`, step G2B-3) are the variables of
+makefiles/tests/tests.inc.mk (tests.test.yaml), read by dist/tools/test/test.py.
 
 Format: `{schema: 4, rules: [...]}`, the rule language of the flash data
 (dist/tools/flash/flashdata.py: the configuration data of
@@ -73,7 +77,7 @@ RIOTBASE = R.RIOTBASE
 SCHEMA = 4
 # the data kinds of this step, in the order an owner includes its adapters
 # (after the flash adapter)
-KINDS = ("debug", "term")
+KINDS = ("debug", "term", "test")
 NOT_IN_DATA = ("section",)
 COMMAND_NAME_RE = re.compile(r"^[A-Za-z0-9_.+-]+$")
 # a goal of `goal: TARGET` (a literal target, as the targets of Makefile.include)
@@ -116,7 +120,7 @@ def adapter_name(data_path: str) -> str:
     """The generated Make file of a data file."""
     kind = kind_of(data_path)
     if kind is None:
-        raise ValueError(f"not a terminal or debugger data file: {data_path}")
+        raise ValueError(f"not a terminal, debugger or test data file: {data_path}")
     return data_path[:-len(".yaml")] + ".inc.mk"
 
 
@@ -141,7 +145,7 @@ def include_line(data_path: str) -> str:
 
 
 def all_data(root: str = RIOTBASE) -> list:
-    """Every terminal and debugger data file of the repository."""
+    """Every terminal, debugger and test data file of the repository."""
     found = [os.path.join(root, f) for f in os.listdir(root)
              if is_data_name(f) and os.path.isfile(os.path.join(root, f))]
     for top in TOPS:

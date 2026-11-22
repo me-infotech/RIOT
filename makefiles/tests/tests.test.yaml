@@ -1,0 +1,30 @@
+# Test data of makefiles/tests/tests.inc.mk (step G2B-3): the test scripts of
+# the application, the prerequisites of `test` and the test executor. Source
+# of tests.test.inc.mk (`just generate-term-data`), which tests.inc.mk
+# includes. The executable files of $(APPDIR)/tests are the probe PROBE_TESTS
+# (makefiles/term_providers.inc.mk). Format: dist/tools/term/README.md,
+# dist/tools/test/README.md.
+schema: 4
+rules:
+  - comment: |-
+      Export TESTRUNNER_RESET_AFTER_TERM only for the test target. This allows for
+      it to be accessed through the environment from python test script.
+      This is currently needed only by `examples/%/tests` and should be removed in
+      the future since `make reset` after `term` is not a valid synch method across
+      all platforms.
+    export: {targets: test test-as-root test-with-config, vars: [TESTRUNNER_RESET_AFTER_TERM]}
+  - set: {var: TESTS, value: '${PROBE_TESTS}', flavor: conditional}
+  - comment: |-
+      "make test" calls "make term" which would implicitly build it's dependencies,
+      but that increases the time "make test" needs to get ready. That can cause
+      problems ("make term" missing some lines) as terminal startup is not properly
+      sychronized, but depends on a static timeout (TESTRUNNER_START_DELAY).
+      Murdock builds the term dependencies before running "make test" to circumvent
+      this. In order to make local builds behave similar, add the term deps here.
+      See #11762.
+    add: {TEST_DEPS: ['${TERMDEPS}']}
+  - comment: |-
+      these variables can be used to use e.g. pytest to execute the tests instead of
+      executing them as a script
+    set: {var: TEST_EXECUTOR, value: '', flavor: conditional}
+  - set: {var: TEST_EXECUTOR_FLAGS, value: '', flavor: conditional}

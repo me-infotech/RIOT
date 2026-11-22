@@ -50,7 +50,9 @@ DATA = sorted([
     "makefiles/tools/serial.term.yaml", "makefiles/tools/dbg_common.debug.yaml",
     "makefiles/tools/gdb.debug.yaml", "makefiles/tools/jlink.debug.yaml",
     "makefiles/tools/openocd.debug.yaml", "makefiles/tools/bmp.debug.yaml",
-    "makefiles/toolchain/gnu.debug.yaml"])
+    "makefiles/toolchain/gnu.debug.yaml",
+    # test data (step G2B-3, dist/tools/test)
+    "makefiles/tests/tests.test.yaml", "test.yaml", "makefiles/setup_dirs.test.yaml"])
 # statements an owner keeps before its adapter: the flash adapter (G3-2), the
 # include of dbg_common.inc.mk (no flash data; a stand_in of the debugger
 # data), the build part of gnu.inc.mk (Make reads gdb.inc.mk after it, as
@@ -59,7 +61,9 @@ LEADING = {"include $(RIOTMAKE)/tools/dbg_common.inc.mk",
            "include $(RIOTMAKE)/toolchain/gnu.build.mk"}
 # Makefile.include includes debug.inc.mk where DEBUG_ELFFILE was (:454,
 # after riotboot.mk, which may set it first)
-NOT_FIRST = {"debug.yaml"}
+# and (step G2B-3) test.inc.mk after the directory defaults, setup_dirs.test.inc.mk
+# at the end of setup_dirs.inc.mk (once RIOTBASE is absolute)
+NOT_FIRST = {"debug.yaml", "test.yaml", "makefiles/setup_dirs.test.yaml"}
 # lines of hand-written Make files that set terminal or debugger variables on
 # purpose: requests outside the data (term.py check_scope: exit 3)
 ALLOWED = {
@@ -68,6 +72,10 @@ ALLOWED = {
                                       "algorithm) and EMULATE=1 (exit 3)",
     ("Makefile.include", "DEBUGDEPS"): "EMULATE=1 (exit 3); the setsid of macOS is data "
                                        "(debug.yaml, step G2B-2)",
+    ("makefiles/setup_dirs.inc.mk", "RIOTPROJECT"): "`override … := $(abspath …)` "
+                                                    "(algorithm, test.py directories)",
+    ("makefiles/setup_dirs.inc.mk", "DLCACHE_DIR"): "`override … := $(abspath …)` "
+                                                    "(algorithm, test.py directories)",
 }
 
 

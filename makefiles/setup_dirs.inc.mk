@@ -91,3 +91,7 @@ ifneq (, $(filter-out 1, $(foreach v,$(__DIRECTORY_VARIABLES),$(words $($(v)))))
   $(info Related variables = $(__DIRECTORY_VARIABLES))
   $(error Make sure no path override is empty or contains spaces!)
 endif
+
+# set python path, e.g. for tests (formerly Makefile.include): test data
+# setup_dirs.test.yaml (step G2B-3)
+include $(RIOTMAKE)/setup_dirs.test.inc.mk

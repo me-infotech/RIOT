@@ -283,3 +283,34 @@ steps:
       pip: [pyyaml]
       tools: [just@1.59.0]
     docs: dist/tools/debug/README.md
+  - id: g2b-03-test
+    title: Run the test scripts of an application (test, test/available) from the test data, without Make
+    group: "2B"
+    targets:
+      - name: test
+        now: just test <application> <board> [TESTS="<script>…"] [VAR=VALUE…]
+        hardware: true
+        board_test: >-
+          nRF52840 DK on USB: `just flash examples/basic/hello-world
+          nrf52840dk`, then `just test examples/basic/hello-world nrf52840dk
+          TESTS=<script>` with a script that uses
+          dist/pythonlibs/testrunner (`run(testfunc)`, testfunc expects
+          "Hello World!"; its terminal is still opened by `make cleanterm`,
+          decision T2); exit 0 and the same output as `make test` with the
+          same TESTS; once more with a script expecting a text that never
+          comes (exit 2 after the timeout, as make); `just test` without
+          TESTS runs nothing (exit 0, as make)
+      - name: test/available
+        now: just test-available <application> <board> [VAR=VALUE…]
+        hardware: true
+        board_test: >-
+          with the board of the board test of test: `just test-available
+          examples/basic/hello-world nrf52840dk` exits 2 (no tests, as `make
+          test/available`), with TESTS=<script> 0, with
+          TEST_ON_CI_BLACKLIST=nrf52840dk 2 and Make's message
+    tests:
+      - dist/tools/test/tests
+    requires:
+      pip: [pyyaml]
+      tools: [just@1.59.0]
+    docs: dist/tools/test/README.md

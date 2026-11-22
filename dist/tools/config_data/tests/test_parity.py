@@ -69,7 +69,8 @@ class GoldenFilesTest(unittest.TestCase):
 
 
 NEW_ADAPTERS = ("flash.inc.mk", ".dist.inc.mk", ".clean.inc.mk", "/term.inc.mk", ".term.inc.mk",
-                "/debug.inc.mk", ".debug.inc.mk", "/term_providers.inc.mk")
+                "/debug.inc.mk", ".debug.inc.mk", "/term_providers.inc.mk",
+                "/test.inc.mk", ".test.inc.mk")
 
 
 def without_flash_adapters(result: tuple) -> tuple:
@@ -78,7 +79,8 @@ def without_flash_adapters(result: tuple) -> tuple:
     `<x>.dist.inc.mk`), the clean data (step G2C-1, `<x>.clean.inc.mk`) and
     the terminal and debugger data with their probes (step G2B-1,
     `term.inc.mk`, `<x>.term.inc.mk`, `debug.inc.mk`, `<x>.debug.inc.mk`,
-    `term_providers.inc.mk`):
+    `term_providers.inc.mk`) and the test data (step G2B-3, `test.inc.mk`,
+    `<x>.test.inc.mk`):
     new files that the Make files of the base commit did not include; the
     settings in them were in those Make files."""
     status, lines = result

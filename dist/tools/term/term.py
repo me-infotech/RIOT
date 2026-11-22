@@ -14,8 +14,8 @@ G2B-1).
       uses the existing image where it needs one (native, semihosting:
       Make's BINDIR <app>/bin/<board>, or BINDIR=…); nothing is built.
   term.py generate [--check] [DATA…]
-      write (check) the Make adapters generated from the terminal and
-      debugger data (all data files of the repository without arguments)
+      write (check) the Make adapters generated from the terminal, debugger
+      and test data (all data files of the repository without arguments)
 
 Inputs: the YAML data of the repository (resolver G0-2, build data G3-1,
 flash data G3-2, terminal and debugger data of this step, see termdata.py)
@@ -279,11 +279,13 @@ def check_board(v, what="the terminal"):
 
 
 def evaluate(app_dir: str, variables: dict, environ: dict, goals=("term",),
-             what="the terminal", termdeps=True) -> TermEvaluator:
+             what="the terminal", termdeps=True, providers=None) -> TermEvaluator:
     """The variables of Make for `term` (plan.evaluate_application with the
     flash, debugger and terminal data); `goals` are Make's MAKECMDGOALS,
-    `termdeps` False for a target without TERMDEPS (debug, step G2B-2)."""
-    v = TermVariables(PROVIDERS)
+    `termdeps` False for a target without TERMDEPS (debug, step G2B-2),
+    `providers` the probes (default PROVIDERS; test.py adds PROBE_TESTS,
+    step G2B-3)."""
+    v = TermVariables(providers or PROVIDERS)
     import_environment(v, environ)
     for name, value in variables.items():
         v.command_line(name, value)
@@ -488,7 +490,7 @@ def cmd_generate(check: bool, files: list = None) -> int:
                 file.write(text)
             print(f"wrote {rel(target)}")
     if stale and check:
-        print("Change the terminal or debugger data, never the adapter; run "
+        print("Change the terminal, debugger or test data, never the adapter; run "
               "`just generate-term-data`.", file=sys.stderr)
     return 1 if stale else 0
 

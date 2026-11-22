@@ -79,6 +79,10 @@ generate --check` in the tests), after its flash adapter:
 | `makefiles/toolchain/gnu.inc.mk` | `gnu.debug.yaml` | `gnu.debug.inc.mk` | the include of gdb.inc.mk (where it was, after the build part) |
 | `Makefile.include` | `debug.yaml` | `debug.inc.mk` | DEBUG_ELFFILE (included where the line was, after riotboot.mk) |
 
+The test data of step G2B-3 (kind `test`: `tests.test.yaml`, `test.yaml`,
+`setup_dirs.test.yaml`) use the same format and generator; they are listed
+in `dist/tools/test/README.md`.
+
 `jlink.inc.mk` and `openocd.inc.mk` still include `dbg_common.inc.mk` first,
 so Make reads its files in the old order; their debugger data names that
 include as a `stand_in` rule (schema 4, step G0-3): read by `term.py`, left

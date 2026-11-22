@@ -1,0 +1,10 @@
+# Test data of Makefile.include (step G2B-3): the directories the test scripts
+# get (as variables and in MAKEFLAGS) that were not yet data. Source of
+# test.inc.mk next to it (`just generate-term-data`), which Makefile.include
+# includes after the other directory defaults. The answer of git is the probe
+# PROBE_RIOTPROJECT (makefiles/term_providers.inc.mk). Format:
+# dist/tools/term/README.md, dist/tools/test/README.md.
+schema: 4
+rules:
+  - set: {var: RIOTPROJECT, value: '${PROBE_RIOTPROJECT}', flavor: conditional}
+  - set: {var: DLCACHE_DIR, value: '${RIOTBASE}/.dlcache', flavor: conditional}

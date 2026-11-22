@@ -17,9 +17,10 @@
 # `just bindist` (dist/tools/bindist) and cleaned with `just clean` and
 # `just distclean` (dist/tools/clean); their terminal is opened with `just
 # term` and `just cleanterm` (dist/tools/term) and their debugger with `just
-# debug`, `just debug-server` and `just debug-client` (dist/tools/debug); all
-# others are still built, flashed, distributed, cleaned, opened and debugged
-# with make in their directory.
+# debug`, `just debug-server` and `just debug-client` (dist/tools/debug);
+# their test scripts run with `just test` and `just test-available`
+# (dist/tools/test); all others are still built, flashed, distributed,
+# cleaned, opened, debugged and tested with make in their directory.
 # Tested with just 1.59.0.
 
 # Recipe lines run with /bin/sh, as GNU Make ran them.
@@ -234,3 +235,20 @@ debug-server app board *vars:
 # (step G2B-2). Example: just debug-client examples/basic/hello-world nrf52840dk
 debug-client app board *vars:
     @./dist/tools/debug/debug.py debug-client -C {{ quote(app) }} BOARD={{ quote(board) }} {{ vars }}
+
+# Run the test scripts of an application on the board without Make, as `make
+# test` (step G2B-3): TESTS (default: the executable files of <app>/tests),
+# TEST_EXECUTOR, TEST_EXECUTOR_FLAGS as for make; nothing is built or flashed
+# (flash first with `just flash`). Each argument is one VAR=VALUE, so TESTS
+# can name several scripts. The terminal inside a test is still opened by
+# make (dist/pythonlibs/testrunner/spawn.py).
+# Example: just test examples/basic/hello-world nrf52840dk TESTS="tests/01-run.py"
+[positional-arguments]
+test app board *vars:
+    @app="$1" board="$2"; shift 2; exec ./dist/tools/test/test.py test -C "$app" BOARD="$board" "$@"
+
+# Exit 0 if the application has tests for the board, as `make test/available`
+# (step G2B-3). Example: just test-available examples/basic/hello-world nrf52840dk
+[positional-arguments]
+test-available app board *vars:
+    @app="$1" board="$2"; shift 2; exec ./dist/tools/test/test.py test/available -C "$app" BOARD="$board" "$@"

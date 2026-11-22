@@ -1,26 +1,11 @@
-# Export TESTRUNNER_RESET_AFTER_TERM only for the test target. This allows for
-# it to be accessed through the environment from python test script.
-# This is currently needed only by `examples/%/tests` and should be removed in
-# the future since `make reset` after `term` is not a valid synch method across
-# all platforms.
-$(call target-export-variables,test test-as-root test-with-config,TESTRUNNER_RESET_AFTER_TERM)
+# The test variables (TESTRUNNER_RESET_AFTER_TERM exported for the test
+# targets, TESTS, TEST_DEPS, TEST_EXECUTOR, TEST_EXECUTOR_FLAGS) are test data:
+# makefiles/tests/tests.test.yaml (step G2B-3), read by `just test` and
+# `just test-available` (dist/tools/test/test.py); for Make the adapter
+# generated from it (`just generate-term-data`).
+include $(RIOTMAKE)/tests/tests.test.inc.mk
 
 .PHONY: test test/available
-TESTS ?= $(foreach file,$(wildcard $(APPDIR)/tests/*[^~]),\
-                        $(shell test -f $(file) -a -x $(file) && echo $(file)))
-
-# "make test" calls "make term" which would implicitly build it's dependencies,
-# but that increases the time "make test" needs to get ready. That can cause
-# problems ("make term" missing some lines) as terminal startup is not properly
-# sychronized, but depends on a static timeout (TESTRUNNER_START_DELAY).
-# Murdock builds the term dependencies before running "make test" to circumvent
-# this. In order to make local builds behave similar, add the term deps here.
-# See #11762.
-TEST_DEPS += $(TERMDEPS)
-# these variables can be used to use e.g. pytest to execute the tests instead of
-# executing them as a script
-TEST_EXECUTOR ?=
-TEST_EXECUTOR_FLAGS ?=
 
 # Are tests going to be run in docker and we are not yet in docker?
 ifeq (1-0-test,$(BUILD_IN_DOCKER)-$(INSIDE_DOCKER)-$(filter test,$(DOCKER_MAKECMDGOALS)))

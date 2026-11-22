@@ -1,0 +1,430 @@
+# golden output of GNU Make for the parity tests of step G2B-3 (tests without Make)
+# generator: dist/tools/test/tests/record_golden.py
+# commit: db4fc1c576 (git archive, unchanged)
+# date: 2026-11-22
+# make: GNU Make 4.3
+# call: make -C <app> [-n] <goal> BOARD=nrf52840dk [VAR=VALUE…]; stubs: git fails;
+#   scripts: the recorder @REC@; environment: env -i PATH HOME LC_ALL=C USER TMPDIR
+#   G2B_*; stdout and stderr merged, `make: ***` and directory lines left out
+# script environment: APPDIR BINDIR BINDIRBASE BOARD BUILD_DIR DLCACHE_DIR MAKE MAKEFLAGS MAKELEVEL MFLAGS PKGDIRBASE PYTHONPATH RIOTBASE RIOTBOARD RIOTCPU RIOTMAKE RIOTPKG RIOTPROJECT RIOTTOOLS RIOT_TEST_TIMEOUT TESTRUNNER_CONNECT_DELAY TESTRUNNER_RESET_AFTER_TERM TESTRUNNER_RESET_BOARD_ON_STARTUP TESTRUNNER_RESET_DELAY TESTRUNNER_START_DELAY TEST_INTERACTIVE_DELAY TEST_INTERACTIVE_RETRIES USEMODULE
+## empty: make -n test [examples/basic/hello-world]
+## exit: 0
+for t in ; do \
+	  $t || exit 1; \
+done
+## empty: run [examples/basic/hello-world]
+## exit: 0
+## two: make -n test [examples/basic/hello-world 'TESTS=@REC@ @REC@ arg']
+## exit: 0
+for t in @REC@ @REC@ arg; do \
+	  $t || exit 1; \
+done
+## two: run [examples/basic/hello-world 'TESTS=@REC@ @REC@ arg']
+## exit: 2
+/bin/sh: 2: arg: not found
+script @REC@
+cwd @RIOTBASE@/examples/basic/hello-world
+  APPDIR=[@RIOTBASE@/examples/basic/hello-world]
+  BINDIR=[@RIOTBASE@/examples/basic/hello-world/bin/nrf52840dk]
+  BINDIRBASE=[@RIOTBASE@/examples/basic/hello-world/bin]
+  BOARD=[nrf52840dk]
+  BUILD_DIR=[@RIOTBASE@/build]
+  DLCACHE_DIR unset
+  MAKE unset
+  MAKEFLAGS=[rw --no-print-directory -- TESTS=@REC@\ @REC@\ arg BOARD=nrf52840dk RIOTBASE=@RIOTBASE@ RIOTCPU=@RIOTBASE@/cpu RIOTMAKE=@RIOTBASE@/makefiles RIOTPKG=@RIOTBASE@/pkg RIOTTOOLS=@RIOTBASE@/dist/tools RIOTPROJECT=@RIOTBASE@/examples/basic/hello-world APPDIR=@RIOTBASE@/examples/basic/hello-world BUILD_DIR=@RIOTBASE@/build BINDIRBASE=@RIOTBASE@/examples/basic/hello-world/bin BINDIR=@RIOTBASE@/examples/basic/hello-world/bin/nrf52840dk PKGDIRBASE=@RIOTBASE@/build/pkg DLCACHE_DIR=@RIOTBASE@/.dlcache]
+  MAKELEVEL=[1]
+  MFLAGS=[-rw --no-print-directory]
+  PKGDIRBASE=[@RIOTBASE@/build/pkg]
+  PYTHONPATH=[@RIOTBASE@/dist/pythonlibs/:]
+  RIOTBASE=[@RIOTBASE@]
+  RIOTBOARD=[@RIOTBASE@/boards]
+  RIOTCPU=[@RIOTBASE@/cpu]
+  RIOTMAKE=[@RIOTBASE@/makefiles]
+  RIOTPKG=[@RIOTBASE@/pkg]
+  RIOTPROJECT=[@RIOTBASE@/examples/basic/hello-world]
+  RIOTTOOLS=[@RIOTBASE@/dist/tools]
+  RIOT_TEST_TIMEOUT unset
+  TESTRUNNER_CONNECT_DELAY unset
+  TESTRUNNER_RESET_AFTER_TERM=[]
+  TESTRUNNER_RESET_BOARD_ON_STARTUP unset
+  TESTRUNNER_RESET_DELAY unset
+  TESTRUNNER_START_DELAY unset
+  TEST_INTERACTIVE_DELAY unset
+  TEST_INTERACTIVE_RETRIES unset
+  USEMODULE=[auto_init board board_common_init boards_common_nrf52xxxdk core core_init core_lib core_msg core_panic core_thread cortexm_common cortexm_common_periph cortexm_fpu cpu cpu_check_address cpu_common div libc malloc_thread_safe mpu_stack_guard newlib newlib_nano newlib_syscalls_default nrf52_vectors nrf5x_common_periph periph periph_common periph_gpio periph_gpio_ll_disconnect periph_gpio_ll_input_pull_down periph_gpio_ll_input_pull_up periph_gpio_ll_irq_edge_triggered_both periph_gpio_ll_irq_unmask periph_gpio_ll_open_drain periph_gpio_ll_open_drain_pull_up periph_gpio_ll_open_source periph_gpio_ll_open_source_pull_down periph_init periph_init_buttons periph_init_gpio periph_init_led0 periph_init_led1 periph_init_led2 periph_init_led3 periph_init_led4 periph_init_led5 periph_init_led6 periph_init_led7 periph_init_leds periph_init_pm periph_init_uart periph_pm periph_uart preprocessor preprocessor_successor stdio stdio_default stdio_uart sys vdd_lc_filter_reg0 vdd_lc_filter_reg1]
+script @REC@
+cwd @RIOTBASE@/examples/basic/hello-world
+  APPDIR=[@RIOTBASE@/examples/basic/hello-world]
+  BINDIR=[@RIOTBASE@/examples/basic/hello-world/bin/nrf52840dk]
+  BINDIRBASE=[@RIOTBASE@/examples/basic/hello-world/bin]
+  BOARD=[nrf52840dk]
+  BUILD_DIR=[@RIOTBASE@/build]
+  DLCACHE_DIR unset
+  MAKE unset
+  MAKEFLAGS=[rw --no-print-directory -- TESTS=@REC@\ @REC@\ arg BOARD=nrf52840dk RIOTBASE=@RIOTBASE@ RIOTCPU=@RIOTBASE@/cpu RIOTMAKE=@RIOTBASE@/makefiles RIOTPKG=@RIOTBASE@/pkg RIOTTOOLS=@RIOTBASE@/dist/tools RIOTPROJECT=@RIOTBASE@/examples/basic/hello-world APPDIR=@RIOTBASE@/examples/basic/hello-world BUILD_DIR=@RIOTBASE@/build BINDIRBASE=@RIOTBASE@/examples/basic/hello-world/bin BINDIR=@RIOTBASE@/examples/basic/hello-world/bin/nrf52840dk PKGDIRBASE=@RIOTBASE@/build/pkg DLCACHE_DIR=@RIOTBASE@/.dlcache]
+  MAKELEVEL=[1]
+  MFLAGS=[-rw --no-print-directory]
+  PKGDIRBASE=[@RIOTBASE@/build/pkg]
+  PYTHONPATH=[@RIOTBASE@/dist/pythonlibs/:]
+  RIOTBASE=[@RIOTBASE@]
+  RIOTBOARD=[@RIOTBASE@/boards]
+  RIOTCPU=[@RIOTBASE@/cpu]
+  RIOTMAKE=[@RIOTBASE@/makefiles]
+  RIOTPKG=[@RIOTBASE@/pkg]
+  RIOTPROJECT=[@RIOTBASE@/examples/basic/hello-world]
+  RIOTTOOLS=[@RIOTBASE@/dist/tools]
+  RIOT_TEST_TIMEOUT unset
+  TESTRUNNER_CONNECT_DELAY unset
+  TESTRUNNER_RESET_AFTER_TERM=[]
+  TESTRUNNER_RESET_BOARD_ON_STARTUP unset
+  TESTRUNNER_RESET_DELAY unset
+  TESTRUNNER_START_DELAY unset
+  TEST_INTERACTIVE_DELAY unset
+  TEST_INTERACTIVE_RETRIES unset
+  USEMODULE=[auto_init board board_common_init boards_common_nrf52xxxdk core core_init core_lib core_msg core_panic core_thread cortexm_common cortexm_common_periph cortexm_fpu cpu cpu_check_address cpu_common div libc malloc_thread_safe mpu_stack_guard newlib newlib_nano newlib_syscalls_default nrf52_vectors nrf5x_common_periph periph periph_common periph_gpio periph_gpio_ll_disconnect periph_gpio_ll_input_pull_down periph_gpio_ll_input_pull_up periph_gpio_ll_irq_edge_triggered_both periph_gpio_ll_irq_unmask periph_gpio_ll_open_drain periph_gpio_ll_open_drain_pull_up periph_gpio_ll_open_source periph_gpio_ll_open_source_pull_down periph_init periph_init_buttons periph_init_gpio periph_init_led0 periph_init_led1 periph_init_led2 periph_init_led3 periph_init_led4 periph_init_led5 periph_init_led6 periph_init_led7 periph_init_leds periph_init_pm periph_init_uart periph_pm periph_uart preprocessor preprocessor_successor stdio stdio_default stdio_uart sys vdd_lc_filter_reg0 vdd_lc_filter_reg1]
+## executor: make -n test [examples/basic/hello-world TESTS=@REC@ TEST_EXECUTOR=sh TEST_EXECUTOR_FLAGS=-e]
+## exit: 0
+for t in @REC@; do \
+	sh -e $t || exit 1; \
+done
+## executor: run [examples/basic/hello-world TESTS=@REC@ TEST_EXECUTOR=sh TEST_EXECUTOR_FLAGS=-e]
+## exit: 0
+script @REC@
+cwd @RIOTBASE@/examples/basic/hello-world
+  APPDIR=[@RIOTBASE@/examples/basic/hello-world]
+  BINDIR=[@RIOTBASE@/examples/basic/hello-world/bin/nrf52840dk]
+  BINDIRBASE=[@RIOTBASE@/examples/basic/hello-world/bin]
+  BOARD=[nrf52840dk]
+  BUILD_DIR=[@RIOTBASE@/build]
+  DLCACHE_DIR unset
+  MAKE unset
+  MAKEFLAGS=[rw --no-print-directory -- TEST_EXECUTOR_FLAGS=-e TEST_EXECUTOR=sh TESTS=@REC@ BOARD=nrf52840dk RIOTBASE=@RIOTBASE@ RIOTCPU=@RIOTBASE@/cpu RIOTMAKE=@RIOTBASE@/makefiles RIOTPKG=@RIOTBASE@/pkg RIOTTOOLS=@RIOTBASE@/dist/tools RIOTPROJECT=@RIOTBASE@/examples/basic/hello-world APPDIR=@RIOTBASE@/examples/basic/hello-world BUILD_DIR=@RIOTBASE@/build BINDIRBASE=@RIOTBASE@/examples/basic/hello-world/bin BINDIR=@RIOTBASE@/examples/basic/hello-world/bin/nrf52840dk PKGDIRBASE=@RIOTBASE@/build/pkg DLCACHE_DIR=@RIOTBASE@/.dlcache]
+  MAKELEVEL=[1]
+  MFLAGS=[-rw --no-print-directory]
+  PKGDIRBASE=[@RIOTBASE@/build/pkg]
+  PYTHONPATH=[@RIOTBASE@/dist/pythonlibs/:]
+  RIOTBASE=[@RIOTBASE@]
+  RIOTBOARD=[@RIOTBASE@/boards]
+  RIOTCPU=[@RIOTBASE@/cpu]
+  RIOTMAKE=[@RIOTBASE@/makefiles]
+  RIOTPKG=[@RIOTBASE@/pkg]
+  RIOTPROJECT=[@RIOTBASE@/examples/basic/hello-world]
+  RIOTTOOLS=[@RIOTBASE@/dist/tools]
+  RIOT_TEST_TIMEOUT unset
+  TESTRUNNER_CONNECT_DELAY unset
+  TESTRUNNER_RESET_AFTER_TERM=[]
+  TESTRUNNER_RESET_BOARD_ON_STARTUP unset
+  TESTRUNNER_RESET_DELAY unset
+  TESTRUNNER_START_DELAY unset
+  TEST_INTERACTIVE_DELAY unset
+  TEST_INTERACTIVE_RETRIES unset
+  USEMODULE=[auto_init board board_common_init boards_common_nrf52xxxdk core core_init core_lib core_msg core_panic core_thread cortexm_common cortexm_common_periph cortexm_fpu cpu cpu_check_address cpu_common div libc malloc_thread_safe mpu_stack_guard newlib newlib_nano newlib_syscalls_default nrf52_vectors nrf5x_common_periph periph periph_common periph_gpio periph_gpio_ll_disconnect periph_gpio_ll_input_pull_down periph_gpio_ll_input_pull_up periph_gpio_ll_irq_edge_triggered_both periph_gpio_ll_irq_unmask periph_gpio_ll_open_drain periph_gpio_ll_open_drain_pull_up periph_gpio_ll_open_source periph_gpio_ll_open_source_pull_down periph_init periph_init_buttons periph_init_gpio periph_init_led0 periph_init_led1 periph_init_led2 periph_init_led3 periph_init_led4 periph_init_led5 periph_init_led6 periph_init_led7 periph_init_leds periph_init_pm periph_init_uart periph_pm periph_uart preprocessor preprocessor_successor stdio stdio_default stdio_uart sys vdd_lc_filter_reg0 vdd_lc_filter_reg1]
+## quiet0: make -n test [examples/basic/hello-world QUIET=0 TESTS=@REC@]
+## exit: 0
+for t in @REC@; do \
+	  $t || exit 1; \
+done
+## quiet0: run [examples/basic/hello-world QUIET=0 TESTS=@REC@]
+## exit: 0
+for t in @REC@; do \
+	  $t || exit 1; \
+done
+script @REC@
+cwd @RIOTBASE@/examples/basic/hello-world
+  APPDIR=[@RIOTBASE@/examples/basic/hello-world]
+  BINDIR=[@RIOTBASE@/examples/basic/hello-world/bin/nrf52840dk]
+  BINDIRBASE=[@RIOTBASE@/examples/basic/hello-world/bin]
+  BOARD=[nrf52840dk]
+  BUILD_DIR=[@RIOTBASE@/build]
+  DLCACHE_DIR unset
+  MAKE unset
+  MAKEFLAGS=[rw -- TESTS=@REC@ QUIET=0 BOARD=nrf52840dk RIOTBASE=@RIOTBASE@ RIOTCPU=@RIOTBASE@/cpu RIOTMAKE=@RIOTBASE@/makefiles RIOTPKG=@RIOTBASE@/pkg RIOTTOOLS=@RIOTBASE@/dist/tools RIOTPROJECT=@RIOTBASE@/examples/basic/hello-world APPDIR=@RIOTBASE@/examples/basic/hello-world BUILD_DIR=@RIOTBASE@/build BINDIRBASE=@RIOTBASE@/examples/basic/hello-world/bin BINDIR=@RIOTBASE@/examples/basic/hello-world/bin/nrf52840dk PKGDIRBASE=@RIOTBASE@/build/pkg DLCACHE_DIR=@RIOTBASE@/.dlcache]
+  MAKELEVEL=[1]
+  MFLAGS=[-rw]
+  PKGDIRBASE=[@RIOTBASE@/build/pkg]
+  PYTHONPATH=[@RIOTBASE@/dist/pythonlibs/:]
+  RIOTBASE=[@RIOTBASE@]
+  RIOTBOARD=[@RIOTBASE@/boards]
+  RIOTCPU=[@RIOTBASE@/cpu]
+  RIOTMAKE=[@RIOTBASE@/makefiles]
+  RIOTPKG=[@RIOTBASE@/pkg]
+  RIOTPROJECT=[@RIOTBASE@/examples/basic/hello-world]
+  RIOTTOOLS=[@RIOTBASE@/dist/tools]
+  RIOT_TEST_TIMEOUT unset
+  TESTRUNNER_CONNECT_DELAY unset
+  TESTRUNNER_RESET_AFTER_TERM=[]
+  TESTRUNNER_RESET_BOARD_ON_STARTUP unset
+  TESTRUNNER_RESET_DELAY unset
+  TESTRUNNER_START_DELAY unset
+  TEST_INTERACTIVE_DELAY unset
+  TEST_INTERACTIVE_RETRIES unset
+  USEMODULE=[auto_init board board_common_init boards_common_nrf52xxxdk core core_init core_lib core_msg core_panic core_thread cortexm_common cortexm_common_periph cortexm_fpu cpu cpu_check_address cpu_common div libc malloc_thread_safe mpu_stack_guard newlib newlib_nano newlib_syscalls_default nrf52_vectors nrf5x_common_periph periph periph_common periph_gpio periph_gpio_ll_disconnect periph_gpio_ll_input_pull_down periph_gpio_ll_input_pull_up periph_gpio_ll_irq_edge_triggered_both periph_gpio_ll_irq_unmask periph_gpio_ll_open_drain periph_gpio_ll_open_drain_pull_up periph_gpio_ll_open_source periph_gpio_ll_open_source_pull_down periph_init periph_init_buttons periph_init_gpio periph_init_led0 periph_init_led1 periph_init_led2 periph_init_led3 periph_init_led4 periph_init_led5 periph_init_led6 periph_init_led7 periph_init_leds periph_init_pm periph_init_uart periph_pm periph_uart preprocessor preprocessor_successor stdio stdio_default stdio_uart sys vdd_lc_filter_reg0 vdd_lc_filter_reg1]
+## fails: make -n test [examples/basic/hello-world 'TESTS=@REC@ @REC@' env:G2B_TEST_STATUS=1]
+## exit: 0
+for t in @REC@ @REC@; do \
+	  $t || exit 1; \
+done
+## fails: run [examples/basic/hello-world 'TESTS=@REC@ @REC@' env:G2B_TEST_STATUS=1]
+## exit: 2
+script @REC@
+cwd @RIOTBASE@/examples/basic/hello-world
+  APPDIR=[@RIOTBASE@/examples/basic/hello-world]
+  BINDIR=[@RIOTBASE@/examples/basic/hello-world/bin/nrf52840dk]
+  BINDIRBASE=[@RIOTBASE@/examples/basic/hello-world/bin]
+  BOARD=[nrf52840dk]
+  BUILD_DIR=[@RIOTBASE@/build]
+  DLCACHE_DIR unset
+  MAKE unset
+  MAKEFLAGS=[rw --no-print-directory -- TESTS=@REC@\ @REC@ BOARD=nrf52840dk RIOTBASE=@RIOTBASE@ RIOTCPU=@RIOTBASE@/cpu RIOTMAKE=@RIOTBASE@/makefiles RIOTPKG=@RIOTBASE@/pkg RIOTTOOLS=@RIOTBASE@/dist/tools RIOTPROJECT=@RIOTBASE@/examples/basic/hello-world APPDIR=@RIOTBASE@/examples/basic/hello-world BUILD_DIR=@RIOTBASE@/build BINDIRBASE=@RIOTBASE@/examples/basic/hello-world/bin BINDIR=@RIOTBASE@/examples/basic/hello-world/bin/nrf52840dk PKGDIRBASE=@RIOTBASE@/build/pkg DLCACHE_DIR=@RIOTBASE@/.dlcache]
+  MAKELEVEL=[1]
+  MFLAGS=[-rw --no-print-directory]
+  PKGDIRBASE=[@RIOTBASE@/build/pkg]
+  PYTHONPATH=[@RIOTBASE@/dist/pythonlibs/:]
+  RIOTBASE=[@RIOTBASE@]
+  RIOTBOARD=[@RIOTBASE@/boards]
+  RIOTCPU=[@RIOTBASE@/cpu]
+  RIOTMAKE=[@RIOTBASE@/makefiles]
+  RIOTPKG=[@RIOTBASE@/pkg]
+  RIOTPROJECT=[@RIOTBASE@/examples/basic/hello-world]
+  RIOTTOOLS=[@RIOTBASE@/dist/tools]
+  RIOT_TEST_TIMEOUT unset
+  TESTRUNNER_CONNECT_DELAY unset
+  TESTRUNNER_RESET_AFTER_TERM=[]
+  TESTRUNNER_RESET_BOARD_ON_STARTUP unset
+  TESTRUNNER_RESET_DELAY unset
+  TESTRUNNER_START_DELAY unset
+  TEST_INTERACTIVE_DELAY unset
+  TEST_INTERACTIVE_RETRIES unset
+  USEMODULE=[auto_init board board_common_init boards_common_nrf52xxxdk core core_init core_lib core_msg core_panic core_thread cortexm_common cortexm_common_periph cortexm_fpu cpu cpu_check_address cpu_common div libc malloc_thread_safe mpu_stack_guard newlib newlib_nano newlib_syscalls_default nrf52_vectors nrf5x_common_periph periph periph_common periph_gpio periph_gpio_ll_disconnect periph_gpio_ll_input_pull_down periph_gpio_ll_input_pull_up periph_gpio_ll_irq_edge_triggered_both periph_gpio_ll_irq_unmask periph_gpio_ll_open_drain periph_gpio_ll_open_drain_pull_up periph_gpio_ll_open_source periph_gpio_ll_open_source_pull_down periph_init periph_init_buttons periph_init_gpio periph_init_led0 periph_init_led1 periph_init_led2 periph_init_led3 periph_init_led4 periph_init_led5 periph_init_led6 periph_init_led7 periph_init_leds periph_init_pm periph_init_uart periph_pm periph_uart preprocessor preprocessor_successor stdio stdio_default stdio_uart sys vdd_lc_filter_reg0 vdd_lc_filter_reg1]
+## quoting: make -n test [examples/basic/hello-world TESTS=@REC@ 'X=p\q r' 'Y=a$$b']
+## exit: 0
+for t in @REC@; do \
+	  $t || exit 1; \
+done
+## quoting: run [examples/basic/hello-world TESTS=@REC@ 'X=p\q r' 'Y=a$$b']
+## exit: 0
+script @REC@
+cwd @RIOTBASE@/examples/basic/hello-world
+  APPDIR=[@RIOTBASE@/examples/basic/hello-world]
+  BINDIR=[@RIOTBASE@/examples/basic/hello-world/bin/nrf52840dk]
+  BINDIRBASE=[@RIOTBASE@/examples/basic/hello-world/bin]
+  BOARD=[nrf52840dk]
+  BUILD_DIR=[@RIOTBASE@/build]
+  DLCACHE_DIR unset
+  MAKE unset
+  MAKEFLAGS=[rw --no-print-directory -- Y=a$$$$b X=p\\q\ r TESTS=@REC@ BOARD=nrf52840dk RIOTBASE=@RIOTBASE@ RIOTCPU=@RIOTBASE@/cpu RIOTMAKE=@RIOTBASE@/makefiles RIOTPKG=@RIOTBASE@/pkg RIOTTOOLS=@RIOTBASE@/dist/tools RIOTPROJECT=@RIOTBASE@/examples/basic/hello-world APPDIR=@RIOTBASE@/examples/basic/hello-world BUILD_DIR=@RIOTBASE@/build BINDIRBASE=@RIOTBASE@/examples/basic/hello-world/bin BINDIR=@RIOTBASE@/examples/basic/hello-world/bin/nrf52840dk PKGDIRBASE=@RIOTBASE@/build/pkg DLCACHE_DIR=@RIOTBASE@/.dlcache]
+  MAKELEVEL=[1]
+  MFLAGS=[-rw --no-print-directory]
+  PKGDIRBASE=[@RIOTBASE@/build/pkg]
+  PYTHONPATH=[@RIOTBASE@/dist/pythonlibs/:]
+  RIOTBASE=[@RIOTBASE@]
+  RIOTBOARD=[@RIOTBASE@/boards]
+  RIOTCPU=[@RIOTBASE@/cpu]
+  RIOTMAKE=[@RIOTBASE@/makefiles]
+  RIOTPKG=[@RIOTBASE@/pkg]
+  RIOTPROJECT=[@RIOTBASE@/examples/basic/hello-world]
+  RIOTTOOLS=[@RIOTBASE@/dist/tools]
+  RIOT_TEST_TIMEOUT unset
+  TESTRUNNER_CONNECT_DELAY unset
+  TESTRUNNER_RESET_AFTER_TERM=[]
+  TESTRUNNER_RESET_BOARD_ON_STARTUP unset
+  TESTRUNNER_RESET_DELAY unset
+  TESTRUNNER_START_DELAY unset
+  TEST_INTERACTIVE_DELAY unset
+  TEST_INTERACTIVE_RETRIES unset
+  USEMODULE=[auto_init board board_common_init boards_common_nrf52xxxdk core core_init core_lib core_msg core_panic core_thread cortexm_common cortexm_common_periph cortexm_fpu cpu cpu_check_address cpu_common div libc malloc_thread_safe mpu_stack_guard newlib newlib_nano newlib_syscalls_default nrf52_vectors nrf5x_common_periph periph periph_common periph_gpio periph_gpio_ll_disconnect periph_gpio_ll_input_pull_down periph_gpio_ll_input_pull_up periph_gpio_ll_irq_edge_triggered_both periph_gpio_ll_irq_unmask periph_gpio_ll_open_drain periph_gpio_ll_open_drain_pull_up periph_gpio_ll_open_source periph_gpio_ll_open_source_pull_down periph_init periph_init_buttons periph_init_gpio periph_init_led0 periph_init_led1 periph_init_led2 periph_init_led3 periph_init_led4 periph_init_led5 periph_init_led6 periph_init_led7 periph_init_leds periph_init_pm periph_init_uart periph_pm periph_uart preprocessor preprocessor_successor stdio stdio_default stdio_uart sys vdd_lc_filter_reg0 vdd_lc_filter_reg1]
+## environment: make -n test [examples/basic/hello-world TESTS=@REC@ TESTRUNNER_CONNECT_DELAY=2 env:PYTHONPATH=/py env:RIOT_TEST_TIMEOUT=30 env:TESTRUNNER_RESET_AFTER_TERM=1]
+## exit: 0
+for t in @REC@; do \
+	  $t || exit 1; \
+done
+## environment: run [examples/basic/hello-world TESTS=@REC@ TESTRUNNER_CONNECT_DELAY=2 env:PYTHONPATH=/py env:RIOT_TEST_TIMEOUT=30 env:TESTRUNNER_RESET_AFTER_TERM=1]
+## exit: 0
+script @REC@
+cwd @RIOTBASE@/examples/basic/hello-world
+  APPDIR=[@RIOTBASE@/examples/basic/hello-world]
+  BINDIR=[@RIOTBASE@/examples/basic/hello-world/bin/nrf52840dk]
+  BINDIRBASE=[@RIOTBASE@/examples/basic/hello-world/bin]
+  BOARD=[nrf52840dk]
+  BUILD_DIR=[@RIOTBASE@/build]
+  DLCACHE_DIR unset
+  MAKE unset
+  MAKEFLAGS=[rw --no-print-directory -- TESTRUNNER_CONNECT_DELAY=2 TESTS=@REC@ BOARD=nrf52840dk RIOTBASE=@RIOTBASE@ RIOTCPU=@RIOTBASE@/cpu RIOTMAKE=@RIOTBASE@/makefiles RIOTPKG=@RIOTBASE@/pkg RIOTTOOLS=@RIOTBASE@/dist/tools RIOTPROJECT=@RIOTBASE@/examples/basic/hello-world APPDIR=@RIOTBASE@/examples/basic/hello-world BUILD_DIR=@RIOTBASE@/build BINDIRBASE=@RIOTBASE@/examples/basic/hello-world/bin BINDIR=@RIOTBASE@/examples/basic/hello-world/bin/nrf52840dk PKGDIRBASE=@RIOTBASE@/build/pkg DLCACHE_DIR=@RIOTBASE@/.dlcache]
+  MAKELEVEL=[1]
+  MFLAGS=[-rw --no-print-directory]
+  PKGDIRBASE=[@RIOTBASE@/build/pkg]
+  PYTHONPATH=[@RIOTBASE@/dist/pythonlibs/:/py]
+  RIOTBASE=[@RIOTBASE@]
+  RIOTBOARD=[@RIOTBASE@/boards]
+  RIOTCPU=[@RIOTBASE@/cpu]
+  RIOTMAKE=[@RIOTBASE@/makefiles]
+  RIOTPKG=[@RIOTBASE@/pkg]
+  RIOTPROJECT=[@RIOTBASE@/examples/basic/hello-world]
+  RIOTTOOLS=[@RIOTBASE@/dist/tools]
+  RIOT_TEST_TIMEOUT=[30]
+  TESTRUNNER_CONNECT_DELAY=[2]
+  TESTRUNNER_RESET_AFTER_TERM=[1]
+  TESTRUNNER_RESET_BOARD_ON_STARTUP unset
+  TESTRUNNER_RESET_DELAY unset
+  TESTRUNNER_START_DELAY unset
+  TEST_INTERACTIVE_DELAY unset
+  TEST_INTERACTIVE_RETRIES unset
+  USEMODULE=[auto_init board board_common_init boards_common_nrf52xxxdk core core_init core_lib core_msg core_panic core_thread cortexm_common cortexm_common_periph cortexm_fpu cpu cpu_check_address cpu_common div libc malloc_thread_safe mpu_stack_guard newlib newlib_nano newlib_syscalls_default nrf52_vectors nrf5x_common_periph periph periph_common periph_gpio periph_gpio_ll_disconnect periph_gpio_ll_input_pull_down periph_gpio_ll_input_pull_up periph_gpio_ll_irq_edge_triggered_both periph_gpio_ll_irq_unmask periph_gpio_ll_open_drain periph_gpio_ll_open_drain_pull_up periph_gpio_ll_open_source periph_gpio_ll_open_source_pull_down periph_init periph_init_buttons periph_init_gpio periph_init_led0 periph_init_led1 periph_init_led2 periph_init_led3 periph_init_led4 periph_init_led5 periph_init_led6 periph_init_led7 periph_init_leds periph_init_pm periph_init_uart periph_pm periph_uart preprocessor preprocessor_successor stdio stdio_default stdio_uart sys vdd_lc_filter_reg0 vdd_lc_filter_reg1]
+## probe: make -n test [examples/basic/hello-world APPDIR=@TMP@/app]
+## exit: 0
+for t in  @TMP@/app/tests/01-run      @TMP@/app/tests/05-run; do \
+	  $t || exit 1; \
+done
+## probe: run [examples/basic/hello-world APPDIR=@TMP@/app]
+## exit: 0
+script @TMP@/app/tests/01-run
+cwd @RIOTBASE@/examples/basic/hello-world
+  APPDIR=[@TMP@/app]
+  BINDIR=[@TMP@/app/bin/nrf52840dk]
+  BINDIRBASE=[@TMP@/app/bin]
+  BOARD=[nrf52840dk]
+  BUILD_DIR=[@RIOTBASE@/build]
+  DLCACHE_DIR unset
+  MAKE unset
+  MAKEFLAGS=[rw --no-print-directory -- APPDIR=@TMP@/app BOARD=nrf52840dk RIOTBASE=@RIOTBASE@ RIOTCPU=@RIOTBASE@/cpu RIOTMAKE=@RIOTBASE@/makefiles RIOTPKG=@RIOTBASE@/pkg RIOTTOOLS=@RIOTBASE@/dist/tools RIOTPROJECT=@RIOTBASE@/examples/basic/hello-world APPDIR=@TMP@/app BUILD_DIR=@RIOTBASE@/build BINDIRBASE=@TMP@/app/bin BINDIR=@TMP@/app/bin/nrf52840dk PKGDIRBASE=@RIOTBASE@/build/pkg DLCACHE_DIR=@RIOTBASE@/.dlcache]
+  MAKELEVEL=[1]
+  MFLAGS=[-rw --no-print-directory]
+  PKGDIRBASE=[@RIOTBASE@/build/pkg]
+  PYTHONPATH=[@RIOTBASE@/dist/pythonlibs/:]
+  RIOTBASE=[@RIOTBASE@]
+  RIOTBOARD=[@RIOTBASE@/boards]
+  RIOTCPU=[@RIOTBASE@/cpu]
+  RIOTMAKE=[@RIOTBASE@/makefiles]
+  RIOTPKG=[@RIOTBASE@/pkg]
+  RIOTPROJECT=[@RIOTBASE@/examples/basic/hello-world]
+  RIOTTOOLS=[@RIOTBASE@/dist/tools]
+  RIOT_TEST_TIMEOUT unset
+  TESTRUNNER_CONNECT_DELAY unset
+  TESTRUNNER_RESET_AFTER_TERM=[]
+  TESTRUNNER_RESET_BOARD_ON_STARTUP unset
+  TESTRUNNER_RESET_DELAY unset
+  TESTRUNNER_START_DELAY unset
+  TEST_INTERACTIVE_DELAY unset
+  TEST_INTERACTIVE_RETRIES unset
+  USEMODULE=[auto_init board board_common_init boards_common_nrf52xxxdk core core_init core_lib core_msg core_panic core_thread cortexm_common cortexm_common_periph cortexm_fpu cpu cpu_check_address cpu_common div libc malloc_thread_safe mpu_stack_guard newlib newlib_nano newlib_syscalls_default nrf52_vectors nrf5x_common_periph periph periph_common periph_gpio periph_gpio_ll_disconnect periph_gpio_ll_input_pull_down periph_gpio_ll_input_pull_up periph_gpio_ll_irq_edge_triggered_both periph_gpio_ll_irq_unmask periph_gpio_ll_open_drain periph_gpio_ll_open_drain_pull_up periph_gpio_ll_open_source periph_gpio_ll_open_source_pull_down periph_init periph_init_buttons periph_init_gpio periph_init_led0 periph_init_led1 periph_init_led2 periph_init_led3 periph_init_led4 periph_init_led5 periph_init_led6 periph_init_led7 periph_init_leds periph_init_pm periph_init_uart periph_pm periph_uart preprocessor preprocessor_successor stdio stdio_default stdio_uart sys vdd_lc_filter_reg0 vdd_lc_filter_reg1]
+script @TMP@/app/tests/05-run
+cwd @RIOTBASE@/examples/basic/hello-world
+  APPDIR=[@TMP@/app]
+  BINDIR=[@TMP@/app/bin/nrf52840dk]
+  BINDIRBASE=[@TMP@/app/bin]
+  BOARD=[nrf52840dk]
+  BUILD_DIR=[@RIOTBASE@/build]
+  DLCACHE_DIR unset
+  MAKE unset
+  MAKEFLAGS=[rw --no-print-directory -- APPDIR=@TMP@/app BOARD=nrf52840dk RIOTBASE=@RIOTBASE@ RIOTCPU=@RIOTBASE@/cpu RIOTMAKE=@RIOTBASE@/makefiles RIOTPKG=@RIOTBASE@/pkg RIOTTOOLS=@RIOTBASE@/dist/tools RIOTPROJECT=@RIOTBASE@/examples/basic/hello-world APPDIR=@TMP@/app BUILD_DIR=@RIOTBASE@/build BINDIRBASE=@TMP@/app/bin BINDIR=@TMP@/app/bin/nrf52840dk PKGDIRBASE=@RIOTBASE@/build/pkg DLCACHE_DIR=@RIOTBASE@/.dlcache]
+  MAKELEVEL=[1]
+  MFLAGS=[-rw --no-print-directory]
+  PKGDIRBASE=[@RIOTBASE@/build/pkg]
+  PYTHONPATH=[@RIOTBASE@/dist/pythonlibs/:]
+  RIOTBASE=[@RIOTBASE@]
+  RIOTBOARD=[@RIOTBASE@/boards]
+  RIOTCPU=[@RIOTBASE@/cpu]
+  RIOTMAKE=[@RIOTBASE@/makefiles]
+  RIOTPKG=[@RIOTBASE@/pkg]
+  RIOTPROJECT=[@RIOTBASE@/examples/basic/hello-world]
+  RIOTTOOLS=[@RIOTBASE@/dist/tools]
+  RIOT_TEST_TIMEOUT unset
+  TESTRUNNER_CONNECT_DELAY unset
+  TESTRUNNER_RESET_AFTER_TERM=[]
+  TESTRUNNER_RESET_BOARD_ON_STARTUP unset
+  TESTRUNNER_RESET_DELAY unset
+  TESTRUNNER_START_DELAY unset
+  TEST_INTERACTIVE_DELAY unset
+  TEST_INTERACTIVE_RETRIES unset
+  USEMODULE=[auto_init board board_common_init boards_common_nrf52xxxdk core core_init core_lib core_msg core_panic core_thread cortexm_common cortexm_common_periph cortexm_fpu cpu cpu_check_address cpu_common div libc malloc_thread_safe mpu_stack_guard newlib newlib_nano newlib_syscalls_default nrf52_vectors nrf5x_common_periph periph periph_common periph_gpio periph_gpio_ll_disconnect periph_gpio_ll_input_pull_down periph_gpio_ll_input_pull_up periph_gpio_ll_irq_edge_triggered_both periph_gpio_ll_irq_unmask periph_gpio_ll_open_drain periph_gpio_ll_open_drain_pull_up periph_gpio_ll_open_source periph_gpio_ll_open_source_pull_down periph_init periph_init_buttons periph_init_gpio periph_init_led0 periph_init_led1 periph_init_led2 periph_init_led3 periph_init_led4 periph_init_led5 periph_init_led6 periph_init_led7 periph_init_leds periph_init_pm periph_init_uart periph_pm periph_uart preprocessor preprocessor_successor stdio stdio_default stdio_uart sys vdd_lc_filter_reg0 vdd_lc_filter_reg1]
+## docker: make -n test [examples/basic/hello-world BUILD_IN_DOCKER=1 TESTS=@REC@]
+## exit: 0
+for t in @REC@; do \
+	  $t || exit 1; \
+done
+## docker: run [examples/basic/hello-world BUILD_IN_DOCKER=1 TESTS=@REC@]
+## exit: 0
+script @REC@
+cwd @RIOTBASE@/examples/basic/hello-world
+  APPDIR=[@RIOTBASE@/examples/basic/hello-world]
+  BINDIR=[@RIOTBASE@/examples/basic/hello-world/bin/nrf52840dk]
+  BINDIRBASE=[@RIOTBASE@/examples/basic/hello-world/bin]
+  BOARD=[nrf52840dk]
+  BUILD_DIR=[@RIOTBASE@/build]
+  DLCACHE_DIR unset
+  MAKE unset
+  MAKEFLAGS=[rw --no-print-directory -- TESTS=@REC@ BUILD_IN_DOCKER=1 BOARD=nrf52840dk RIOTBASE=@RIOTBASE@ RIOTCPU=@RIOTBASE@/cpu RIOTMAKE=@RIOTBASE@/makefiles RIOTPKG=@RIOTBASE@/pkg RIOTTOOLS=@RIOTBASE@/dist/tools RIOTPROJECT=@RIOTBASE@/examples/basic/hello-world APPDIR=@RIOTBASE@/examples/basic/hello-world BUILD_DIR=@RIOTBASE@/build BINDIRBASE=@RIOTBASE@/examples/basic/hello-world/bin BINDIR=@RIOTBASE@/examples/basic/hello-world/bin/nrf52840dk PKGDIRBASE=@RIOTBASE@/build/pkg DLCACHE_DIR=@RIOTBASE@/.dlcache]
+  MAKELEVEL=[1]
+  MFLAGS=[-rw --no-print-directory]
+  PKGDIRBASE=[@RIOTBASE@/build/pkg]
+  PYTHONPATH=[@RIOTBASE@/dist/pythonlibs/:]
+  RIOTBASE=[@RIOTBASE@]
+  RIOTBOARD=[@RIOTBASE@/boards]
+  RIOTCPU=[@RIOTBASE@/cpu]
+  RIOTMAKE=[@RIOTBASE@/makefiles]
+  RIOTPKG=[@RIOTBASE@/pkg]
+  RIOTPROJECT=[@RIOTBASE@/examples/basic/hello-world]
+  RIOTTOOLS=[@RIOTBASE@/dist/tools]
+  RIOT_TEST_TIMEOUT unset
+  TESTRUNNER_CONNECT_DELAY unset
+  TESTRUNNER_RESET_AFTER_TERM=[]
+  TESTRUNNER_RESET_BOARD_ON_STARTUP unset
+  TESTRUNNER_RESET_DELAY unset
+  TESTRUNNER_START_DELAY unset
+  TEST_INTERACTIVE_DELAY unset
+  TEST_INTERACTIVE_RETRIES unset
+  USEMODULE=[auto_init board board_common_init boards_common_nrf52xxxdk core core_init core_lib core_msg core_panic core_thread cortexm_common cortexm_common_periph cortexm_fpu cpu cpu_check_address cpu_common div libc malloc_thread_safe mpu_stack_guard newlib newlib_nano newlib_syscalls_default nrf52_vectors nrf5x_common_periph periph periph_common periph_gpio periph_gpio_ll_disconnect periph_gpio_ll_input_pull_down periph_gpio_ll_input_pull_up periph_gpio_ll_irq_edge_triggered_both periph_gpio_ll_irq_unmask periph_gpio_ll_open_drain periph_gpio_ll_open_drain_pull_up periph_gpio_ll_open_source periph_gpio_ll_open_source_pull_down periph_init periph_init_buttons periph_init_gpio periph_init_led0 periph_init_led1 periph_init_led2 periph_init_led3 periph_init_led4 periph_init_led5 periph_init_led6 periph_init_led7 periph_init_leds periph_init_pm periph_init_uart periph_pm periph_uart preprocessor preprocessor_successor stdio stdio_default stdio_uart sys vdd_lc_filter_reg0 vdd_lc_filter_reg1]
+## available-none: make -n test/available [examples/basic/hello-world]
+## exit: 0
+test -n ""
+## available-none: run [examples/basic/hello-world]
+## exit: 2
+## available: make -n test/available [examples/basic/hello-world TESTS=@REC@]
+## exit: 0
+test -n "@REC@"
+## available: run [examples/basic/hello-world TESTS=@REC@]
+## exit: 0
+## available-probe: make -n test/available [examples/basic/hello-world APPDIR=@TMP@/app]
+## exit: 0
+test -n "@TMP@/app/tests/01-run @TMP@/app/tests/05-run"
+## available-probe: run [examples/basic/hello-world APPDIR=@TMP@/app]
+## exit: 0
+## whitelist-other: make -n test/available [examples/basic/hello-world TESTS=@REC@ TEST_ON_CI_WHITELIST=other]
+## exit: 0
+echo "Board nrf52840dk not in TEST_ON_CI_WHITELIST"
+false
+test -n "@REC@"
+## whitelist-other: run [examples/basic/hello-world TESTS=@REC@ TEST_ON_CI_WHITELIST=other]
+## exit: 2
+Board nrf52840dk not in TEST_ON_CI_WHITELIST
+## whitelist-all: make -n test/available [examples/basic/hello-world TESTS=@REC@ TEST_ON_CI_WHITELIST=all]
+## exit: 0
+echo "Board nrf52840dk not in TEST_ON_CI_WHITELIST"
+false
+test -n "@REC@"
+## whitelist-all: run [examples/basic/hello-world TESTS=@REC@ TEST_ON_CI_WHITELIST=all]
+## exit: 2
+Board nrf52840dk not in TEST_ON_CI_WHITELIST
+## whitelist-board: make -n test/available [examples/basic/hello-world TESTS=@REC@ TEST_ON_CI_WHITELIST=nrf52840dk]
+## exit: 0
+test -n "@REC@"
+## whitelist-board: run [examples/basic/hello-world TESTS=@REC@ TEST_ON_CI_WHITELIST=nrf52840dk]
+## exit: 0
+## blacklist-all: make -n test/available [examples/basic/hello-world TESTS=@REC@ TEST_ON_CI_BLACKLIST=all]
+## exit: 0
+echo "Board nrf52840dk is in TEST_ON_CI_BLACKLIST"
+false
+test -n "@REC@"
+## blacklist-all: run [examples/basic/hello-world TESTS=@REC@ TEST_ON_CI_BLACKLIST=all]
+## exit: 2
+Board nrf52840dk is in TEST_ON_CI_BLACKLIST
+## blacklist-board: make -n test/available [examples/basic/hello-world QUIET=0 TESTS=@REC@ 'TEST_ON_CI_WHITELIST=other nrf52840dk' TEST_ON_CI_BLACKLIST=nrf52840dk]
+## exit: 0
+echo "Board nrf52840dk is in TEST_ON_CI_BLACKLIST"
+false
+test -n "@REC@"
+## blacklist-board: run [examples/basic/hello-world QUIET=0 TESTS=@REC@ 'TEST_ON_CI_WHITELIST=other nrf52840dk' TEST_ON_CI_BLACKLIST=nrf52840dk]
+## exit: 2
+Board nrf52840dk is in TEST_ON_CI_BLACKLIST
+false
+## end

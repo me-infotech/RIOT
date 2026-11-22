@@ -1,0 +1,9 @@
+# Test data of makefiles/setup_dirs.inc.mk (step G2B-3): the Python path of
+# the test scripts (formerly Makefile.include), set once RIOTBASE is
+# absolute. Source of setup_dirs.test.inc.mk (`just generate-term-data`),
+# which setup_dirs.inc.mk includes at its end. Format:
+# dist/tools/term/README.md, dist/tools/test/README.md.
+schema: 4
+rules:
+  - comment: set python path, e.g. for tests
+    set: {var: PYTHONPATH, value: '${RIOTBASE}/dist/pythonlibs/:${PYTHONPATH}', flavor: simple}

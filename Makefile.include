@@ -63,13 +63,14 @@ RIOTKCONFIG                     ?= $(RIOTBASE)/kconfigs
 RIOTPKG                         ?= $(RIOTBASE)/pkg
 EXTERNAL_PKG_DIRS               ?=
 RIOTTOOLS                       ?= $(RIOTBASE)/dist/tools
-RIOTPROJECT                     ?= $(shell git rev-parse --show-toplevel 2>/dev/null || pwd)
 BUILD_DIR                       ?= $(RIOTBASE)/build
 APPDIR                          ?= $(CURDIR)
 BINDIRBASE                      ?= $(APPDIR)/bin
 PKGDIRBASE                      ?= $(BUILD_DIR)/pkg
 DLCACHE                         ?= $(RIOTTOOLS)/dlcache/dlcache.sh
-DLCACHE_DIR                     ?= $(RIOTBASE)/.dlcache
+# RIOTPROJECT, DLCACHE_DIR: test data test.yaml; probes (recursive) first
+include $(RIOTMAKE)/term_providers.inc.mk
+include $(RIOTBASE)/test.inc.mk
 
 # Resolve potential BOARD alias to canonical name before defining BINDIR
 include $(RIOTMAKE)/board_alias.inc.mk
@@ -123,8 +124,7 @@ include $(RIOTMAKE)/utils/strings.mk
 # values the build data reads but does not define (probes, build algorithm)
 include $(RIOTMAKE)/build_providers.inc.mk
 
-# values the terminal data reads but does not define (probes, step G2B-1)
-include $(RIOTMAKE)/term_providers.inc.mk
+# term_providers.inc.mk (probes, steps G2B-1, G2B-3): with the directories
 
 # include nimble makefile tools
 include $(RIOTMAKE)/pkg/nimble.adv.mk
@@ -134,8 +134,8 @@ UNAME := $(shell uname -m -s)
 OS = $(word 1, $(UNAME))
 OS_ARCH = $(word 2, $(UNAME))
 
-# set python path, e.g. for tests
-PYTHONPATH := $(RIOTBASE)/dist/pythonlibs/:$(PYTHONPATH)
+# set python path, e.g. for tests: test data makefiles/setup_dirs.test.yaml
+# (step G2B-3), at the end of setup_dirs.inc.mk (RIOTBASE absolute there)
 
 # Basic utilities included before anything else
 include $(RIOTMAKE)/utils/checks.mk
