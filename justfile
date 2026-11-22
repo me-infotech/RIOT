@@ -16,8 +16,10 @@
 # with `just flash` (dist/tools/flash), distributed as binaries with
 # `just bindist` (dist/tools/bindist) and cleaned with `just clean` and
 # `just distclean` (dist/tools/clean); their terminal is opened with `just
-# term` and `just cleanterm` (dist/tools/term); all others are still built,
-# flashed, distributed, cleaned and opened with make in their directory.
+# term` and `just cleanterm` (dist/tools/term) and their debugger with `just
+# debug`, `just debug-server` and `just debug-client` (dist/tools/debug); all
+# others are still built, flashed, distributed, cleaned, opened and debugged
+# with make in their directory.
 # Tested with just 1.59.0.
 
 # Recipe lines run with /bin/sh, as GNU Make ran them.
@@ -214,3 +216,21 @@ term app board *vars:
 # (step G2B-1). Example: just cleanterm examples/basic/hello-world nrf52840dk
 cleanterm app board *vars:
     @./dist/tools/term/term.py cleanterm -C {{ quote(app) }} BOARD={{ quote(board) }} {{ vars }}
+
+# Start the debugger (GDB with the programmer's GDB server) of an application
+# on the board without Make, as `make debug` (step G2B-2): PROGRAMMER,
+# DEBUG_ADAPTER_ID, MOST_RECENT_PORT, … as for make; the image must exist
+# (Make's BINDIR <app>/bin/<board>, or BINDIR=…): `just flash … && just debug …`.
+# Example: just debug examples/basic/hello-world nrf52840dk PROGRAMMER=openocd
+debug app board *vars:
+    @./dist/tools/debug/debug.py debug -C {{ quote(app) }} BOARD={{ quote(board) }} {{ vars }}
+
+# Only the GDB server of the programmer, as `make debug-server` (step G2B-2).
+# Example: just debug-server examples/basic/hello-world nrf52840dk
+debug-server app board *vars:
+    @./dist/tools/debug/debug.py debug-server -C {{ quote(app) }} BOARD={{ quote(board) }} {{ vars }}
+
+# Only GDB, connected to a running debug server, as `make debug-client`
+# (step G2B-2). Example: just debug-client examples/basic/hello-world nrf52840dk
+debug-client app board *vars:
+    @./dist/tools/debug/debug.py debug-client -C {{ quote(app) }} BOARD={{ quote(board) }} {{ vars }}

@@ -141,9 +141,11 @@ class TermEvaluator(FL.FlashEvaluator):
     adapters its first statements include) before its build data; inside
     such data an include reads only the data of the named file."""
 
-    def __init__(self, variables, curdir: str):
+    def __init__(self, variables, curdir: str, goals=(), what="the terminal"):
         super().__init__(variables, curdir)
         self.term_read: list = []
+        self.goals = tuple(goals)     # MAKECMDGOALS (condition `goal`)
+        self.what = what              # what to open with make (messages of exit 3)
 
     def load(self, yaml_path: str) -> list:
         if not T.is_data_name(yaml_path):
@@ -214,7 +216,7 @@ class TermEvaluator(FL.FlashEvaluator):
                 self.run_file(data)
         elif os.path.exists(path):
             raise OutOfScope(f"programmer {programmer}: {rel(path)} has no flash or debugger "
-                             "data; open the terminal with make")
+                             f"data; open {self.what} with make")
 
     def serial_file(self):
         """Makefile.include:316: `include $(RIOTMAKE)/tools/serial.inc.mk`."""
@@ -228,7 +230,20 @@ class TermEvaluator(FL.FlashEvaluator):
         (key, value), = cond.items()
         if key == "command" and "name" in value:
             return FL.command_found(value["name"])
+        if key == "goal":                  # $(filter TARGET,$(MAKECMDGOALS))
+            return value in self.goals
         return super().condition(cond)
+
+    def run(self, rules: list, where: str = "rules"):
+        for rule in rules:
+            if "export" in rule and isinstance(rule["export"], dict) and self.in_flash_data():
+                # a word ${NAME} of vars is the variable named by NAME's value
+                # (step G2B-2), as $(call target-export-variables,T,$(NAME))
+                exp = rule["export"]
+                names = self.v.text(" ".join(exp["vars"])).split()
+                self.exports.append((self.v.text(exp["targets"]).split(), names))
+            else:
+                super().run([rule], where)
 
 
 def import_environment(v, environ: dict):
@@ -253,31 +268,33 @@ def check_scope(v):
         raise OutOfScope("suit (makefiles/suit.inc.mk) is not converted to data")
 
 
-def check_board(v):
+def check_board(v, what="the terminal"):
     """The board's Make file must have terminal data: a board without it may
     set the terminal in Make (e.g. native64), which is not read here."""
     boarddir = v.get("BOARDDIR").strip()
     data = T.data_name(os.path.join(boarddir, "Makefile.include"), "term")
     if not os.path.isfile(data):
         raise OutOfScope(f"board {v.get('BOARD').strip()}: no terminal data ({rel(data)}); "
-                         "open the terminal with make")
+                         f"open {what} with make")
 
 
-def evaluate(app_dir: str, variables: dict, environ: dict) -> TermEvaluator:
+def evaluate(app_dir: str, variables: dict, environ: dict, goals=("term",),
+             what="the terminal", termdeps=True) -> TermEvaluator:
     """The variables of Make for `term` (plan.evaluate_application with the
-    flash, debugger and terminal data)."""
+    flash, debugger and terminal data); `goals` are Make's MAKECMDGOALS,
+    `termdeps` False for a target without TERMDEPS (debug, step G2B-2)."""
     v = TermVariables(PROVIDERS)
     import_environment(v, environ)
     for name, value in variables.items():
         v.command_line(name, value)
     curdir = os.path.abspath(app_dir)
     v.set("CURDIR", curdir, "simple")
-    ev = TermEvaluator(v, curdir)
+    ev = TermEvaluator(v, curdir, goals, what)
     ev.hooks["makefiles/features_check.inc.mk"] = lambda: pipeline.features_check(v)
 
     def build_system():
         pipeline.prelude(ev)
-        check_board(v)
+        check_board(v, what)
         pipeline.application(ev, info_goal=False)
         P.directories(v)
         check_scope(v)
@@ -289,7 +306,7 @@ def evaluate(app_dir: str, variables: dict, environ: dict) -> TermEvaluator:
                                              "programmer.inc.mk")))
     resolver._run_application(ev, build_system)   # pylint: disable=protected-access
     check_scope(v)
-    deps = v.words("TERMDEPS")
+    deps = v.words("TERMDEPS") if termdeps else []
     if deps:
         raise OutOfScope(f"the terminal needs {' '.join(rel(d) if os.path.isabs(d) else d for d in deps)} "
                          "to be built first (TERMDEPS); open it with make")
@@ -318,6 +335,16 @@ def recipe(v, goal: str, isatty=os.isatty) -> tuple:
     return [check, " ".join(words)], sh
 
 
+def target_matches(goal: str, target: str) -> bool:
+    """The goal is the target, or matches the pattern (`debug%`: `%` stands
+    for a non-empty stem, as for Make's pattern-specific variables)."""
+    if "%" not in target:
+        return goal == target
+    prefix, suffix = target.split("%", 1)
+    return len(goal) > len(prefix) + len(suffix) and goal.startswith(prefix) \
+        and goal.endswith(suffix)
+
+
 def terminal_environment(ev, goal: str, environ: dict) -> dict:
     """What Make adds to the environment of the terminal: the exported
     variables (vars.build.yaml), the command line variables, the variables
@@ -333,7 +360,7 @@ def terminal_environment(ev, goal: str, environ: dict) -> dict:
         for name in names:
             if v.defined(name):
                 env[name] = v.get(name)
-            elif goal in targets:
+            elif any(target_matches(goal, t) for t in targets):
                 env.setdefault(name, "")
     if goal == "cleanterm":
         env["PYTERMFLAGS"] = v.get("PYTERMFLAGS")
@@ -345,7 +372,7 @@ def plan_term(app_dir: str, variables: dict, goal: str, environ: dict, report=No
     """What `make term` (`make cleanterm`) does: the recipe lines, the
     variables the terminal gets and Make's warnings (passed to `report` in
     Make's order, before a configuration error)."""
-    ev = evaluate(app_dir, variables, environ)
+    ev = evaluate(app_dir, variables, environ, goals=(goal,))
     v = ev.v
     messages = [f"{level}: {text}" for level, text in ev.messages if level == "warning"]
     warning = FL.supported_warning(v)
@@ -353,6 +380,8 @@ def plan_term(app_dir: str, variables: dict, goal: str, environ: dict, report=No
         messages.append(f"warning: {warning}")
     for message in messages if report else []:
         report(message)
+    if not v.get("FLASHFILE").strip():                             # Makefile.include:470-472
+        raise ResolveError(f"FLASHFILE is not defined for this board: {v.get('BOARD').strip()}")
     if v.get("TERMLOG").strip() or v.get("TERMTEE").strip():      # Makefile.include:659-661
         v.set("TERMTEE", "| tee -a ${TERMLOG}", "conditional")
     if goal == "cleanterm":                                        # Makefile.include:673

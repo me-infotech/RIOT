@@ -66,7 +66,8 @@ ALLOWED = {
     ("makefiles/boot/riotboot.mk", "DEBUG_ELFFILE"): "riotboot (exit 3)",
     ("Makefile.include", "TERMDEPS"): "`TERMDEPS += $(TERMFLASHDEPS)` (rule of term, "
                                       "algorithm) and EMULATE=1 (exit 3)",
-    ("Makefile.include", "DEBUGDEPS"): "EMULATE=1 (exit 3), setsid on macOS (debug)",
+    ("Makefile.include", "DEBUGDEPS"): "EMULATE=1 (exit 3); the setsid of macOS is data "
+                                       "(debug.yaml, step G2B-2)",
 }
 
 
@@ -289,6 +290,8 @@ class OwnerTest(unittest.TestCase):
             with self.subTest(owner=os.path.relpath(owner, sample.RIOTBASE)):
                 with open(owner, encoding="utf-8") as file:
                     left = set(assigned(file.read()))
+                name = os.path.relpath(owner, sample.RIOTBASE)
+                left = {v for v in left if (name, v) not in ALLOWED}
                 self.assertEqual(left & data_vars(T.load(path)), set())
 
     def test_stand_in_names_the_owner_and_is_not_generated(self):

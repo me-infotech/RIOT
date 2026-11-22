@@ -1,0 +1,245 @@
+# golden output of GNU Make for the parity tests of step G2B-2 (debugger without Make)
+# generator: dist/tools/debug/tests/record_golden.py
+# commit: d04191b950 (git archive, unchanged)
+# date: 2026-11-22
+# make: GNU Make 4.3
+# stubs: openocd, JLinkGDBServer (servers), arm-none-eabi-gdb or gdb-multiarch, JLinkExe (DLL version V7.94), pipx, setsid (then the real one); ttys.py -> '/dev/ttyACM7 000683654321'; USER=riot
+# environment: env -i PATH HOME LC_ALL=C USER TMPDIR G2B_* (PATH: stub directories first);
+#   stdout and stderr merged, `make: ***` lines left out; stdin a pipe closed once the server started;
+#   BINDIRBASE outside the tree; `left running`: server stubs alive 0.3 s after the call
+# debugger environment: BAUD BMP_OPTIONS DBG DBG_DEFAULT_FLAGS DBG_EXTRA_FLAGS DBG_FLAGS DEBUG_ADAPTER_ID ELFFILE FLASH_ADDR GDB GDB_PORT GDB_PORT_CORE_OFFSET HOME JLINK JLINK_DEVICE JLINK_IF JLINK_SERIAL JLINK_SERVER JLINK_SKIP_VERSION JLINK_SPEED JLINK_TERMFLAGS JLINK_TERMPROG OPENOCD OPENOCD_ADAPTER_INIT OPENOCD_CONFIG OPENOCD_CORE OPENOCD_DBG_EXTRA_CMD OPENOCD_DBG_START_CMD OPENOCD_EXTRA_INIT OPENOCD_SERVER_ADDRESS OPENOCD_TERMFLAGS OPENOCD_TERMPROG PROGRAMMER PYTERMFLAGS RAM_LEN RAM_START_ADDR RIOTTOOLS RTT_PORT SETSID TCL_PORT TELNET_PORT TUI
+## openocd-debug: make -n debug [examples/advanced/bindist PROGRAMMER=openocd]
+## exit: 0
+command -v @RIOTBASE@/dist/tools/openocd/openocd.sh >/dev/null 2>&1 || { /usr/bin/env echo 'Debug program @RIOTBASE@/dist/tools/openocd/openocd.sh is required but not found in PATH.  Aborting.'; exit 1;}
+@RIOTBASE@/dist/tools/openocd/openocd.sh debug @BINDIR@/bindist.elf
+## openocd-debug: run [examples/advanced/bindist PROGRAMMER=openocd]
+## exit: 0
+out: @RIOTBASE@/dist/tools/openocd/openocd.sh debug @BINDIR@/bindist.elf
+out: ### Starting Debugging ###
+setsid [sh] [-c] [openocd             -c 'source [find interface/jlink.cfg]' -c 'transport select swd'             -f '@RIOTBASE@/boards/common/nrf52/dist/openocd.cfg'                          -c 'bindto localhost'             -c 'tcl_port 6333'             -c 'telnet_port 4444'             -c 'gdb_port 3333'             -c 'init'                          -c 'targets '             -c halt             -l /dev/null &             echo $! > @TMP@/openocd_pid.@XXXXXXXXXX@]
+  BAUD=[115200]
+  DBG_EXTRA_FLAGS=[--eval-command='directory @RIOTBASE@']
+  ELFFILE=[@BINDIR@/bindist.elf]
+  FLASH_ADDR=[0x0]
+  GDB=[arm-none-eabi-gdb]
+  HOME=[@HOME@]
+  OPENOCD_ADAPTER_INIT=[-c 'source [find interface/jlink.cfg]' -c 'transport select swd']
+  OPENOCD_CONFIG=[@RIOTBASE@/boards/common/nrf52/dist/openocd.cfg]
+  PROGRAMMER=[openocd]
+  RIOTTOOLS=[@RIOTBASE@/dist/tools]
+openocd [-c] [source [find interface/jlink.cfg]] [-c] [transport select swd] [-f] [@RIOTBASE@/boards/common/nrf52/dist/openocd.cfg] [-c] [bindto localhost] [-c] [tcl_port 6333] [-c] [telnet_port 4444] [-c] [gdb_port 3333] [-c] [init] [-c] [targets ] [-c] [halt] [-l] [/dev/null]
+  BAUD=[115200]
+  DBG_EXTRA_FLAGS=[--eval-command='directory @RIOTBASE@']
+  ELFFILE=[@BINDIR@/bindist.elf]
+  FLASH_ADDR=[0x0]
+  GDB=[arm-none-eabi-gdb]
+  HOME=[@HOME@]
+  OPENOCD_ADAPTER_INIT=[-c 'source [find interface/jlink.cfg]' -c 'transport select swd']
+  OPENOCD_CONFIG=[@RIOTBASE@/boards/common/nrf52/dist/openocd.cfg]
+  PROGRAMMER=[openocd]
+  RIOTTOOLS=[@RIOTBASE@/dist/tools]
+arm-none-eabi-gdb [-q] [-ex] [tar ext localhost:3333] [--eval-command=directory @RIOTBASE@] [@BINDIR@/bindist.elf]
+  BAUD=[115200]
+  DBG_DEFAULT_FLAGS=[-q -ex "tar ext localhost:3333"]
+  DBG_EXTRA_FLAGS=[--eval-command='directory @RIOTBASE@']
+  DBG_FLAGS=[-q -ex "tar ext localhost:3333" --eval-command='directory @RIOTBASE@']
+  ELFFILE=[@BINDIR@/bindist.elf]
+  FLASH_ADDR=[0x0]
+  GDB=[arm-none-eabi-gdb]
+  GDB_PORT=[3333]
+  HOME=[@HOME@]
+  OPENOCD_ADAPTER_INIT=[-c 'source [find interface/jlink.cfg]' -c 'transport select swd']
+  OPENOCD_CONFIG=[@RIOTBASE@/boards/common/nrf52/dist/openocd.cfg]
+  PROGRAMMER=[openocd]
+  RIOTTOOLS=[@RIOTBASE@/dist/tools]
+left running: 
+## openocd-debug-server: make -n debug-server [examples/advanced/bindist PROGRAMMER=openocd]
+## exit: 0
+command -v @RIOTBASE@/dist/tools/openocd/openocd.sh >/dev/null 2>&1 || { /usr/bin/env echo 'Debug server program @RIOTBASE@/dist/tools/openocd/openocd.sh is required but not found in PATH.  Aborting.'; exit 1;}
+@RIOTBASE@/dist/tools/openocd/openocd.sh debug-server
+## openocd-debug-server: run [examples/advanced/bindist PROGRAMMER=openocd]
+## exit: 0
+out: @RIOTBASE@/dist/tools/openocd/openocd.sh debug-server
+out: ### Starting GDB Server ###
+out: Terminated
+openocd [-c] [source [find interface/jlink.cfg]] [-c] [transport select swd] [-f] [@RIOTBASE@/boards/common/nrf52/dist/openocd.cfg] [-c] [bindto localhost] [-c] [tcl_port 6333] [-c] [telnet_port 4444] [-c] [gdb_port 3333] [-c] [init] [-c] [targets] [-c] [halt]
+  BAUD=[115200]
+  DBG_EXTRA_FLAGS=[--eval-command='directory @RIOTBASE@']
+  ELFFILE=[@BINDIR@/bindist.elf]
+  FLASH_ADDR=[0x0]
+  GDB=[arm-none-eabi-gdb]
+  GDB_PORT_CORE_OFFSET=[0]
+  HOME=[@HOME@]
+  OPENOCD_ADAPTER_INIT=[-c 'source [find interface/jlink.cfg]' -c 'transport select swd']
+  OPENOCD_CONFIG=[@RIOTBASE@/boards/common/nrf52/dist/openocd.cfg]
+  OPENOCD_CORE=[]
+  OPENOCD_EXTRA_INIT=[]
+  PROGRAMMER=[openocd]
+  RIOTTOOLS=[@RIOTBASE@/dist/tools]
+left running: 
+## openocd-debug-client: make -n debug-client [examples/advanced/bindist PROGRAMMER=openocd]
+## exit: 0
+command -v @RIOTBASE@/dist/tools/openocd/openocd.sh >/dev/null 2>&1 || { /usr/bin/env echo 'Debug client program @RIOTBASE@/dist/tools/openocd/openocd.sh is required but not found in PATH.  Aborting.'; exit 1;}
+@RIOTBASE@/dist/tools/openocd/openocd.sh debug-client @BINDIR@/bindist.elf
+## openocd-debug-client: run [examples/advanced/bindist PROGRAMMER=openocd]
+## exit: 0
+out: @RIOTBASE@/dist/tools/openocd/openocd.sh debug-client @BINDIR@/bindist.elf
+out: ### Attaching to GDB Server ###
+arm-none-eabi-gdb [-q] [-ex] [tar ext localhost:3333] [--eval-command=directory @RIOTBASE@] [@BINDIR@/bindist.elf]
+  BAUD=[115200]
+  DBG_DEFAULT_FLAGS=[-q -ex "tar ext localhost:3333"]
+  DBG_EXTRA_FLAGS=[--eval-command='directory @RIOTBASE@']
+  DBG_FLAGS=[-q -ex "tar ext localhost:3333" --eval-command='directory @RIOTBASE@']
+  ELFFILE=[@BINDIR@/bindist.elf]
+  FLASH_ADDR=[0x0]
+  GDB=[arm-none-eabi-gdb]
+  GDB_PORT=[3333]
+  GDB_PORT_CORE_OFFSET=[0]
+  HOME=[@HOME@]
+  OPENOCD_ADAPTER_INIT=[-c 'source [find interface/jlink.cfg]' -c 'transport select swd']
+  OPENOCD_CONFIG=[@RIOTBASE@/boards/common/nrf52/dist/openocd.cfg]
+  OPENOCD_CORE=[]
+  OPENOCD_EXTRA_INIT=[]
+  PROGRAMMER=[openocd]
+  RIOTTOOLS=[@RIOTBASE@/dist/tools]
+left running: 
+## jlink-debug: make -n debug [examples/advanced/bindist PROGRAMMER=jlink]
+## exit: 0
+command -v @RIOTBASE@/dist/tools/jlink/jlink.sh >/dev/null 2>&1 || { /usr/bin/env echo 'Debug program @RIOTBASE@/dist/tools/jlink/jlink.sh is required but not found in PATH.  Aborting.'; exit 1;}
+@RIOTBASE@/dist/tools/jlink/jlink.sh debug @BINDIR@/bindist.elf
+## jlink-debug: run [examples/advanced/bindist PROGRAMMER=jlink]
+## exit: 0
+out: @RIOTBASE@/dist/tools/jlink/jlink.sh debug @BINDIR@/bindist.elf
+out: ### Starting Debugging ###
+setsid [sh] [-c] [JLinkGDBServer                             -nogui                            -silent                            -device 'nrf52840_xxaa'                            -speed '2000'                            -if 'SWD'                            -port '3333'                            -telnetport '4444']
+  BAUD=[115200]
+  DBG_EXTRA_FLAGS=[--eval-command='directory @RIOTBASE@']
+  ELFFILE=[@BINDIR@/bindist.elf]
+  FLASH_ADDR=[0x0]
+  GDB=[arm-none-eabi-gdb]
+  HOME=[@HOME@]
+  JLINK=[JLinkExe]
+  JLINK_DEVICE=[nrf52840_xxaa]
+  JLINK_SERIAL=[]
+  PROGRAMMER=[jlink]
+  RIOTTOOLS=[@RIOTBASE@/dist/tools]
+JLinkExe [] [-nogui] [1]
+  BAUD=[115200]
+  DBG_EXTRA_FLAGS=[--eval-command='directory @RIOTBASE@']
+  ELFFILE=[@BINDIR@/bindist.elf]
+  FLASH_ADDR=[0x0]
+  GDB=[arm-none-eabi-gdb]
+  HOME=[@HOME@]
+  JLINK=[JLinkExe]
+  JLINK_DEVICE=[nrf52840_xxaa]
+  JLINK_SERIAL=[]
+  PROGRAMMER=[jlink]
+  RIOTTOOLS=[@RIOTBASE@/dist/tools]
+JLinkGDBServer [-nogui] [-silent] [-device] [nrf52840_xxaa] [-speed] [2000] [-if] [SWD] [-port] [3333] [-telnetport] [4444]
+  BAUD=[115200]
+  DBG_EXTRA_FLAGS=[--eval-command='directory @RIOTBASE@']
+  ELFFILE=[@BINDIR@/bindist.elf]
+  FLASH_ADDR=[0x0]
+  GDB=[arm-none-eabi-gdb]
+  HOME=[@HOME@]
+  JLINK=[JLinkExe]
+  JLINK_DEVICE=[nrf52840_xxaa]
+  JLINK_SERIAL=[]
+  PROGRAMMER=[jlink]
+  RIOTTOOLS=[@RIOTBASE@/dist/tools]
+arm-none-eabi-gdb [-q] [-tui] [-ex] [tar ext :3333] [--eval-command=directory @RIOTBASE@] [@BINDIR@/bindist.elf]
+  BAUD=[115200]
+  DBG_EXTRA_FLAGS=[--eval-command='directory @RIOTBASE@']
+  ELFFILE=[@BINDIR@/bindist.elf]
+  FLASH_ADDR=[0x0]
+  GDB=[arm-none-eabi-gdb]
+  HOME=[@HOME@]
+  JLINK=[JLinkExe]
+  JLINK_DEVICE=[nrf52840_xxaa]
+  JLINK_SERIAL=[]
+  PROGRAMMER=[jlink]
+  RIOTTOOLS=[@RIOTBASE@/dist/tools]
+left running: JLinkGDBServer
+## jlink-debug-server: make -n debug-server [examples/advanced/bindist PROGRAMMER=jlink]
+## exit: 0
+command -v @RIOTBASE@/dist/tools/jlink/jlink.sh >/dev/null 2>&1 || { /usr/bin/env echo 'Debug server program @RIOTBASE@/dist/tools/jlink/jlink.sh is required but not found in PATH.  Aborting.'; exit 1;}
+@RIOTBASE@/dist/tools/jlink/jlink.sh debug-server
+## jlink-debug-server: run [examples/advanced/bindist PROGRAMMER=jlink]
+## exit: 0
+out: @RIOTBASE@/dist/tools/jlink/jlink.sh debug-server
+out: ### Starting GDB Server ###
+JLinkExe [] [-nogui] [1]
+  BAUD=[115200]
+  DBG_EXTRA_FLAGS=[--eval-command='directory @RIOTBASE@']
+  ELFFILE=[@BINDIR@/bindist.elf]
+  FLASH_ADDR=[0x0]
+  GDB=[arm-none-eabi-gdb]
+  HOME=[@HOME@]
+  JLINK=[JLinkExe]
+  JLINK_DEVICE=[nrf52840_xxaa]
+  JLINK_SERIAL=[]
+  PROGRAMMER=[jlink]
+  RIOTTOOLS=[@RIOTBASE@/dist/tools]
+JLinkGDBServer [-nogui] [-device] [nrf52840_xxaa] [-speed] [2000] [-if] [SWD] [-port] [3333] [-telnetport] [4444]
+  BAUD=[115200]
+  DBG_EXTRA_FLAGS=[--eval-command='directory @RIOTBASE@']
+  ELFFILE=[@BINDIR@/bindist.elf]
+  FLASH_ADDR=[0x0]
+  GDB=[arm-none-eabi-gdb]
+  HOME=[@HOME@]
+  JLINK=[JLinkExe]
+  JLINK_DEVICE=[nrf52840_xxaa]
+  JLINK_SERIAL=[]
+  PROGRAMMER=[jlink]
+  RIOTTOOLS=[@RIOTBASE@/dist/tools]
+left running: 
+## jlink-debug-client: make -n debug-client [examples/advanced/bindist PROGRAMMER=jlink]
+## exit: 0
+echo '$(DEBUGCLIENT) is not set. This means that `make debug` is not'\
+' supported by your current setup. A common reason is that PROGRAMMER'\
+' is set to something like flashing via bootloader, where debugging is'\
+' not possible.'
+false
+## jlink-debug-client: run [examples/advanced/bindist PROGRAMMER=jlink]
+## exit: 2
+out: $(DEBUGCLIENT) is not set. This means that `make debug` is not supported by your current setup. A common reason is that PROGRAMMER is set to something like flashing via bootloader, where debugging is not possible.
+left running: 
+## bmp-debug: make -n debug [examples/advanced/bindist PROGRAMMER=bmp]
+## exit: 0
+command -v @RIOTBASE@/dist/tools/bmp/bmp.py >/dev/null 2>&1 || { /usr/bin/env echo 'Debug program @RIOTBASE@/dist/tools/bmp/bmp.py is required but not found in PATH.  Aborting.'; exit 1;}
+@RIOTBASE@/dist/tools/bmp/bmp.py  debug @BINDIR@/bindist.elf
+## bmp-debug: run [examples/advanced/bindist PROGRAMMER=bmp]
+## exit: 0
+out: @RIOTBASE@/dist/tools/bmp/bmp.py  debug @BINDIR@/bindist.elf
+pipx [run] [@RIOTBASE@/dist/tools/bmp/bmp.py] [debug] [@BINDIR@/bindist.elf]
+  BAUD=[115200]
+  ELFFILE=[@BINDIR@/bindist.elf]
+  FLASH_ADDR=[0x0]
+  GDB=[arm-none-eabi-gdb]
+  HOME=[@HOME@]
+  PROGRAMMER=[bmp]
+  RIOTTOOLS=[@RIOTBASE@/dist/tools]
+left running: 
+## bmp-debug-server: make -n debug-server [examples/advanced/bindist PROGRAMMER=bmp]
+## exit: 0
+echo '$(DEBUGSERVER) is not set. This means that `make debug` is not'\
+' supported by your current setup. A common reason is that PROGRAMMER'\
+' is set to something like flashing via bootloader, where debugging is'\
+' not possible.'
+false
+## bmp-debug-server: run [examples/advanced/bindist PROGRAMMER=bmp]
+## exit: 2
+out: $(DEBUGSERVER) is not set. This means that `make debug` is not supported by your current setup. A common reason is that PROGRAMMER is set to something like flashing via bootloader, where debugging is not possible.
+left running: 
+## bmp-debug-client: make -n debug-client [examples/advanced/bindist PROGRAMMER=bmp]
+## exit: 0
+echo '$(DEBUGCLIENT) is not set. This means that `make debug` is not'\
+' supported by your current setup. A common reason is that PROGRAMMER'\
+' is set to something like flashing via bootloader, where debugging is'\
+' not possible.'
+false
+## bmp-debug-client: run [examples/advanced/bindist PROGRAMMER=bmp]
+## exit: 2
+out: $(DEBUGCLIENT) is not set. This means that `make debug` is not supported by your current setup. A common reason is that PROGRAMMER is set to something like flashing via bootloader, where debugging is not possible.
+left running: 
+## end

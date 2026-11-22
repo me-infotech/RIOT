@@ -231,6 +231,7 @@ Mutation probe
 | A6a | EMULATE=1 not rejected | term failures=1 |
 | A6b | TERMDEPS not rejected (bootterm) | term failures=1 |
 | A6c | board without terminal data accepted | term failures=1 |
+| A6d | unknown programmer: no FLASHFILE error (`Makefile.include:470-472`, exit 2; added with G2B-2 debug, 2026-11-22) | term failures=2 |
 | A7a | colour test ignores stderr | term failures=1 |
 | A7b | cleanterm without PYTERMFLAGS | term failures=5 |
 | A7c | TERMENV also for cleanterm | term failures=1 |

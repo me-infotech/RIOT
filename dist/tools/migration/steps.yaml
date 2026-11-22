@@ -240,3 +240,46 @@ steps:
       pip: [pyyaml]
       tools: [just@1.59.0]
     docs: dist/tools/term/README.md
+  - id: g2b-02-debug
+    title: Start the debugger of an application (debug, debug-server, debug-client) from the debugger data, without Make
+    group: "2B"
+    targets:
+      - name: debug
+        now: just debug <application> <board> [PROGRAMMER=…] [VAR=VALUE…]
+        hardware: true
+        board_test: >-
+          nRF52840 DK on USB: for hello-world run `just flash
+          examples/basic/hello-world nrf52840dk`, then `just debug
+          examples/basic/hello-world nrf52840dk PROGRAMMER=openocd`; in gdb
+          `info registers`, `continue`, Ctrl+C (the target stops, gdb and
+          openocd stay), `quit`; afterwards no openocd process may be left;
+          repeat with PROGRAMMER=jlink (J-Link software installed; the
+          JLinkGDBServer stays running as with make, end it by hand) and with
+          MOST_RECENT_PORT=1; compare each with `make debug` of the same
+          application (same commands, same gdb session); PROGRAMMER=bmp is
+          not applicable without a Black Magic Probe
+      - name: debug-server
+        now: just debug-server <application> <board> [PROGRAMMER=…] [VAR=VALUE…]
+        hardware: true
+        board_test: >-
+          nRF52840 DK on USB, after `just flash examples/basic/hello-world
+          nrf52840dk`: in a first terminal `just debug-server
+          examples/basic/hello-world nrf52840dk` (openocd), in a second `just
+          debug-client examples/basic/hello-world nrf52840dk`; in gdb `info
+          registers`, `continue`, Ctrl+C, `quit`; then Ctrl+D in the first
+          terminal must end the server; repeat the server with
+          PROGRAMMER=jlink (Ctrl+C ends it); compare with `make debug-server`
+      - name: debug-client
+        now: just debug-client <application> <board> [VAR=VALUE…]
+        hardware: true
+        board_test: >-
+          with the debug server of the board test of debug-server: `just
+          debug-client examples/basic/hello-world nrf52840dk` connects (gdb
+          `info registers`); with PROGRAMMER=jlink it prints Make's hint
+          "$(DEBUGCLIENT) is not set" and exits 2, as `make debug-client`
+    tests:
+      - dist/tools/debug/tests
+    requires:
+      pip: [pyyaml]
+      tools: [just@1.59.0]
+    docs: dist/tools/debug/README.md

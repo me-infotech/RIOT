@@ -231,6 +231,17 @@ class ScopeTest(unittest.TestCase):
                       res.stderr)
         self.assertNotIn("make: ***", res.stderr)
 
+    def test_unknown_programmer_is_2(self):
+        # Makefile.include:470-472: no FLASHFILE for an unknown programmer
+        # stops every goal, term included (exit 2, after the warning)
+        for goal in ("term", "cleanterm"):
+            with self.subTest(goal=goal):
+                res = cli(goal, "-n", "-C", HELLO, f"BOARD={sample.BOARD}", "PROGRAMMER=nosuch")
+                self.assertEqual(res.returncode, 2, res.stderr)
+                self.assertIn("not supported by this board", res.stderr)
+                self.assertIn("FLASHFILE is not defined for this board: nrf52840dk", res.stderr)
+                self.assertEqual(res.stdout, "")
+
 
 class RecipeTest(unittest.TestCase):
     """A7."""

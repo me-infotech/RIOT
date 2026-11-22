@@ -1,8 +1,22 @@
-# Debugger data of Makefile.include (step G2B-1): the ELF file of the
-# debugger (RIOT_TERMINAL=semihosting runs the debugger with it). Source of
-# debug.inc.mk next to it (`just generate-term-data`), which Makefile.include
-# includes where the line was. Format: dist/tools/term/README.md.
+# Debugger data of Makefile.include (steps G2B-1, G2B-2): the ELF file of the
+# debugger (RIOT_TERMINAL=semihosting and `debug` run the debugger with it) and
+# the setsid of macOS for `debug`. Source of debug.inc.mk next to it (`just
+# generate-term-data`), which Makefile.include includes where DEBUG_ELFFILE
+# was. Format: dist/tools/term/README.md, dist/tools/debug/README.md.
 schema: 4
 rules:
   - comment: elf file used for the debugger, must include bootloader offset
     set: {var: DEBUG_ELFFILE, value: '${ELFFILE}', flavor: conditional}
+  - comment: |-
+      Check if setsid command is available on the system for debug target
+      This is not the case on MacOSX, so it must be built on the fly
+      (the export names the value of SETSID, as Make did before: Make's text kept)
+    if: {equals: {OS: Darwin}}
+    then:
+      - if: {goal: debug}
+        then:
+          - if: {not: {command: {name: setsid}}}
+            then:
+              - set: {var: SETSID, value: '${RIOTTOOLS}/setsid/setsid'}
+              - export: {targets: debug, vars: ['${SETSID}']}
+              - add: {DEBUGDEPS: ['${SETSID}']}

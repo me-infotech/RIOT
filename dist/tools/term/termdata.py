@@ -28,6 +28,15 @@ condition `command: {var}`) without `section`, plus three constructs of this ste
   `set: {…, export: true}`          the variable is exported to     export V ?= …
                                     every command (schema 4)
 
+and two of step G2B-2 (`debug`, decision D4 and P1 of 2026-11-22):
+
+  construct                         meaning                         Make (generated)
+  condition `goal: TARGET`          TARGET is a goal of the call    ifneq (,$(filter TARGET,$(MAKECMDGOALS)))
+                                    (make's command line goals)
+  `export: {targets, vars}` with    the variable whose NAME is the  $(call target-export-variables,T,$(NAME))
+  a word `${NAME}` in vars          value of NAME (Make's text of
+                                    Makefile.include, bug included)
+
 A rule with `stand_in: <owner Make file>` (schema 4, step G0-3) is read by
 the terminal without Make and left out of the adapter: the owner Make file
 still does it itself (jlink.inc.mk and openocd.inc.mk include
@@ -67,6 +76,10 @@ SCHEMA = 4
 KINDS = ("debug", "term")
 NOT_IN_DATA = ("section",)
 COMMAND_NAME_RE = re.compile(r"^[A-Za-z0-9_.+-]+$")
+# a goal of `goal: TARGET` (a literal target, as the targets of Makefile.include)
+GOAL_RE = re.compile(r"^[A-Za-z0-9_.+/-]+$")
+# a word of `export.vars`: a variable name or ${NAME} (the name is its value)
+EXPORT_VAR_RE = re.compile(r"^(?:[A-Za-z_][A-Za-z0-9_]*|\$\{[A-Za-z_][A-Za-z0-9_]*\})$")
 # the top directories with data; the repository root holds debug.yaml of
 # Makefile.include
 TOPS = ("boards", "cpu", "makefiles")
@@ -139,9 +152,13 @@ def all_data(root: str = RIOTBASE) -> list:
 
 # --- validator ------------------------------------------------------------------
 def condition_problems(cond, where, negated=False) -> list:
-    """A condition of the flash data, or `command: {name}`."""
+    """A condition of the flash data, `command: {name}` or `goal: TARGET`."""
     if isinstance(cond, dict) and len(cond) == 1:
         (key, value), = cond.items()
+        if key == "goal":
+            if not isinstance(value, str) or not GOAL_RE.match(value):
+                return [f"{where}.goal: {value!r} is not a target"]
+            return []
         if key == "command" and isinstance(value, dict) and "name" in value:
             problems = S._keys_problems(value, f"{where}.command", ("name",))
             if not problems and (not isinstance(value["name"], str)
@@ -166,6 +183,23 @@ def word_problems(value, where) -> list:
     index = body["index"]
     if not isinstance(index, int) or isinstance(index, bool) or index == 0 or index < -1:
         problems.append(f"{here}.index: a word number 1, 2, … or -1 (the last word)")
+    return problems
+
+
+def export_problems(value, where) -> list:
+    """`export: {targets, vars}` of the flash data, a var also `${NAME}`."""
+    problems = S._keys_problems(value, where, ("targets", "vars"))
+    if problems:
+        return problems
+    plain = dict(value, vars=["X"])
+    problems = F._export_problems(plain, where)
+    names = value["vars"]
+    if not isinstance(names, list) or not names:
+        problems.append(f"{where}.vars: must be a non-empty list of variable names")
+    else:
+        problems += [f"{where}.vars[{i}]: {n!r} is not a variable name or ${{NAME}}"
+                     for i, n in enumerate(names)
+                     if not isinstance(n, str) or not EXPORT_VAR_RE.match(n)]
     return problems
 
 
@@ -199,6 +233,10 @@ def rules_problems(rules, where="rules") -> list:
         here = f"{where}[{i}]"
         if isinstance(rule, dict) and any(k in rule for k in NOT_IN_DATA):
             problems.append(f"{here}: `section` is build data only")
+        elif isinstance(rule, dict) and "export" in rule and isinstance(rule["export"], dict):
+            extra = [k for k in rule if k not in ("export", "comment")]
+            problems += [f"{here}: unknown key {k!r} next to export" for k in extra]
+            problems += export_problems(rule["export"], f"{here}.export")
         elif isinstance(rule, dict) and "if" in rule:
             problems += condition_problems(rule["if"], f"{here}.if")
             if "then" not in rule:
@@ -257,7 +295,15 @@ def condition_text(cond: dict) -> str:
     if key == "command" and "name" in value:
         kind = "ifeq" if negated else "ifneq"
         return f"{kind} (,$(shell command -v {value['name']} 2>/dev/null))"
+    if key == "goal":
+        kind = "ifeq" if negated else "ifneq"
+        return f"{kind} (,$(filter {value},$(MAKECMDGOALS)))"
     return F.condition_text(cond)
+
+
+def export_text(value: dict) -> str:
+    return (f"$(call target-export-variables,{R.to_make_text(value['targets'])},"
+            f"{' '.join(R.to_make_text(n) for n in value['vars'])})")
 
 
 def word_text(value: dict) -> str:
@@ -307,6 +353,8 @@ def lines(rules: list, depth: int = 0) -> list:
             out += _if(rule, depth)
         elif isinstance(rule.get("set"), dict) and is_word(rule["set"].get("value")):
             out.append(_set_word(rule, pad))
+        elif isinstance(rule.get("export"), dict):
+            out.append(pad + export_text(rule["export"]))
         elif set(rule) != {"comment"}:
             out += F.lines([{k: v for k, v in rule.items() if k != "comment"}], depth)
         previous = rule
