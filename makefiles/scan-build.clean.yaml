@@ -1,0 +1,8 @@
+# Clean data of makefiles/scan-build.inc.mk (step G2C-1): the directory of
+# the scan-build reports, relative to the application, which `clean` removes
+# (Makefile.include:609). Source of scan-build.clean.inc.mk
+# (`just generate-clean-data`), which scan-build.inc.mk includes first.
+# Format: dist/tools/clean/README.md.
+schema: 3
+rules:
+  - set: {var: SCANBUILD_OUTPUTDIR, value: 'scan-build/${BOARD}'}

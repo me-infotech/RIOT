@@ -13,9 +13,10 @@
 # Rules: a recipe never calls make; inputs are repository files only; the
 # commands are no longer Make targets. The applications of step G3-1 are
 # built with `just build` (CMake + Ninja, dist/tools/cmake_gen), flashed
-# with `just flash` (dist/tools/flash) and distributed as binaries with
-# `just bindist` (dist/tools/bindist); all others are still built, flashed
-# and distributed with make in their directory. Tested with just 1.59.0.
+# with `just flash` (dist/tools/flash), distributed as binaries with
+# `just bindist` (dist/tools/bindist) and cleaned with `just clean`
+# (dist/tools/clean); all others are still built, flashed, distributed and
+# cleaned with make in their directory. Tested with just 1.59.0.
 
 # Recipe lines run with /bin/sh, as GNU Make ran them.
 set shell := ["/bin/sh", "-c"]
@@ -136,3 +137,16 @@ generate-dist-data:
 # Example: just bindist examples/advanced/bindist nrf52840dk
 bindist app board *vars:
     @./dist/tools/bindist/bindist.py bindist -C {{ quote(app) }} BOARD={{ quote(board) }} {{ vars }}
+
+# Regenerate the Make adapters (<x>.clean.inc.mk) from the clean data
+# (maintenance of step G2C-1; private: not a former Make target).
+[private]
+generate-clean-data:
+    @./dist/tools/clean/clean.py generate
+
+# Remove what `make clean` removes (package build directories, Make's BINDIR
+# <app>/bin/<board>, the scan-build reports) and the build directory of
+# `just build`/`just flash` (<app>/bin/cmake-<board>) without Make (step G2C-1).
+# Example: just clean examples/basic/hello-world nrf52840dk
+clean app board *vars:
+    @./dist/tools/clean/clean.py clean -C {{ quote(app) }} BOARD={{ quote(board) }} {{ vars }}

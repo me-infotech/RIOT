@@ -168,3 +168,17 @@ steps:
       pip: [pyyaml]
       tools: [just@1.59.0]
     docs: dist/tools/bindist/README.md
+
+  - id: g2c-01-clean
+    title: Remove the build products of an application from the data, without Make
+    group: "2C"
+    targets:
+      - name: clean
+        now: just clean <application> <board> [VAR=VALUE…]
+        hardware: false
+    tests:
+      - dist/tools/clean/tests
+    requires:
+      pip: [pyyaml]
+      tools: [just@1.59.0]
+    docs: dist/tools/clean/README.md

@@ -1,3 +1,8 @@
+# The directory of the scan-build reports, which `clean` removes, is clean
+# data: makefiles/scan-build.clean.yaml. The file included here is generated
+# from it (`just generate-clean-data`); edit the YAML, not it.
+include $(RIOTMAKE)/scan-build.clean.inc.mk
+
 SCANBUILD_ENV_VARS := \
   APPDIR \
   AR \
@@ -46,8 +51,6 @@ SCANBUILD_ARGS ?= \
   -analyzer-config stable-report-filename=true \
   $(SCANBUILD_ERROR) \
   #
-
-SCANBUILD_OUTPUTDIR = scan-build/$(BOARD)
 
 # Find all variables given on the command line and recreate the command.
 CMDVARS := $(strip $(foreach varname, $(SCANBUILD_ENV_VARS), \

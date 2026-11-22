@@ -308,6 +308,13 @@ includes its adapter (`bindist.dist.inc.mk`) as its first statement and its
 build part (`bindist.build.mk`) where it was. The build without Make reads
 only `bindist.build.yaml`; `dist/tools/bindist` reads both.
 
+Clean data (step G2C-1, `dist/tools/clean/README.md`) is not read by the
+build either: `makefiles/scan-build.clean.yaml` sets SCANBUILD_OUTPUTDIR,
+the directory of the scan-build reports that `clean` removes;
+`makefiles/scan-build.inc.mk` includes its adapter
+(`scan-build.clean.inc.mk`) as its first statement. `dist/tools/clean`
+reads it together with the build and package data.
+
 Schema 4 adds what the generated Make needs to say exactly what the Make
 file said (every schema 1-3 file stays valid):
 
